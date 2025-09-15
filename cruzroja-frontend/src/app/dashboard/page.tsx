@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import EventsCalendar, { CalendarEvent } from "@/calendar/EventsCalendar";
+import Link from "next/link";
 
 export default function Dashboard() {
   const events: CalendarEvent[] = [
@@ -23,7 +24,7 @@ export default function Dashboard() {
     {
       id: "2",
       title: "Capacitación primeros auxilios",
-      start: "2025-09-18T15:30:00",
+      start: "2025-09-16T13:30:00",
       color: "#ef4444", // rojo
       textColor: "#ffffff",
     },
@@ -74,12 +75,14 @@ export default function Dashboard() {
           icon={<ClipboardList className="size-6" />}
           className="bg-amber-100 text-amber-800"
         />
-        <Card
-          title="Total Voluntarios"
-          content="200"
-          icon={<BicepsFlexed className="size-6" />}
-          className="bg-pink-100 text-pink-500"
-        />
+        <Link href="/dashboard/voluntarios">
+          <Card
+            title="Total Voluntarios"
+            content="200"
+            icon={<BicepsFlexed className="size-6" />}
+            className="bg-pink-100 text-pink-500"
+          />
+        </Link>
         <Card
           title="Eventos Activos"
           content="50"

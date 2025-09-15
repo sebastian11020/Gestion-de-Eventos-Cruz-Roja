@@ -20,12 +20,12 @@ type Item = {
 };
 
 const MENU: Item[] = [
-  { title: "Inicio", href: "#", icon: Home },
-  { title: "Agrupaciones", href: "#", icon: Layers },
-  { title: "Programas", href: "#", icon: Clipboard },
-  { title: "Voluntarios", href: "#", icon: Users },
-  { title: "Eventos", href: "#", icon: CalendarCheck },
-  { title: "Reportes", href: "#", icon: ChartColumnBig },
+  { title: "Inicio", href: "/dashboard", icon: Home },
+  { title: "Agrupaciones", href: "/dashboard/agrupaciones", icon: Layers },
+  { title: "Programas", href: "/dashboard/programas", icon: Clipboard },
+  { title: "Voluntarios", href: "/dashboard/voluntarios", icon: Users },
+  { title: "Eventos", href: "/dashboard/eventos", icon: CalendarCheck },
+  { title: "Reportes", href: "/dashboard/reportes", icon: ChartColumnBig },
 ];
 
 const user = {

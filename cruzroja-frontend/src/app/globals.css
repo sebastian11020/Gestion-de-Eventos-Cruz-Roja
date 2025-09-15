@@ -2,10 +2,24 @@
 @import "tw-animate-css";
 
 /* Chrome / Edge / Safari */
-html::-webkit-scrollbar { width: 8px; height: 8px; }
-html::-webkit-scrollbar-track { background: #f3f4f6; border-radius: 9999px; }
-html::-webkit-scrollbar-thumb { background: #f3f4f6; border-radius: 9999px; }
-html::-webkit-scrollbar-thumb:hover { background: #f3f4f6; }
+html::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+html::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 9999px;
+}
+html::-webkit-scrollbar-thumb {
+  background: #f3f4f6;
+  border-radius: 9999px;
+}
+html::-webkit-scrollbar-thumb:hover {
+  background: #f3f4f6;
+}
 
 /* Firefox */
-html { scrollbar-width: thin; scrollbar-color: #f3f4f6 #f3f4f6; }
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #f3f4f6 #f3f4f6;
+}

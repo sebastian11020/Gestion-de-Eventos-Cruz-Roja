@@ -10,7 +10,6 @@ import { Eye, EyeOff } from "lucide-react";
 
 export default function LoginCR() {
   const [showPassword, setShowPassword] = useState(false);
-
   return (
     <div
       className={`
