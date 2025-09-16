@@ -1,38 +1,19 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { X, Check } from "lucide-react";
+import { FormState } from "@/types/usertType";
 
-type FormState = {
-  typeDocument: string;
-  document: string;
-  name: string;
-  lastName: string;
-  bloodType: string;
-  sex: string;
-  profesion: string;
-  department: string;
-  city: string;
-  zone: string;
-  address: string;
-  email: string;
-  cellphone: string;
-  emergencyContact: {
-    name: string;
-    relationShip: string;
-    phone: string;
-  };
-  eps: { name: string; type: string };
-  picture: string;
-};
-
-const INITIAL_FORM: FormState = {
+let INITIAL_FORM: FormState = {
   typeDocument: "",
   document: "",
+  carnet: "",
   name: "",
   lastName: "",
   bloodType: "",
   sex: "",
-  profesion: "",
+  state: "Formacion",
+  bornDate: "",
+  profession: "",
   department: "Boyacá",
   city: "",
   zone: "",
@@ -220,6 +201,13 @@ const EPS_CO = [
   "Otra",
 ];
 const EPS_TYPES = ["Contributivo", "Subsidiado"];
+const STATE_TYPES = [
+  "Formacion",
+  "Activo",
+  "Inactivo",
+  "Licencia",
+  "Desvinculado",
+];
 
 const fieldBase =
   "w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 pr-8 text-sm text-gray-700 shadow-sm " +
@@ -234,10 +222,12 @@ export default function VolunteerWizard({
   open,
   onClose,
   onSubmit,
+  editForm,
 }: {
   open: boolean;
   onClose: () => void;
   onSubmit: (data: FormState) => void;
+  editForm: FormState | null;
 }) {
   const [step, setStep] = useState(0);
   const steps = [
@@ -248,25 +238,16 @@ export default function VolunteerWizard({
     "Revisión",
   ];
   const progress = Math.round(((step + 1) / steps.length) * 100);
+  const [form, setForm] = useState<FormState>(INITIAL_FORM);
 
-  const [form, setForm] = useState<FormState>({
-    typeDocument: "",
-    document: "",
-    name: "",
-    lastName: "",
-    bloodType: "",
-    sex: "",
-    profesion: "",
-    department: "Boyacá",
-    city: "",
-    zone: "",
-    address: "",
-    email: "",
-    cellphone: "",
-    emergencyContact: { name: "", relationShip: "", phone: "" },
-    eps: { name: "", type: "" },
-    picture: "",
-  });
+  useEffect(() => {
+    if (!open) return;
+    if (editForm) {
+      setForm(editForm);
+    } else {
+      setForm(INITIAL_FORM);
+    }
+  }, [open, editForm]);
 
   const normalizeText = (s: string) => {
     return (s ?? "")
@@ -292,21 +273,17 @@ export default function VolunteerWizard({
       [group]: { ...(s as any)[group], [name]: value },
     }));
   };
-
-  // Profesión autocomplete
   const [profOpen, setProfOpen] = useState(false);
   const profSuggestions = useMemo(() => {
-    const q = normalizeText(form.profesion.trim());
+    const q = normalizeText(form.profession.trim());
     if (!q) return PROFESSIONS.slice(0, 8);
     return PROFESSIONS.filter((p) => normalizeText(p).includes(q)).slice(0, 8);
-  }, [form.profesion]);
+  }, [form.profession]);
 
   const selectProfession = (p: string) => {
-    setForm((s) => ({ ...s, profesion: p }));
+    setForm((s) => ({ ...s, profession: p }));
     setProfOpen(false);
   };
-
-  // Validación mínima por paso
   const canNext = useMemo(() => {
     if (step === 0) {
       return form.typeDocument && form.document && form.bloodType;
@@ -477,6 +454,18 @@ export default function VolunteerWizard({
               </div>
 
               <div>
+                <label className={labelBase}>N° Carnet</label>
+                <input
+                  type="text"
+                  inputMode="text"
+                  name="carnet"
+                  value={form.carnet}
+                  onChange={handleChange}
+                  className={fieldBase}
+                />
+              </div>
+
+              <div>
                 <label className={labelBase}>
                   Tipo de sangre <span className="text-red-500">*</span>
                 </label>
@@ -566,21 +555,6 @@ export default function VolunteerWizard({
                       </option>
                     ))}
                   </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400">
-                    <svg
-                      className="h-4 w-4"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M6 9l6 6 6-6"
-                      />
-                    </svg>
-                  </div>
                 </div>
               </div>
 
@@ -591,8 +565,8 @@ export default function VolunteerWizard({
                 </label>
                 <input
                   type="text"
-                  name="profesion"
-                  value={form.profesion}
+                  name="profession"
+                  value={form.profession}
                   onChange={(e) => {
                     handleChange(e);
                     setProfOpen(true);
@@ -622,14 +596,46 @@ export default function VolunteerWizard({
                         Sin coincidencias
                       </li>
                     )}
-                    {!profSuggestions.includes(form.profesion) &&
-                      form.profesion.trim() !== "" && (
+                    {!profSuggestions.includes(form.profession) &&
+                      form.profession.trim() !== "" && (
                         <li className="px-3 py-2 text-xs text-gray-500 border-t">
-                          Usar “{form.profesion}”
+                          Usar “{form.profession}”
                         </li>
                       )}
                   </ul>
                 )}
+              </div>
+              <div>
+                <label className={labelBase}>Estado</label>
+                <div className="relative">
+                  <select
+                    name="state"
+                    value={form.state}
+                    onChange={handleChange}
+                    className={`${fieldBase} appearance-none`}
+                    required
+                  >
+                    {STATE_TYPES.map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className={labelBase}>
+                  Fecha de nacimiento <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  name="bornDate"
+                  value={form.bornDate}
+                  onChange={handleChange}
+                  className={fieldBase}
+                  max={new Date().toISOString().split("T")[0]}
+                  required
+                />
               </div>
             </section>
           )}
@@ -898,6 +904,9 @@ export default function VolunteerWizard({
                       <strong>Documento:</strong> {form.document}
                     </li>
                     <li>
+                      <strong>N° Carnet:</strong> {form.carnet || "-"}
+                    </li>
+                    <li>
                       <strong>Sangre:</strong> {form.bloodType}
                     </li>
                   </ul>
@@ -912,7 +921,13 @@ export default function VolunteerWizard({
                       <strong>Sexo:</strong> {form.sex}
                     </li>
                     <li>
-                      <strong>Profesión:</strong> {form.profesion || "—"}
+                      <strong>Profesión:</strong> {form.profession || "—"}
+                    </li>
+                    <li>
+                      <strong>Estado:</strong> {form.state}
+                    </li>
+                    <li>
+                      <strong>Fecha de nacimiento:</strong> {form.bornDate}
                     </li>
                   </ul>
                 </div>

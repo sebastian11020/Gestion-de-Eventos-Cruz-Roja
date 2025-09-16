@@ -4,100 +4,219 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useMemo, useState } from "react";
 import VolunteerWizard from "@/components/layout/formCreateUser";
 import { Eye, PencilLine } from "lucide-react";
-
-type voluntarProps = {
-  id: string;
-  typeDocument: string;
-  document: number;
-  fullName: string;
-  cellphone: number;
-  emergencyCellPhone: number;
-  email: string;
-  state: string;
-};
+import { FormState } from "@/types/usertType";
+import ViewUser from "@/components/layout/viewUser";
 
 const PAGE_SIZE = 7;
 
-const dataUser: voluntarProps[] = [
+const dataUser: FormState[] = [
   {
-    id: "a123",
     typeDocument: "CC",
-    document: 1023456534,
-    fullName: "Juan Sebastian Rodriguez Mateus",
-    cellphone: 3124567654,
-    emergencyCellPhone: 3206754312,
-    email: "juan@gmail.com",
+    document: "1006453276",
+    carnet: "a123",
+    name: "Juan Sebastian",
+    lastName: "Rodriguez Mateus",
+    bloodType: "O+",
+    sex: "Masculino",
     state: "Activo",
+    bornDate: "2002-03-23",
+    profession: "Estudiante",
+    department: "Boyacá",
+    city: "Tunja",
+    zone: "El topo",
+    address: "Cra 15#3-12",
+    email: "juan@gmail.com",
+    cellphone: "3124567654",
+    emergencyContact: {
+      name: "Andres Castro",
+      relationShip: "Primo",
+      phone: "3126785478",
+    },
+    eps: { name: "Nueva EPS", type: "Subsidiado" },
+    totalHours: "500",
+    monthHours: "20",
   },
   {
-    id: "a1234",
     typeDocument: "CC",
-    document: 1023456536,
-    fullName: "Sebastian Daza Delgadillo",
-    cellphone: 3123567454,
-    emergencyCellPhone: 3106754312,
+    document: "1006453278",
+    carnet: "a124",
+    name: "Sebastian",
+    lastName: "Daza Delgadillo",
+    bloodType: "O+",
+    sex: "Masculino",
+    state: "Activo",
+    bornDate: "2001-02-11",
+    profession: "Estudiante",
+    department: "Boyacá",
+    city: "Tunja",
+    zone: "San Rafael",
+    address: "Cra 14#46-39",
     email: "sebastian@gmail.com",
+    cellphone: "3114567654",
+    emergencyContact: {
+      name: "Andres Castro",
+      relationShip: "Primo",
+      phone: "3126785478",
+    },
+    eps: { name: "Nueva EPS", type: "Subsidiado" },
+    totalHours: "500",
+    monthHours: "5",
+  },
+  {
+    typeDocument: "CC",
+    document: "1001453276",
+    carnet: "a125",
+    name: "Andres Felipe",
+    lastName: "Melo Avellaneda",
+    bloodType: "O+",
+    sex: "Masculino",
+    state: "Activo",
+    bornDate: "2002-03-23",
+    profession: "Estudiante",
+    department: "Boyacá",
+    city: "Tunja",
+    zone: "El topo",
+    address: "Cra 15#3-12",
+    email: "juan@gmail.com",
+    cellphone: "3124567654",
+    emergencyContact: {
+      name: "Andres Castro",
+      relationShip: "Primo",
+      phone: "3126785478",
+    },
+    eps: { name: "Nueva EPS", type: "Subsidiado" },
+    totalHours: "500",
+    monthHours: "9",
+  },
+  {
+    typeDocument: "CC",
+    document: "1002453276",
+    carnet: "a126",
+    name: "David Santiago",
+    lastName: "Lotero Rodriguez",
+    bloodType: "O+",
+    sex: "Masculino",
     state: "Licencia",
+    bornDate: "2002-03-23",
+    profession: "Estudiante",
+    department: "Boyacá",
+    city: "Tunja",
+    zone: "El topo",
+    address: "Cra 15#3-12",
+    email: "juan@gmail.com",
+    cellphone: "3124567654",
+    emergencyContact: {
+      name: "Andres Castro",
+      relationShip: "Primo",
+      phone: "3126785478",
+    },
+    eps: { name: "Nueva EPS", type: "Subsidiado" },
+    totalHours: "500",
+    monthHours: "20",
   },
   {
-    id: "a1235",
     typeDocument: "CC",
-    document: 1012456534,
-    fullName: "Andres Felipe Melo Avellaneda",
-    cellphone: 3024567654,
-    emergencyCellPhone: 3116754312,
-    email: "andres@gmail.com",
-    state: "Inactivo",
-  },
-  {
-    id: "a1236",
-    typeDocument: "CC",
-    document: 1023456556,
-    fullName: "David Santiago Lotero Rodriguez",
-    cellphone: 3156785432,
-    emergencyCellPhone: 3216354312,
-    email: "david@gmail.com",
+    document: "1003453276",
+    carnet: "a127",
+    name: "Samuel David",
+    lastName: "Vargas Millan",
+    bloodType: "O+",
+    sex: "Masculino",
     state: "Formacion",
+    bornDate: "2002-03-23",
+    profession: "Estudiante",
+    department: "Boyacá",
+    city: "Tunja",
+    zone: "El topo",
+    address: "Cra 15#3-12",
+    email: "juan@gmail.com",
+    cellphone: "3124567654",
+    emergencyContact: {
+      name: "Andres Castro",
+      relationShip: "Primo",
+      phone: "3126785478",
+    },
+    eps: { name: "Nueva EPS", type: "Subsidiado" },
+    totalHours: "500",
+    monthHours: "20",
   },
   {
-    id: "a12379",
     typeDocument: "CC",
-    document: 1023456556,
-    fullName: "Harold Ricardo Alvarado Rodriguez",
-    cellphone: 3156785432,
-    emergencyCellPhone: 3216354312,
-    email: "harold@gmail.com",
-    state: "Desvinculado",
+    document: "1004453276",
+    carnet: "a128",
+    name: "Harold Ricardo",
+    lastName: "Alvarado Leandro",
+    bloodType: "O+",
+    sex: "Masculino",
+    state: "Inactivo",
+    bornDate: "2002-03-23",
+    profession: "Estudiante",
+    department: "Boyacá",
+    city: "Tunja",
+    zone: "El topo",
+    address: "Cra 15#3-12",
+    email: "juan@gmail.com",
+    cellphone: "3124567654",
+    emergencyContact: {
+      name: "Andres Castro",
+      relationShip: "Primo",
+      phone: "3126785478",
+    },
+    eps: { name: "Nueva EPS", type: "Subsidiado" },
+    totalHours: "500",
+    monthHours: "20",
   },
   {
-    id: "a22379",
     typeDocument: "CC",
-    document: 1023456556,
-    fullName: "Harold Ricardo Alvarado Rodriguez",
-    cellphone: 3156785432,
-    emergencyCellPhone: 3216354312,
-    email: "harold@gmail.com",
+    document: "1005453276",
+    carnet: "a12310",
+    name: "Juan Pablo",
+    lastName: "Martinez Gomez",
+    bloodType: "O+",
+    sex: "Masculino",
     state: "Desvinculado",
+    bornDate: "2002-03-23",
+    profession: "Estudiante",
+    department: "Boyacá",
+    city: "Tunja",
+    zone: "El topo",
+    address: "Cra 15#3-12",
+    email: "juan@gmail.com",
+    cellphone: "3124567654",
+    emergencyContact: {
+      name: "Andres Castro",
+      relationShip: "Primo",
+      phone: "3126785478",
+    },
+    eps: { name: "Nueva EPS", type: "Subsidiado" },
+    totalHours: "500",
+    monthHours: "20",
   },
   {
-    id: "a32379",
     typeDocument: "CC",
-    document: 1023456556,
-    fullName: "Harold Ricardo Alvarado Rodriguez",
-    cellphone: 3156785432,
-    emergencyCellPhone: 3216354312,
-    email: "harold@gmail.com",
-    state: "Desvinculado",
-  },
-  {
-    id: "b12379",
-    typeDocument: "CC",
-    document: 1023456556,
-    fullName: "Harold Ricardo Alvarado Rodriguez",
-    cellphone: 3156785432,
-    emergencyCellPhone: 3216354312,
-    email: "harold@gmail.com",
-    state: "Desvinculado",
+    document: "1009453276",
+    carnet: "b123",
+    name: "Juan Esteban",
+    lastName: "Perez Garcia",
+    bloodType: "O+",
+    sex: "Masculino",
+    state: "Formacion",
+    bornDate: "2002-03-23",
+    profession: "Estudiante",
+    department: "Boyacá",
+    city: "Tunja",
+    zone: "El topo",
+    address: "Cra 15#3-12",
+    email: "juan@gmail.com",
+    cellphone: "3124567654",
+    emergencyContact: {
+      name: "Andres Castro",
+      relationShip: "Primo",
+      phone: "3126785478",
+    },
+    eps: { name: "Nueva EPS", type: "Subsidiado" },
+    totalHours: "500",
+    monthHours: "20",
   },
 ];
 
@@ -122,17 +241,25 @@ function badgeClass(state: string) {
 export default function voluntarios() {
   const [filtro, setFiltro] = useState("");
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
   const [openWizard, setOpenWizard] = useState(false);
+  const [openView, setOpenView] = useState(false);
+  const [editUser, setEditUser] = useState<FormState | null>(null);
+  const [viewUser, setViewUser] = useState<FormState | null>(null);
 
   const handleSearch = (value: string) => {
     setFiltro(value);
   };
 
-  const handleCreate = (data: any) => {
-    console.log("Voluntario creado:", data);
-    // aquí podrías llamar a tu API Nest (POST /voluntarios)
+  const handleCreateOrUpdate = (data: FormState) => {
+    if (editUser) {
+      console.log("Actualizar voluntario:", data);
+      // TODO: update en tu store/API
+    } else {
+      console.log("Crear voluntario:", data);
+      // TODO: create en tu store/API
+    }
     setOpenWizard(false);
+    setEditUser(null);
   };
 
   useEffect(() => {
@@ -145,13 +272,14 @@ export default function voluntarios() {
 
     return dataUser.filter((u) => {
       return (
-        normalize(u.fullName).includes(q) ||
+        normalize(u.name).includes(q) ||
+        normalize(u.lastName).includes(q) ||
         normalize(u.email).includes(q) ||
         normalize(u.state).includes(q) ||
         normalize(u.typeDocument).includes(q) ||
         normalize(u.document).includes(q) ||
         normalize(u.cellphone).includes(q) ||
-        normalize(u.emergencyCellPhone).includes(q)
+        normalize(u.emergencyContact.phone).includes(q)
       );
     });
   }, [filtro]);
@@ -162,16 +290,19 @@ export default function voluntarios() {
   const startIdx = (currentPage - 1) * PAGE_SIZE;
   const endIdx = Math.min(startIdx + PAGE_SIZE, total);
   const pageData = results.slice(startIdx, endIdx);
+  const handleCloseView = () => setViewUser(null);
 
   const goPrev = () => setPage((p) => Math.max(1, p - 1));
   const goNext = () => setPage((p) => Math.min(totalPages, p + 1));
   const goTo = (n: number) => setPage(n);
 
-  const onView = (u: voluntarProps) => {
-    console.log("Ver voluntario", u);
+  const onView = (u: FormState) => {
+    setViewUser(u);
+    setOpenView(true);
   };
-  const onEdit = (u: voluntarProps) => {
-    console.log("Editar voluntario", u);
+  const onEdit = (u: FormState) => {
+    setEditUser(u);
+    setOpenWizard(true);
   };
   return (
     <div>
@@ -217,10 +348,10 @@ export default function voluntarios() {
             <tbody className="divide-y divide-gray-100">
               {pageData.map((u) => (
                 <tr
-                  key={u.id}
+                  key={u.document}
                   className="even:bg-gray-50/60 hover:bg-blue-50/50 transition-colors"
                 >
-                  <td className="px-4 py-3 text-gray-700">{u.id}</td>
+                  <td className="px-4 py-3 text-gray-700">{u.carnet}</td>
                   <td className="px-4 py-3 text-center text-gray-700">
                     {u.typeDocument}
                   </td>
@@ -228,14 +359,14 @@ export default function voluntarios() {
 
                   {/* Nombre y email truncados con tooltip */}
                   <td className="px-4 py-3 text-gray-800 max-w-[260px]">
-                    <div className="truncate font-medium" title={u.fullName}>
-                      {u.fullName}
+                    <div className="truncate font-medium" title={u.name}>
+                      {u.name} {u.lastName}
                     </div>
                   </td>
 
                   <td className="px-4 py-3 text-gray-700">{u.cellphone}</td>
                   <td className="px-4 py-3 text-gray-700">
-                    {u.emergencyCellPhone}
+                    {u.emergencyContact.phone}
                   </td>
                   <td className="px-4 py-3 text-gray-700">
                     <span
@@ -257,7 +388,7 @@ export default function voluntarios() {
                         type="button"
                         onClick={() => onView(u)}
                         className="inline-flex items-center justify-center rounded-md p-2 hover:bg-blue-100 text-blue-700 hover:text-blue-800 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-                        aria-label={`Ver ${u.fullName}`}
+                        aria-label={`Ver ${u.name} ${u.lastName}`}
                         title="Ver"
                       >
                         <Eye className="size-4" />
@@ -267,7 +398,7 @@ export default function voluntarios() {
                         type="button"
                         onClick={() => onEdit(u)}
                         className="inline-flex items-center justify-center rounded-md p-2 hover:bg-amber-100 text-amber-700 hover:text-amber-800 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
-                        aria-label={`Editar ${u.fullName}`}
+                        aria-label={`Editar ${u.name} ${u.lastName}`}
                         title="Editar"
                       >
                         <PencilLine className="size-4" />
@@ -380,8 +511,10 @@ export default function voluntarios() {
       <VolunteerWizard
         open={openWizard}
         onClose={() => setOpenWizard(false)}
-        onSubmit={handleCreate}
+        onSubmit={handleCreateOrUpdate}
+        editForm={editUser}
       />
+      <ViewUser infUser={viewUser} onClose={handleCloseView}></ViewUser>
     </div>
   );
 }
