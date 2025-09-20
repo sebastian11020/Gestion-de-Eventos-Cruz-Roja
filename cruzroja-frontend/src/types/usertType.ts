@@ -8,20 +8,47 @@ export type FormState = {
   sex?: string;
   state: string;
   bornDate?: string;
-  profession: string;
   department?: string;
   city?: string;
   zone?: string;
   address?: string;
-  email?: string;
+  email: string;
   cellphone?: string;
   emergencyContact: {
     name?: string;
     relationShip?: string;
     phone?: string;
   };
+  sectional: {
+    id?: string;
+    city: string;
+  };
+  group: {
+    id: string;
+    name: string;
+    program: {
+      id: string;
+      name: string;
+    };
+  };
   eps: { name?: string; type?: string };
   totalHours?: string;
   monthHours?: string;
   picture?: string;
+};
+
+export type sectional = {
+  id?: string;
+  city: string;
+};
+
+export type group = {
+  id?: string;
+  name: string;
+  program: program[];
+};
+
+export type program = {
+  id: string;
+  name: string;
 };

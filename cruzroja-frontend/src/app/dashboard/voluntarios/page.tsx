@@ -4,8 +4,10 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useMemo, useState } from "react";
 import VolunteerWizard from "@/components/layout/formCreateUser";
 import { Eye, PencilLine } from "lucide-react";
-import { FormState } from "@/types/usertType";
+import { FormState,sectional } from "@/types/usertType";
 import ViewUser from "@/components/layout/viewUser";
+import { supabase } from "@/lib/supabase-browser";
+
 
 const PAGE_SIZE = 7;
 
@@ -20,7 +22,6 @@ const dataUser: FormState[] = [
     sex: "Masculino",
     state: "Activo",
     bornDate: "2002-03-23",
-    profession: "Estudiante",
     department: "Boyacá",
     city: "Tunja",
     zone: "El topo",
@@ -31,6 +32,18 @@ const dataUser: FormState[] = [
       name: "Andres Castro",
       relationShip: "Primo",
       phone: "3126785478",
+    },
+    sectional: {
+      id: "1234",
+      city: "Tunja",
+    },
+    group: {
+      id: "1",
+      name: "Juventud",
+      program: {
+        id: "1",
+        name: "Aire Libre",
+      },
     },
     eps: { name: "Nueva EPS", type: "Subsidiado" },
     totalHours: "500",
@@ -46,7 +59,6 @@ const dataUser: FormState[] = [
     sex: "Masculino",
     state: "Activo",
     bornDate: "2001-02-11",
-    profession: "Estudiante",
     department: "Boyacá",
     city: "Tunja",
     zone: "San Rafael",
@@ -57,6 +69,18 @@ const dataUser: FormState[] = [
       name: "Andres Castro",
       relationShip: "Primo",
       phone: "3126785478",
+    },
+    sectional: {
+      id: "1234",
+      city: "Tunja",
+    },
+    group: {
+      id: "1",
+      name: "Juventud",
+      program: {
+        id: "1",
+        name: "Aire Libre",
+      },
     },
     eps: { name: "Nueva EPS", type: "Subsidiado" },
     totalHours: "500",
@@ -72,7 +96,6 @@ const dataUser: FormState[] = [
     sex: "Masculino",
     state: "Activo",
     bornDate: "2002-03-23",
-    profession: "Estudiante",
     department: "Boyacá",
     city: "Tunja",
     zone: "El topo",
@@ -83,6 +106,18 @@ const dataUser: FormState[] = [
       name: "Andres Castro",
       relationShip: "Primo",
       phone: "3126785478",
+    },
+    sectional: {
+      id: "1234",
+      city: "Tunja",
+    },
+    group: {
+      id: "1",
+      name: "Juventud",
+      program: {
+        id: "1",
+        name: "Aire Libre",
+      },
     },
     eps: { name: "Nueva EPS", type: "Subsidiado" },
     totalHours: "500",
@@ -98,7 +133,6 @@ const dataUser: FormState[] = [
     sex: "Masculino",
     state: "Licencia",
     bornDate: "2002-03-23",
-    profession: "Estudiante",
     department: "Boyacá",
     city: "Tunja",
     zone: "El topo",
@@ -109,6 +143,18 @@ const dataUser: FormState[] = [
       name: "Andres Castro",
       relationShip: "Primo",
       phone: "3126785478",
+    },
+    sectional: {
+      id: "1234",
+      city: "Tunja",
+    },
+    group: {
+      id: "1",
+      name: "Juventud",
+      program: {
+        id: "1",
+        name: "Aire Libre",
+      },
     },
     eps: { name: "Nueva EPS", type: "Subsidiado" },
     totalHours: "500",
@@ -124,7 +170,6 @@ const dataUser: FormState[] = [
     sex: "Masculino",
     state: "Formacion",
     bornDate: "2002-03-23",
-    profession: "Estudiante",
     department: "Boyacá",
     city: "Tunja",
     zone: "El topo",
@@ -135,6 +180,18 @@ const dataUser: FormState[] = [
       name: "Andres Castro",
       relationShip: "Primo",
       phone: "3126785478",
+    },
+    sectional: {
+      id: "1234",
+      city: "Duitama",
+    },
+    group: {
+      id: "1",
+      name: "Juventud",
+      program: {
+        id: "1",
+        name: "Aire Libre",
+      },
     },
     eps: { name: "Nueva EPS", type: "Subsidiado" },
     totalHours: "500",
@@ -150,7 +207,6 @@ const dataUser: FormState[] = [
     sex: "Masculino",
     state: "Inactivo",
     bornDate: "2002-03-23",
-    profession: "Estudiante",
     department: "Boyacá",
     city: "Tunja",
     zone: "El topo",
@@ -161,6 +217,18 @@ const dataUser: FormState[] = [
       name: "Andres Castro",
       relationShip: "Primo",
       phone: "3126785478",
+    },
+    sectional: {
+      id: "1234",
+      city: "Tunja",
+    },
+    group: {
+      id: "1",
+      name: "Juventud",
+      program: {
+        id: "1",
+        name: "Aire Libre",
+      },
     },
     eps: { name: "Nueva EPS", type: "Subsidiado" },
     totalHours: "500",
@@ -176,7 +244,6 @@ const dataUser: FormState[] = [
     sex: "Masculino",
     state: "Desvinculado",
     bornDate: "2002-03-23",
-    profession: "Estudiante",
     department: "Boyacá",
     city: "Tunja",
     zone: "El topo",
@@ -187,6 +254,18 @@ const dataUser: FormState[] = [
       name: "Andres Castro",
       relationShip: "Primo",
       phone: "3126785478",
+    },
+    sectional: {
+      id: "1234",
+      city: "Tunja",
+    },
+    group: {
+      id: "1",
+      name: "Juventud",
+      program: {
+        id: "1",
+        name: "Aire Libre",
+      },
     },
     eps: { name: "Nueva EPS", type: "Subsidiado" },
     totalHours: "500",
@@ -202,7 +281,6 @@ const dataUser: FormState[] = [
     sex: "Masculino",
     state: "Formacion",
     bornDate: "2002-03-23",
-    profession: "Estudiante",
     department: "Boyacá",
     city: "Tunja",
     zone: "El topo",
@@ -214,11 +292,24 @@ const dataUser: FormState[] = [
       relationShip: "Primo",
       phone: "3126785478",
     },
+    sectional: {
+      id: "1234",
+      city: "Tunja",
+    },
+    group: {
+      id: "1",
+      name: "Juventud",
+      program: {
+        id: "1",
+        name: "Aire Libre",
+      },
+    },
     eps: { name: "Nueva EPS", type: "Subsidiado" },
     totalHours: "500",
     monthHours: "20",
   },
 ];
+
 
 function normalize(v: unknown) {
   return String(v ?? "").toLowerCase();
@@ -243,6 +334,7 @@ export default function voluntarios() {
   const [page, setPage] = useState(1);
   const [openWizard, setOpenWizard] = useState(false);
   const [openView, setOpenView] = useState(false);
+  const [cityFilter, setCityFilter] = useState<string>("");
   const [editUser, setEditUser] = useState<FormState | null>(null);
   const [viewUser, setViewUser] = useState<FormState | null>(null);
 
@@ -250,13 +342,24 @@ export default function voluntarios() {
     setFiltro(value);
   };
 
+    const cities = useMemo(() => {
+        const set = new Set(dataUser.map(u => u.sectional.city));
+        return Array.from(set).sort();
+    }, []);
+
+  async function register(form: FormState) {
+    const sb = supabase();
+    const { error } = await sb.auth.signUp({
+      email: form.email,
+      password: "a12344",
+    });
+  }
+
   const handleCreateOrUpdate = (data: FormState) => {
     if (editUser) {
       console.log("Actualizar voluntario:", data);
-      // TODO: update en tu store/API
     } else {
-      console.log("Crear voluntario:", data);
-      // TODO: create en tu store/API
+      register(data);
     }
     setOpenWizard(false);
     setEditUser(null);
@@ -264,25 +367,25 @@ export default function voluntarios() {
 
   useEffect(() => {
     setPage(1);
-  }, [filtro]);
+  }, [filtro,cityFilter]);
 
-  const results = useMemo(() => {
-    const q = normalize(filtro);
-    if (!q) return dataUser;
-
-    return dataUser.filter((u) => {
-      return (
-        normalize(u.name).includes(q) ||
-        normalize(u.lastName).includes(q) ||
-        normalize(u.email).includes(q) ||
-        normalize(u.state).includes(q) ||
-        normalize(u.typeDocument).includes(q) ||
-        normalize(u.document).includes(q) ||
-        normalize(u.cellphone).includes(q) ||
-        normalize(u.emergencyContact.phone).includes(q)
-      );
-    });
-  }, [filtro]);
+    const results = useMemo(() => {
+        const q = normalize(filtro);
+        const base = !q
+            ? dataUser
+            : dataUser.filter((u) =>
+                normalize(u.carnet).includes(q) ||
+                normalize(u.name).includes(q) ||
+                normalize(u.lastName).includes(q) ||
+                normalize(u.email).includes(q) ||
+                normalize(u.state).includes(q) ||
+                normalize(u.typeDocument).includes(q) ||
+                normalize(u.document).includes(q) ||
+                normalize(u.cellphone).includes(q) ||
+                normalize(u.sectional.city).includes(q)
+            );
+        return base.filter(u => cityFilter === "" || u.sectional.city === cityFilter);
+    }, [filtro, cityFilter]);
 
   const total = results.length;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -316,6 +419,20 @@ export default function voluntarios() {
             onSearch={handleSearch}
           />
         </div>
+          <div className="w-44">
+              <select
+                  value={cityFilter}
+                  onChange={(e) => setCityFilter(e.target.value)}
+                  className="w-full rounded-lg bg-white px-3 py-2 text-sm text-gray-700 shadow-sm hover: focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40"
+              >
+                  <option value="">Todas las ciudades</option>
+                  {cities.map((city) => (
+                      <option key={city} value={city}>
+                          {city}
+                      </option>
+                  ))}
+              </select>
+          </div>
         <Button
           type="button"
           className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-md hover:bg-blue-700 transition"
@@ -337,7 +454,7 @@ export default function voluntarios() {
                 </th>
                 <th className="px-4 py-3 text-left font-semibold">Celular</th>
                 <th className="px-4 py-3 text-left font-semibold">
-                  Emergencia
+                  Seccional
                 </th>
                 <th className="px-4 py-3 text-left font-semibold">Email</th>
                 <th className="px-4 py-3 text-left font-semibold">Estado</th>
@@ -366,7 +483,7 @@ export default function voluntarios() {
 
                   <td className="px-4 py-3 text-gray-700">{u.cellphone}</td>
                   <td className="px-4 py-3 text-gray-700">
-                    {u.emergencyContact.phone}
+                    {u.sectional.city}
                   </td>
                   <td className="px-4 py-3 text-gray-700">
                     <span

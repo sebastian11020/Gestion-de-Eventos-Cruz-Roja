@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { X, Check } from "lucide-react";
-import { FormState } from "@/types/usertType";
+import { FormState, sectional, group, program } from "@/types/usertType";
 
 let INITIAL_FORM: FormState = {
   typeDocument: "",
@@ -13,7 +13,6 @@ let INITIAL_FORM: FormState = {
   sex: "",
   state: "Formacion",
   bornDate: "",
-  profession: "",
   department: "Boyacá",
   city: "",
   zone: "",
@@ -21,43 +20,26 @@ let INITIAL_FORM: FormState = {
   email: "",
   cellphone: "",
   emergencyContact: { name: "", relationShip: "", phone: "" },
+  sectional: {
+    id: "",
+    city: "",
+  },
+  group: {
+    id: "",
+    name: "",
+    program: {
+      id: "",
+      name: "",
+    },
+  },
   eps: { name: "", type: "" },
   picture: "",
 };
 
 const DOCUMENT_TYPES = ["CC", "TI", "CE", "PAS"];
+
 const BLOOD_TYPES = ["O+", "O-", "A+", "A-", "B+", "B-", "AB+", "AB-"];
 const SEX_OPTIONS = ["Masculino", "Femenino"];
-const PROFESSIONS = [
-  "Estudiante",
-  "Docente",
-  "Médico",
-  "Enfermero",
-  "Paramédico",
-  "Odontólogo",
-  "Psicólogo",
-  "Trabajador Social",
-  "Ingeniero de Sistemas",
-  "Ingeniero Civil",
-  "Abogado",
-  "Administrador",
-  "Contador",
-  "Comunicador Social",
-  "Arquitecto",
-  "Diseñador",
-  "Conductor",
-  "Técnico en Sistemas",
-  "Tecnólogo en Gestión",
-  "Auxiliar de Enfermería",
-  "Bacteriólogo",
-  "Fisioterapeuta",
-  "Nutricionista",
-  "Veterinario",
-  "Agrónomo",
-  "Comerciante",
-  "Independiente",
-  "Desarrollador de Software",
-];
 const MUNICIPALITIES_BOYACA = [
   "Almeida",
   "Aquitania",
@@ -209,6 +191,78 @@ const STATE_TYPES = [
   "Desvinculado",
 ];
 
+const SECTIONAL_TYPES: sectional[] = [
+  {
+    id: "1",
+    city: "Tunja",
+  },
+  {
+    id: "2",
+    city: "Duitama",
+  },
+  {
+    id: "3",
+    city: "Sogamoso",
+  },
+];
+
+const GRUOP_TYPES: group[] = [
+  {
+    id: "1",
+    name: "Juventud",
+    program: [
+      {
+        id: "1",
+        name: "Programa al aire libre",
+      },
+      {
+        id: "2",
+        name: "Infantiles y Pre-juveniles",
+      },
+      {
+        id: "3",
+        name: "Servicio social estudiantil",
+      },
+      {
+        id: "4",
+        name: "Recreacion",
+      },
+    ],
+  },
+  {
+    id: "2",
+    name: "Socorrismo",
+    program: [
+      {
+        id: "1",
+        name: "Busqueda y Rescate",
+      },
+      {
+        id: "2",
+        name: "Busqueda y rescate con caninos",
+      },
+      {
+        id: "3",
+        name: "Servicios especiales",
+      },
+    ],
+  },
+  {
+    id: "3",
+    name: "Damas Grises",
+    program: [
+      {
+        id: "1",
+        name: "PAMES",
+      },
+      {
+        id: "2",
+        name: "PEDEC",
+      },
+    ],
+  },
+];
+
 const fieldBase =
   "w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 pr-8 text-sm text-gray-700 shadow-sm " +
   "placeholder:text-gray-400 transition-colors hover:border-gray-400 " +
@@ -249,19 +303,16 @@ export default function VolunteerWizard({
     }
   }, [open, editForm]);
 
-  const normalizeText = (s: string) => {
-    return (s ?? "")
-      .normalize("NFD")
-      .replace(/\p{Diacritic}/gu, "")
-      .toLowerCase();
-  };
-
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     setForm((s) => ({ ...s, [name]: value }));
   };
+    const programs = useMemo(() => {
+        const g = GRUOP_TYPES.find(g => g.id === form.group.id);
+        return g?.program ?? [];
+    }, [form.group.id]);
 
   const handleNested = (
     group: "emergencyContact" | "eps",
@@ -273,18 +324,32 @@ export default function VolunteerWizard({
       [group]: { ...(s as any)[group], [name]: value },
     }));
   };
-  const [profOpen, setProfOpen] = useState(false);
-  const profSuggestions = useMemo(() => {
-    const q = normalizeText(form.profession.trim());
-    if (!q) return PROFESSIONS.slice(0, 8);
-    return PROFESSIONS.filter((p) => normalizeText(p).includes(q)).slice(0, 8);
-  }, [form.profession]);
+    function handleGroupChange(e: React.ChangeEvent<HTMLSelectElement>) {
+        const groupId = e.target.value;
+        const g = GRUOP_TYPES.find(x => x.id === groupId);
+        setForm(s => ({
+            ...s,
+            group: {
+                id: g?.id ?? "",
+                name: g?.name ?? "",
+                program: { id: "", name: "" }, // reset
+            },
+        }));
+    }
 
-  const selectProfession = (p: string) => {
-    setForm((s) => ({ ...s, profession: p }));
-    setProfOpen(false);
-  };
-  const canNext = useMemo(() => {
+    function handleProgramChange(e: React.ChangeEvent<HTMLSelectElement>) {
+        const programId = e.target.value;
+        const p = programs.find(x => x.id === programId);
+        setForm(s => ({
+            ...s,
+            group: {
+                ...s.group,
+                program: { id: p?.id ?? "", name: p?.name ?? "" },
+            },
+        }));
+    }
+
+    const canNext = useMemo(() => {
     if (step === 0) {
       return form.typeDocument && form.document && form.bloodType;
     }
@@ -306,7 +371,6 @@ export default function VolunteerWizard({
   const resetForm = () => {
     setForm(INITIAL_FORM);
     setStep(0);
-    setProfOpen(false);
   };
 
   const submit = () => {
@@ -557,54 +621,6 @@ export default function VolunteerWizard({
                   </select>
                 </div>
               </div>
-
-              {/* Profesión con autocompletado */}
-              <div className="relative">
-                <label className={labelBase}>
-                  Profesión <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="profession"
-                  value={form.profession}
-                  onChange={(e) => {
-                    handleChange(e);
-                    setProfOpen(true);
-                  }}
-                  onFocus={() => setProfOpen(true)}
-                  onBlur={() => setTimeout(() => setProfOpen(false), 120)}
-                  placeholder="Escribe para buscar…"
-                  className={`${fieldBase.replace("bg-white", "bg-white")} !pr-3`}
-                  autoComplete="off"
-                  required
-                />
-                {profOpen && (
-                  <ul className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-lg border border-gray-200 bg-white/95 shadow-xl backdrop-blur">
-                    {profSuggestions.length > 0 ? (
-                      profSuggestions.map((p) => (
-                        <li
-                          key={p}
-                          onMouseDown={(e) => e.preventDefault()}
-                          onClick={() => selectProfession(p)}
-                          className="cursor-pointer px-3 py-2 text-sm hover:bg-blue-50"
-                        >
-                          {p}
-                        </li>
-                      ))
-                    ) : (
-                      <li className="px-3 py-2 text-xs text-gray-500">
-                        Sin coincidencias
-                      </li>
-                    )}
-                    {!profSuggestions.includes(form.profession) &&
-                      form.profession.trim() !== "" && (
-                        <li className="px-3 py-2 text-xs text-gray-500 border-t">
-                          Usar “{form.profession}”
-                        </li>
-                      )}
-                  </ul>
-                )}
-              </div>
               <div>
                 <label className={labelBase}>Estado</label>
                 <div className="relative">
@@ -703,6 +719,61 @@ export default function VolunteerWizard({
                 />
               </div>
 
+              <div className="relative">
+                <label className={labelBase}>Seccional</label>
+                <select
+                  name="sectional"
+                  value={form.sectional.city}
+                  onChange={handleChange}
+                  className={`${fieldBase} appearance-none`}
+                  required
+                >
+                  <option value="" disabled>
+                    Seleccione…
+                  </option>
+                  {SECTIONAL_TYPES.map((s) => (
+                    <option key={s.id} value={s.city}>
+                      {s.city}
+                    </option>
+                  ))}
+                </select>
+              </div>
+                <div className="relative">
+                    <label className={labelBase}>Agrupacion</label>
+                    <select
+                        name="group"
+                        value={form.group.id}
+                        onChange={handleGroupChange}
+                        className={`${fieldBase} appearance-none`}
+                    >
+                        <option value="" disabled>
+                            Seleccione…
+                        </option>
+                        {GRUOP_TYPES.map((s) => (
+                            <option key={s.id} value={s.id}>
+                                {s.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                <div className="relative">
+                    <label className={labelBase}>Programa</label>
+                    <select
+                        name="program"
+                        value={form.group.program.id}
+                        onChange={handleProgramChange}
+                        className={`${fieldBase} appearance-none`}
+                    >
+                        <option value="" disabled>
+                            Seleccione…
+                        </option>
+                        {programs.map((p) => (
+                            <option key={p.id} value={p.id}>
+                                {p.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
               <div className="md:col-span-3">
                 <label className={labelBase}>
                   Dirección <span className="text-red-500">*</span>
@@ -747,7 +818,7 @@ export default function VolunteerWizard({
                 <input
                   type="url"
                   name="picture"
-                  value={form.picture}
+                  value={form.picture ?? ""}
                   onChange={handleChange}
                   placeholder="https://…"
                   className={fieldBase}
@@ -919,9 +990,6 @@ export default function VolunteerWizard({
                     </li>
                     <li>
                       <strong>Sexo:</strong> {form.sex}
-                    </li>
-                    <li>
-                      <strong>Profesión:</strong> {form.profession || "—"}
                     </li>
                     <li>
                       <strong>Estado:</strong> {form.state}

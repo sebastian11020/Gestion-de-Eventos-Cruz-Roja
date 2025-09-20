@@ -11,6 +11,7 @@ import {
   Settings,
   LogOut,
   ChartColumnBig,
+  Warehouse,
 } from "lucide-react";
 
 type Item = {
@@ -21,6 +22,7 @@ type Item = {
 
 const MENU: Item[] = [
   { title: "Inicio", href: "/dashboard", icon: Home },
+  { title: "Sedes", href: "/dashboard/sedes", icon: Warehouse },
   { title: "Agrupaciones", href: "/dashboard/agrupaciones", icon: Layers },
   { title: "Programas", href: "/dashboard/programas", icon: Clipboard },
   { title: "Voluntarios", href: "/dashboard/voluntarios", icon: Users },

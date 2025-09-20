@@ -14,9 +14,9 @@ import {
   X,
   Flame,
   CalendarClock,
-    HardHat,
-    Siren,
-    BriefcaseBusiness
+  HardHat,
+  Siren,
+  BriefcaseBusiness,
 } from "lucide-react";
 import { CardBlock } from "@/components/ui/cardBlock";
 import { DL } from "@/components/ui/dl";
@@ -145,12 +145,6 @@ export default function ViewUser({ infUser, onClose }: viewUserProps) {
                       {age} años
                     </span>
                   )}
-                  {data?.profession && (
-                    <span className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 font-medium text-slate-700 ring-1 ring-slate-200">
-                        <BriefcaseBusiness className="mr-1.5 h-4 w-4" />
-                      {data?.profession}
-                    </span>
-                  )}
                   {data?.totalHours && (
                     <span className="inline-flex items-center rounded-full bg-red-300 px-3 py-1 font-medium text-red-600 ring-1 ring-slate-200">
                       <Flame className="mr-1.5 h-4 w-4 text-red-500"></Flame>
@@ -244,23 +238,22 @@ export default function ViewUser({ infUser, onClose }: viewUserProps) {
             >
               <DL
                 items={[
-                  ["Profesión", data?.profession],
                   ["Estado", data?.state],
                   ["Tipo de sangre", data?.bloodType],
                 ]}
               />
             </CardBlock>
-              <CardBlock
-                  title="Informacion de voluntariado"
-                  icon={<HardHat className="h-4 w-4" />}
-              >
-                  <DL
-                      items={[
-                          ["Horas Totales", data?.totalHours],
-                          ["Horas Ultimo Mes", data?.monthHours],
-                      ]}
-                  />
-              </CardBlock>
+            <CardBlock
+              title="Informacion de voluntariado"
+              icon={<HardHat className="h-4 w-4" />}
+            >
+              <DL
+                items={[
+                  ["Horas Totales", data?.totalHours],
+                  ["Horas Ultimo Mes", data?.monthHours],
+                ]}
+              />
+            </CardBlock>
           </div>
         </section>
       </div>
