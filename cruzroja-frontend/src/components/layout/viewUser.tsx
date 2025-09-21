@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { CardBlock } from "@/components/ui/cardBlock";
 import { DL } from "@/components/ui/dl";
+import { createPortal } from "react-dom";
 
 type viewUserProps = {
   infUser: FormState | null;
@@ -76,7 +77,7 @@ export default function ViewUser({ infUser, onClose }: viewUserProps) {
   const photo =
     data?.picture && data?.picture !== "#" ? data?.picture : "/4792929.png";
 
-  return (
+  const viewUI = (
     <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto md:overflow-hidden ">
       {/* overlay + blur */}
       <div
@@ -251,6 +252,8 @@ export default function ViewUser({ infUser, onClose }: viewUserProps) {
                 items={[
                   ["Horas Totales", data?.totalHours],
                   ["Horas Ultimo Mes", data?.monthHours],
+                  ["Agrupacion", data?.group.name],
+                  ["Programa", data?.group.program.name],
                 ]}
               />
             </CardBlock>
@@ -259,4 +262,5 @@ export default function ViewUser({ infUser, onClose }: viewUserProps) {
       </div>
     </div>
   );
+  return createPortal(viewUI, document.body);
 }

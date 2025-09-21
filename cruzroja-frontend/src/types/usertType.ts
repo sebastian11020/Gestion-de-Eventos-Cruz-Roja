@@ -38,17 +38,38 @@ export type FormState = {
 };
 
 export type sectional = {
-  id?: string;
+  id: string;
   city: string;
+  type?: string;
+  numberVolunteers?: string;
+  numberGroups?: string;
+  leader?: {
+    document: string;
+    name: string;
+  };
 };
 
 export type group = {
   id?: string;
   name: string;
+  numberPrograms?: string;
+  leader?: {
+    document: string;
+    name: string;
+  };
   program: program[];
 };
 
 export type program = {
   id: string;
   name: string;
+  leader?: string;
+};
+
+export type leaderDataTable = {
+  typeDocument: string;
+  document: string;
+  name: string;
+  state: string;
+  group: string;
 };

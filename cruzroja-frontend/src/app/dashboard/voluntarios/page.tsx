@@ -4,10 +4,9 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useMemo, useState } from "react";
 import VolunteerWizard from "@/components/layout/formCreateUser";
 import { Eye, PencilLine } from "lucide-react";
-import { FormState,sectional } from "@/types/usertType";
+import { FormState, sectional } from "@/types/usertType";
 import ViewUser from "@/components/layout/viewUser";
 import { supabase } from "@/lib/supabase-browser";
-
 
 const PAGE_SIZE = 7;
 
@@ -310,7 +309,6 @@ const dataUser: FormState[] = [
   },
 ];
 
-
 function normalize(v: unknown) {
   return String(v ?? "").toLowerCase();
 }
@@ -342,10 +340,10 @@ export default function voluntarios() {
     setFiltro(value);
   };
 
-    const cities = useMemo(() => {
-        const set = new Set(dataUser.map(u => u.sectional.city));
-        return Array.from(set).sort();
-    }, []);
+  const cities = useMemo(() => {
+    const set = new Set(dataUser.map((u) => u.sectional.city));
+    return Array.from(set).sort();
+  }, []);
 
   async function register(form: FormState) {
     const sb = supabase();
@@ -367,25 +365,28 @@ export default function voluntarios() {
 
   useEffect(() => {
     setPage(1);
-  }, [filtro,cityFilter]);
+  }, [filtro, cityFilter]);
 
-    const results = useMemo(() => {
-        const q = normalize(filtro);
-        const base = !q
-            ? dataUser
-            : dataUser.filter((u) =>
-                normalize(u.carnet).includes(q) ||
-                normalize(u.name).includes(q) ||
-                normalize(u.lastName).includes(q) ||
-                normalize(u.email).includes(q) ||
-                normalize(u.state).includes(q) ||
-                normalize(u.typeDocument).includes(q) ||
-                normalize(u.document).includes(q) ||
-                normalize(u.cellphone).includes(q) ||
-                normalize(u.sectional.city).includes(q)
-            );
-        return base.filter(u => cityFilter === "" || u.sectional.city === cityFilter);
-    }, [filtro, cityFilter]);
+  const results = useMemo(() => {
+    const q = normalize(filtro);
+    const base = !q
+      ? dataUser
+      : dataUser.filter(
+          (u) =>
+            normalize(u.carnet).includes(q) ||
+            normalize(u.name).includes(q) ||
+            normalize(u.lastName).includes(q) ||
+            normalize(u.email).includes(q) ||
+            normalize(u.state).includes(q) ||
+            normalize(u.typeDocument).includes(q) ||
+            normalize(u.document).includes(q) ||
+            normalize(u.cellphone).includes(q) ||
+            normalize(u.sectional.city).includes(q),
+        );
+    return base.filter(
+      (u) => cityFilter === "" || u.sectional.city === cityFilter,
+    );
+  }, [filtro, cityFilter]);
 
   const total = results.length;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -419,20 +420,20 @@ export default function voluntarios() {
             onSearch={handleSearch}
           />
         </div>
-          <div className="w-44">
-              <select
-                  value={cityFilter}
-                  onChange={(e) => setCityFilter(e.target.value)}
-                  className="w-full rounded-lg bg-white px-3 py-2 text-sm text-gray-700 shadow-sm hover: focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40"
-              >
-                  <option value="">Todas las ciudades</option>
-                  {cities.map((city) => (
-                      <option key={city} value={city}>
-                          {city}
-                      </option>
-                  ))}
-              </select>
-          </div>
+        <div className="w-44">
+          <select
+            value={cityFilter}
+            onChange={(e) => setCityFilter(e.target.value)}
+            className="w-full rounded-lg bg-white px-3 py-2 text-sm text-gray-700 shadow-sm hover: focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40"
+          >
+            <option value="">Todas las ciudades</option>
+            {cities.map((city) => (
+              <option key={city} value={city}>
+                {city}
+              </option>
+            ))}
+          </select>
+        </div>
         <Button
           type="button"
           className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-md hover:bg-blue-700 transition"
@@ -453,9 +454,7 @@ export default function voluntarios() {
                   Nombre completo
                 </th>
                 <th className="px-4 py-3 text-left font-semibold">Celular</th>
-                <th className="px-4 py-3 text-left font-semibold">
-                  Seccional
-                </th>
+                <th className="px-4 py-3 text-left font-semibold">Seccional</th>
                 <th className="px-4 py-3 text-left font-semibold">Email</th>
                 <th className="px-4 py-3 text-left font-semibold">Estado</th>
                 <th className="px-4 py-3 text-right font-semibold">Acciones</th>
@@ -497,7 +496,6 @@ export default function voluntarios() {
                   <td className="px-4 py-3">
                     <span className={badgeClass(u.state)}>{u.state}</span>
                   </td>
-
                   {/* Acciones */}
                   <td className="px-3 py-2">
                     <div className="flex items-center justify-end gap-1.5">

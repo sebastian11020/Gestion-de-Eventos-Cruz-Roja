@@ -309,10 +309,10 @@ export default function VolunteerWizard({
     const { name, value } = e.target;
     setForm((s) => ({ ...s, [name]: value }));
   };
-    const programs = useMemo(() => {
-        const g = GRUOP_TYPES.find(g => g.id === form.group.id);
-        return g?.program ?? [];
-    }, [form.group.id]);
+  const programs = useMemo(() => {
+    const g = GRUOP_TYPES.find((g) => g.id === form.group.id);
+    return g?.program ?? [];
+  }, [form.group.id]);
 
   const handleNested = (
     group: "emergencyContact" | "eps",
@@ -324,32 +324,32 @@ export default function VolunteerWizard({
       [group]: { ...(s as any)[group], [name]: value },
     }));
   };
-    function handleGroupChange(e: React.ChangeEvent<HTMLSelectElement>) {
-        const groupId = e.target.value;
-        const g = GRUOP_TYPES.find(x => x.id === groupId);
-        setForm(s => ({
-            ...s,
-            group: {
-                id: g?.id ?? "",
-                name: g?.name ?? "",
-                program: { id: "", name: "" }, // reset
-            },
-        }));
-    }
+  function handleGroupChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const groupId = e.target.value;
+    const g = GRUOP_TYPES.find((x) => x.id === groupId);
+    setForm((s) => ({
+      ...s,
+      group: {
+        id: g?.id ?? "",
+        name: g?.name ?? "",
+        program: { id: "", name: "" }, // reset
+      },
+    }));
+  }
 
-    function handleProgramChange(e: React.ChangeEvent<HTMLSelectElement>) {
-        const programId = e.target.value;
-        const p = programs.find(x => x.id === programId);
-        setForm(s => ({
-            ...s,
-            group: {
-                ...s.group,
-                program: { id: p?.id ?? "", name: p?.name ?? "" },
-            },
-        }));
-    }
+  function handleProgramChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const programId = e.target.value;
+    const p = programs.find((x) => x.id === programId);
+    setForm((s) => ({
+      ...s,
+      group: {
+        ...s.group,
+        program: { id: p?.id ?? "", name: p?.name ?? "" },
+      },
+    }));
+  }
 
-    const canNext = useMemo(() => {
+  const canNext = useMemo(() => {
     if (step === 0) {
       return form.typeDocument && form.document && form.bloodType;
     }
@@ -738,42 +738,42 @@ export default function VolunteerWizard({
                   ))}
                 </select>
               </div>
-                <div className="relative">
-                    <label className={labelBase}>Agrupacion</label>
-                    <select
-                        name="group"
-                        value={form.group.id}
-                        onChange={handleGroupChange}
-                        className={`${fieldBase} appearance-none`}
-                    >
-                        <option value="" disabled>
-                            Seleccione…
-                        </option>
-                        {GRUOP_TYPES.map((s) => (
-                            <option key={s.id} value={s.id}>
-                                {s.name}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-                <div className="relative">
-                    <label className={labelBase}>Programa</label>
-                    <select
-                        name="program"
-                        value={form.group.program.id}
-                        onChange={handleProgramChange}
-                        className={`${fieldBase} appearance-none`}
-                    >
-                        <option value="" disabled>
-                            Seleccione…
-                        </option>
-                        {programs.map((p) => (
-                            <option key={p.id} value={p.id}>
-                                {p.name}
-                            </option>
-                        ))}
-                    </select>
-                </div>
+              <div className="relative">
+                <label className={labelBase}>Agrupacion</label>
+                <select
+                  name="group"
+                  value={form.group.id}
+                  onChange={handleGroupChange}
+                  className={`${fieldBase} appearance-none`}
+                >
+                  <option value="" disabled>
+                    Seleccione…
+                  </option>
+                  {GRUOP_TYPES.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="relative">
+                <label className={labelBase}>Programa</label>
+                <select
+                  name="program"
+                  value={form.group.program.id}
+                  onChange={handleProgramChange}
+                  className={`${fieldBase} appearance-none`}
+                >
+                  <option value="" disabled>
+                    Seleccione…
+                  </option>
+                  {programs.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <div className="md:col-span-3">
                 <label className={labelBase}>
                   Dirección <span className="text-red-500">*</span>
