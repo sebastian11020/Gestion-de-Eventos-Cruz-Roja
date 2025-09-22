@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import * as process from 'node:process';
 import { LocationModule } from './modules/location/location.module';
-import { Location } from './modules/location/entity/location.entity';
+import { HeadquartersModule } from './modules/headquarters/headquarters.module';
 
 @Module({
   imports: [
@@ -16,6 +16,7 @@ import { Location } from './modules/location/entity/location.entity';
       autoLoadEntities: true,
     }),
     LocationModule,
+    HeadquartersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

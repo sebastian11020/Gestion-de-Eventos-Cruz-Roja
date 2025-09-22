@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Post,
@@ -16,21 +18,31 @@ export class LocationController {
   constructor(private readonly locationService: LocationService) {}
 
   @Get('/all')
+  @HttpCode(HttpStatus.OK)
   getAll() {
-    return this.locationService.getAll();
+    return this.locationService.getAllDto();
   }
 
   @Get(':id')
+  @HttpCode(HttpStatus.OK)
   getById(@Param('id', ParseIntPipe) id: number) {
-    return this.locationService.getById(id);
+    return this.locationService.getByIdDto(id);
+  }
+
+  @Get('/department/:id/municipalities')
+  @HttpCode(HttpStatus.OK)
+  getMunicipalitiesByDepartment(@Param('id', ParseIntPipe) id: number) {
+    return this.locationService.getMunicipalitiesByDepartmentDto(id);
   }
 
   @Post('create')
+  @HttpCode(HttpStatus.CREATED)
   create(@Body() createLocationDto: CreateLocationDto) {
     return this.locationService.create(createLocationDto);
   }
 
   @Put('update/:id')
+  @HttpCode(HttpStatus.OK)
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateLocationDto: UpdateLocationDto,

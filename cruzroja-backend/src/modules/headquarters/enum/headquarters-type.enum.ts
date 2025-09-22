@@ -1,0 +1,5 @@
+export enum HeadquartersTypeEnum {
+  SECCIONAL = 'SECCIONAL',
+  UNIDAD_MUNICIPAL = 'UNIDAD MUNICIPAL',
+  GURPO_DE_APOYO = 'GURPO_DE_APOYO',
+}

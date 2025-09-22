@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { LocationTypeEnum } from '../enum/location-type.enum';
+import { Headquarters } from '../../headquarters/entity/headquarters.entity';
 
 @Entity()
 export class Location {
@@ -25,4 +26,6 @@ export class Location {
   parent?: Location;
   @OneToMany(() => Location, (location) => location.parent)
   children: Location[];
+  @OneToMany(() => Headquarters, (h) => h.location)
+  headquarters: Headquarters[];
 }
