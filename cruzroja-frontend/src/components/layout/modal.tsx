@@ -28,7 +28,6 @@ export default function Modal({ open, onClose, title, children }: ModalProps) {
       {/* Overlay */}
       <button
         aria-label="Cerrar"
-        onClick={onClose}
         className="
           absolute inset-0 bg-black/40 backdrop-blur-[1px]
           animate-[overlayShow_150ms_ease-out]

@@ -6,45 +6,32 @@ import {
   group,
   FormState,
   leaderDataTable,
+  program,
 } from "@/types/usertType";
 import {
   Users,
   MapPin,
-  User2,
   Eye,
   ArrowLeftRight,
   BadgePlus,
   User,
+  Clipboard,
 } from "lucide-react";
 import Modal from "@/components/layout/modal";
-import GroupTable from "@/components/layout/groupTable";
 import ViewUser from "@/components/layout/viewUser";
 import ChangeLeaderTable from "@/components/layout/changeLeaderTable";
+import ProgramTable from "@/components/layout/programTable";
 
 type SectionalCardProps = {
-  sectional: sectional;
+  sectional?: sectional;
+  group?: group;
 };
 
-const groups: group[] = [
+const programData: program[] = [
   {
-    id: "1",
-    name: "Juvenil",
-    leader: {
-      document: "1007749746",
-      name: "Samuel David Vargas Millan",
-    },
-    program: [
-      {
-        id: "1",
-        name: "Al aire libre",
-        leader: { document: "1298765432", name: "Juan David Lopez Garcia" },
-      },
-      {
-        id: "2",
-        name: "Recreacion",
-        leader: { document: "10087654561", name: "Andres David Lopez Garcia" },
-      },
-    ],
+    name: "Aire Libre",
+    numberVolunteers: "30",
+    leader: { name: "Juan Pablo Martinez Gomez" },
   },
 ];
 
@@ -65,18 +52,12 @@ const users: leaderDataTable[] = [
   },
 ];
 
-function getInitialsFromFullName(full?: string) {
-  const [n = "", l = ""] = (full ?? "").split(" ");
-  return `${n.charAt(0)}${l.charAt(0)}`.toUpperCase();
-}
-
-export function SectionalCard({ sectional }: SectionalCardProps) {
+export function GroupCard({ group }: SectionalCardProps) {
   const [openGroups, setOpenGroups] = useState(false);
   const [openChangeLeader, setOpenChangeLeader] = useState(false);
   const [viewUser, setViewUser] = useState<FormState | null>(null);
   const handleCloseView = () => setViewUser(null);
   const [openView, setOpenView] = useState(false);
-  const initials = getInitialsFromFullName(sectional.leader?.name);
 
   function onView(g: string | undefined) {
     setOpenView(true);
@@ -129,28 +110,30 @@ export function SectionalCard({ sectional }: SectionalCardProps) {
         flex flex-col
       "
       role="article"
-      aria-label={`${sectional.type} - ${sectional.city}`}
+      aria-label={group?.name}
     >
       {/* Header */}
       <div className="mb-3 flex items-start justify-between gap-3">
         <h3 className="text-base md:text-lg font-semibold text-gray-900 leading-snug truncate">
-          {sectional.city}
+          {group?.name}
         </h3>
-        <span className="shrink-0 rounded-full border border-blue-100 bg-blue-50 px-2 py-0.5 text-[11px] font-medium text-blue-700">
-          {sectional.type}
-        </span>
       </div>
 
       {/* Info principal */}
       <div className="space-y-2 text-sm text-gray-600 flex-1">
+        <div className="flex items-center gap-2">
+          <MapPin className="h-4 w-4 text-gray-400" />
+          <span className="truncate">
+            <span className="font-medium text-gray-700">Seccional:</span>{" "}
+            {group?.sectional}
+          </span>
+        </div>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <MapPin className="h-4 w-4 text-gray-400" />
+            <Clipboard className="h-4 w-4 text-gray-400" />
             <span className="truncate">
-              <span className="font-medium text-gray-700">
-                N° Agrupaciones:
-              </span>{" "}
-              {sectional.numberGroups}
+              <span className="font-medium text-gray-700">N° Programas:</span>{" "}
+              {group?.numberPrograms}
             </span>
           </div>
           <button
@@ -162,12 +145,11 @@ export function SectionalCard({ sectional }: SectionalCardProps) {
             <BadgePlus className="w-4 h-4" />
           </button>
         </div>
-
         <div className="flex items-center gap-2">
           <Users className="h-4 w-4 text-gray-400" />
           <span className="truncate">
             <span className="font-medium text-gray-700">N° Voluntarios:</span>{" "}
-            {sectional.numberVolunteers}
+            {group?.numberVolunteers}
           </span>
         </div>
 
@@ -175,7 +157,7 @@ export function SectionalCard({ sectional }: SectionalCardProps) {
           <User className="h-4 w-4 text-gray-400" />
           <span className="truncate">
             <span className="font-medium text-gray-700">Líder:</span>{" "}
-            {sectional.leader?.name}
+            {group?.leader?.name}
           </span>
         </div>
       </div>
@@ -193,9 +175,9 @@ export function SectionalCard({ sectional }: SectionalCardProps) {
           <ArrowLeftRight className="w-4 h-4" />
           Cambiar
         </button>
-        {sectional.leader?.document && (
+        {group?.leader?.document && (
           <button
-            onClick={() => onView(sectional.leader!.document)}
+            onClick={() => onView(group?.leader!.document)}
             className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-white text-sm font-medium hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 transition-colors"
             aria-label="Ver líder"
           >
@@ -204,18 +186,17 @@ export function SectionalCard({ sectional }: SectionalCardProps) {
           </button>
         )}
       </div>
-
       <Modal
         open={openGroups}
         onClose={() => setOpenGroups(false)}
-        title={`Agrupaciones - ${sectional.city}`}
+        title={`Agrupación - ${group?.name}`}
       >
-        <GroupTable groups={groups} />
+        <ProgramTable programs={programData} />
       </Modal>
       <Modal
         open={openChangeLeader}
         onClose={() => setOpenChangeLeader(false)}
-        title={`Voluntarios - ${sectional.city}`}
+        title={`Voluntarios - ${group?.name}`}
       >
         <ChangeLeaderTable users={users} />
       </Modal>

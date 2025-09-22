@@ -52,18 +52,24 @@ export type sectional = {
 export type group = {
   id?: string;
   name: string;
+  sectional?: string;
+  numberVolunteers?: string;
   numberPrograms?: string;
   leader?: {
     document: string;
     name: string;
   };
-  program: program[];
+  program?: program[];
 };
 
 export type program = {
-  id: string;
+  id?: string;
   name: string;
-  leader?: string;
+  numberVolunteers?: string;
+  leader?: {
+    document?: string;
+    name?: string;
+  };
 };
 
 export type leaderDataTable = {
@@ -71,5 +77,6 @@ export type leaderDataTable = {
   document: string;
   name: string;
   state: string;
-  group: string;
+  group?: string;
+  program?: string;
 };

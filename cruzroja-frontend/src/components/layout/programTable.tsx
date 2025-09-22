@@ -1,32 +1,34 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Search } from "lucide-react";
-import type { group } from "@/types/usertType";
+import type { program } from "@/types/usertType";
 
-type GroupTableProps = {
-  groups: group[];
+type ProgramTableProps = {
+  programs: program[];
   initialPageSize?: number;
 };
 
-export default function GroupTable({
-  groups,
+export default function ProgramTable({
+  programs,
   initialPageSize = 10,
-}: GroupTableProps) {
+}: ProgramTableProps) {
   const [query, setQuery] = useState("");
   const [pageSize, setPageSize] = useState(initialPageSize);
   const [page, setPage] = useState(1); // 1-based
 
+  // normaliza para búsqueda: minúsculas + sin tildes
   const normalize = (v: string) =>
     (v ?? "")
       .toLowerCase()
       .normalize("NFD")
       .replace(/\p{Diacritic}/gu, "");
 
+  // filtro por nombre de programa
   const filtered = useMemo(() => {
     const q = normalize(query);
-    if (!q) return groups;
-    return groups.filter((g) => normalize(g.name).includes(q));
-  }, [groups, query]);
+    if (!q) return programs;
+    return programs.filter((p) => normalize(p.name).includes(q));
+  }, [programs, query]);
 
   const total = filtered.length;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
@@ -61,14 +63,14 @@ export default function GroupTable({
     <section className="space-y-3">
       {/* Toolbar */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-base font-semibold text-gray-900">Agrupaciones</h2>
+        <h2 className="text-base font-semibold text-gray-900">Programas</h2>
 
         <div className="flex w-full items-center gap-2 sm:w-auto">
           <div className="relative w-full sm:w-80">
             <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
-              placeholder="Buscar agrupación…"
+              placeholder="Buscar programa…"
               value={query}
               onChange={(e) => {
                 setQuery(e.target.value);
@@ -80,7 +82,7 @@ export default function GroupTable({
                 placeholder:text-gray-400
                 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20
               "
-              aria-label="Buscar agrupación por nombre"
+              aria-label="Buscar programa por nombre"
             />
           </div>
 
@@ -110,8 +112,8 @@ export default function GroupTable({
         <span className="font-medium">
           {total === 0 ? 0 : start + 1}–{end}
         </span>{" "}
-        de <span className="font-medium">{total}</span> agrupación
-        {total === 1 ? "" : "es"}
+        de <span className="font-medium">{total}</span> programa
+        {total === 1 ? "" : "s"}
       </div>
 
       {/* Tabla */}
@@ -119,7 +121,7 @@ export default function GroupTable({
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr className="bg-gray-50 text-left text-gray-600">
-              {["Nombre", "Líder", "Programas"].map((h) => (
+              {["Nombre", "Líder", "N° Voluntarios"].map((h) => (
                 <th
                   key={h}
                   scope="col"
@@ -141,50 +143,46 @@ export default function GroupTable({
                     </div>
                     <p className="mt-3 text-sm text-gray-600">
                       {total === 0
-                        ? "No hay agrupaciones registradas."
+                        ? "No hay programas registrados."
                         : `No se encontraron resultados para “${query}”.`}
                     </p>
                   </div>
                 </td>
               </tr>
             ) : (
-              paged.map((g, idx) => (
+              paged.map((p, idx) => (
                 <tr
-                  key={g.id}
+                  key={p.id ?? `${p.name}-${idx}`}
                   className={`${
                     idx % 2 === 0 ? "bg-white" : "bg-gray-50/60"
                   } hover:bg-blue-50/40 focus-within:bg-blue-50/40 transition-colors`}
                 >
+                  {/* Nombre */}
                   <td className="border-b border-gray-200 px-4 py-3 text-gray-900">
                     <div className="flex items-center gap-2">
-                      <span className="truncate font-medium">{g.name}</span>
+                      <span className="truncate font-medium">{p.name}</span>
                     </div>
                   </td>
 
+                  {/* Líder */}
                   <td className="border-b border-gray-200 px-4 py-3 text-gray-700">
                     <div className="flex items-center gap-2 min-w-[12rem]">
-                      <span className="truncate">{g.leader?.name}</span>
+                      {p.leader?.name ? (
+                        <>
+                          <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-blue-700 text-[11px] font-semibold">
+                            {getInitials(p.leader?.name)}
+                          </span>
+                          <span className="truncate">{p.leader?.name}</span>
+                        </>
+                      ) : (
+                        <span className="text-gray-400">Sin asignar</span>
+                      )}
                     </div>
                   </td>
 
+                  {/* N° Voluntarios */}
                   <td className="border-b border-gray-200 px-4 py-3 text-gray-700">
-                    <div className="flex flex-wrap gap-1.5">
-                      {g.program?.map((p) => (
-                        <span
-                          key={p.id}
-                          className="inline-flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-[11px] font-medium text-blue-700"
-                          title={p.leader ? `Líder: ${p.leader}` : "Programa"}
-                        >
-                          <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
-                          {p.name}
-                        </span>
-                      ))}
-                      {g.program?.length === 0 && (
-                        <span className="text-gray-400 text-xs">
-                          Sin programas
-                        </span>
-                      )}
-                    </div>
+                    {p.numberVolunteers ?? "—"}
                   </td>
                 </tr>
               ))
@@ -248,7 +246,7 @@ export default function GroupTable({
 }
 
 function getInitials(full?: string) {
-  if (!full) return "L";
+  if (!full) return "P";
   const parts = full.trim().split(/\s+/);
   const first = parts[0]?.[0] || "";
   const last = parts[parts.length - 1]?.[0] || "";
