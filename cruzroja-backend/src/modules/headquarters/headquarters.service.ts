@@ -7,6 +7,7 @@ import { LocationService } from '../location/location.service';
 import { assert, assertFound, conflict } from '../../common/utils/assert';
 import { LocationTypeEnum } from '../location/enum/location-type.enum';
 import { GetHeadquartersDto } from './dto/get-headquarters.dto';
+import { FormatNamesString } from '../../common/utils/string.utils';
 
 @Injectable()
 export class HeadquartersService {
@@ -30,8 +31,8 @@ export class HeadquartersService {
     return rows.map((row) => {
       const dto = new GetHeadquartersDto();
       dto.id = String(row.id);
-      dto.type = String(row.type ?? '');
-      dto.city = String(row.city ?? '');
+      dto.type = FormatNamesString(String(row.type ?? ''));
+      dto.city = FormatNamesString(String(row.city ?? ''));
       dto.numberVolunteers = String(row.number_volunteers ?? 0);
       dto.numberGroups = String(row.number_groups ?? 0);
       return dto;

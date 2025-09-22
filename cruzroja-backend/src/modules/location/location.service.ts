@@ -79,10 +79,16 @@ export class LocationService {
       parent,
       `No se encontro una ubicacion relacionada al sigueinte id: ${id}`,
     );
-    return this.locationRepository.find({
+    const municipalities = await this.locationRepository.find({
       where: {
         parent: parent,
       },
+    });
+    return municipalities.map((n: Location): GetLocationDto => {
+      const dto = new GetLocationDto();
+      dto.id = n.id;
+      dto.name = FormatNamesString(n.name);
+      return dto;
     });
   }
 
