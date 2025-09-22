@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Location } from './entity/location.entity';
@@ -25,7 +25,7 @@ export class LocationService {
     private locationRepository: Repository<Location>,
   ) {}
 
-  async getAll(): Promise<GetLocationDto[]> {
+  async getAllDto(): Promise<GetLocationDto[]> {
     const entities = await this.locationRepository.find();
     return entities.map((entity) => {
       const dto = new GetLocationDto();
@@ -35,7 +35,7 @@ export class LocationService {
     });
   }
 
-  async getById(id: number): Promise<GetLocationDto | null> {
+  async getByIdDto(id: number): Promise<GetLocationDto | null> {
     const entity = await this.locationRepository.findOne({
       where: {
         id: id,
@@ -63,6 +63,29 @@ export class LocationService {
     });
   }
 
+  async getById(id: number): Promise<Location | null> {
+    return this.locationRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+  }
+
+  async getMunicipalitiesByDepartmentDto(
+    id: number,
+  ): Promise<GetLocationDto[] | null> {
+    const parent = await this.getById(id);
+    assertFound(
+      parent,
+      `No se encontro una ubicacion relacionada al sigueinte id: ${id}`,
+    );
+    return this.locationRepository.find({
+      where: {
+        parent: parent,
+      },
+    });
+  }
+
   async create(dto: CreateLocationDto) {
     const location: Location = this.locationRepository.create({
       name: NormalizeString(dto.name),
@@ -83,7 +106,7 @@ export class LocationService {
         `Ya se encuentra una ubicacion registrada con el siguiente nombre: ${location.name}`,
       );
     await this.locationRepository.save(location);
-    return (HttpStatus.CREATED, { success: true });
+    return { success: true };
   }
 
   async update(id: number, dto: UpdateLocationDto) {
@@ -106,7 +129,7 @@ export class LocationService {
     location.name = NormalizeString(dto.name);
 
     await this.locationRepository.update(dto.id, location);
-    return (HttpStatus.OK, { success: true });
+    return { success: true };
   }
 
   private async validateDependence(
