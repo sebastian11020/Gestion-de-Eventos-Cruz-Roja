@@ -9,18 +9,19 @@ import {
   program,
 } from "@/types/usertType";
 import {
-  Users,
-  MapPin,
-  Eye,
-  ArrowLeftRight,
-  BadgePlus,
-  User,
-  Clipboard,
+    Users,
+    MapPin,
+    Eye,
+    ArrowLeftRight,
+    BadgePlus,
+    User,
+    Clipboard, Trash2,
 } from "lucide-react";
 import Modal from "@/components/layout/modal";
 import ViewUser from "@/components/layout/viewUser";
 import ChangeLeaderTable from "@/components/layout/changeLeaderTable";
 import ProgramTable from "@/components/layout/programTable";
+import {ConfirmDialog} from "@/components/layout/confitmDialog";
 
 type SectionalCardProps = {
   sectional?: sectional;
@@ -56,6 +57,7 @@ export function GroupCard({ group }: SectionalCardProps) {
   const [openGroups, setOpenGroups] = useState(false);
   const [openChangeLeader, setOpenChangeLeader] = useState(false);
   const [viewUser, setViewUser] = useState<FormState | null>(null);
+    const [confirmOpen, setConfirmOpen] = useState(false);
   const handleCloseView = () => setViewUser(null);
   const [openView, setOpenView] = useState(false);
 
@@ -100,6 +102,10 @@ export function GroupCard({ group }: SectionalCardProps) {
     });
   }
 
+    function handleDelete() {
+        setConfirmOpen(false);
+    }
+
   return (
     <div
       className="
@@ -117,6 +123,25 @@ export function GroupCard({ group }: SectionalCardProps) {
         <h3 className="text-base md:text-lg font-semibold text-gray-900 leading-snug truncate">
           {group?.name}
         </h3>
+          <button
+              type="button"
+              aria-label="Eliminar"
+              title="Eliminar"
+              onClick={() => setConfirmOpen(true)}
+              className="
+    inline-flex items-center justify-center
+    rounded-full p-2
+    text-red-600 bg-red-50
+    hover:bg-red-100 hover:text-red-700
+    active:bg-red-200
+    shadow-sm transition
+    focus-visible:outline-none
+    focus-visible:ring-2 focus-visible:ring-red-500/30 focus-visible:ring-offset-2 focus-visible:ring-offset-white
+    disabled:opacity-60 disabled:cursor-not-allowed
+  "
+          >
+              <Trash2 className="size-4" />
+          </button>
       </div>
 
       {/* Info principal */}
@@ -201,6 +226,11 @@ export function GroupCard({ group }: SectionalCardProps) {
         <ChangeLeaderTable users={users} />
       </Modal>
       <ViewUser infUser={viewUser} onClose={handleCloseView}></ViewUser>
+        <ConfirmDialog
+            open={confirmOpen}
+            onCancel={() => setConfirmOpen(false)}
+            onConfirm={handleDelete}
+        />
     </div>
   );
 }
