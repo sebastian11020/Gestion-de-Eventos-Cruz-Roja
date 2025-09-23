@@ -2,6 +2,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { X, Check } from "lucide-react";
 import { FormState, sectional, group, program } from "@/types/usertType";
+import { getCities } from "@/services/serviceSelect";
+
+type cities = {
+  id: string;
+  name: string;
+};
 
 let INITIAL_FORM: FormState = {
   typeDocument: "",
@@ -37,133 +43,8 @@ let INITIAL_FORM: FormState = {
 };
 
 const DOCUMENT_TYPES = ["CC", "TI", "CE", "PAS"];
-
 const BLOOD_TYPES = ["O+", "O-", "A+", "A-", "B+", "B-", "AB+", "AB-"];
 const SEX_OPTIONS = ["Masculino", "Femenino"];
-const MUNICIPALITIES_BOYACA = [
-  "Almeida",
-  "Aquitania",
-  "Arcabuco",
-  "Belén",
-  "Berbeo",
-  "Betéitiva",
-  "Boavita",
-  "Boyacá",
-  "Briceño",
-  "Buenavista",
-  "Busbanzá",
-  "Caldas",
-  "Campohermoso",
-  "Cerinza",
-  "Chinavita",
-  "Chiquinquirá",
-  "Chíquiza",
-  "Chiscas",
-  "Chita",
-  "Chitaraque",
-  "Chivatá",
-  "Ciénega",
-  "Cómbita",
-  "Coper",
-  "Corrales",
-  "Covarachía",
-  "Cubará",
-  "Cucaita",
-  "Cuítiva",
-  "Duitama",
-  "El Cocuy",
-  "El Espino",
-  "Firavitoba",
-  "Floresta",
-  "Gachantivá",
-  "Gámeza",
-  "Garagoa",
-  "Guacamayas",
-  "Guateque",
-  "Guayatá",
-  "Güicán",
-  "Iza",
-  "Jenesano",
-  "Jericó",
-  "La Capilla",
-  "La Uvita",
-  "La Victoria",
-  "Labranzagrande",
-  "Macanal",
-  "Maripí",
-  "Miraflores",
-  "Mongua",
-  "Monguí",
-  "Moniquirá",
-  "Motavita",
-  "Muzo",
-  "Nobsa",
-  "Nuevo Colón",
-  "Oicatá",
-  "Otanche",
-  "Pachavita",
-  "Páez",
-  "Paipa",
-  "Pajarito",
-  "Panqueba",
-  "Pauna",
-  "Paya",
-  "Paz de Río",
-  "Pesca",
-  "Pisba",
-  "Puerto Boyacá",
-  "Quípama",
-  "Ramiriquí",
-  "Ráquira",
-  "Rondón",
-  "Saboyá",
-  "Sáchica",
-  "Samacá",
-  "San Eduardo",
-  "San José de Pare",
-  "San Luis de Gaceno",
-  "San Mateo",
-  "San Miguel de Sema",
-  "San Pablo de Borbur",
-  "Santa María",
-  "Santa Rosa de Viterbo",
-  "Santa Sofía",
-  "Santana",
-  "Sativanorte",
-  "Sativasur",
-  "Siachoque",
-  "Soatá",
-  "Socha",
-  "Socotá",
-  "Sogamoso",
-  "Somondoco",
-  "Sora",
-  "Soracá",
-  "Sotaquirá",
-  "Susacón",
-  "Sutamarchán",
-  "Sutatenza",
-  "Tasco",
-  "Tenza",
-  "Tibaná",
-  "Tibasosa",
-  "Tinjacá",
-  "Tipacoque",
-  "Toca",
-  "Togüí",
-  "Tópaga",
-  "Tota",
-  "Tunja",
-  "Tununguá",
-  "Turmequé",
-  "Tuta",
-  "Tutazá",
-  "Umbita",
-  "Ventaquemada",
-  "Villa de Leyva",
-  "Viracachá",
-  "Zetaquira",
-];
 const EPS_CO = [
   "Nueva EPS",
   "Sura",
@@ -293,15 +174,26 @@ export default function VolunteerWizard({
   ];
   const progress = Math.round(((step + 1) / steps.length) * 100);
   const [form, setForm] = useState<FormState>(INITIAL_FORM);
+  const [cities, setCities] = useState<cities[]>();
 
   useEffect(() => {
     if (!open) return;
+    getMunicipalities();
     if (editForm) {
       setForm(editForm);
     } else {
       setForm(INITIAL_FORM);
     }
   }, [open, editForm]);
+
+  async function getMunicipalities(){
+      try {
+          const citiesForm: cities[] = await getCities();
+          setCities(citiesForm);
+      }catch (error){
+          console.error(error)
+      }
+  }
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -683,9 +575,9 @@ export default function VolunteerWizard({
                     <option value="" disabled>
                       Seleccione…
                     </option>
-                    {MUNICIPALITIES_BOYACA.map((m) => (
-                      <option key={m} value={m}>
-                        {m}
+                    {cities?.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.name}
                       </option>
                     ))}
                   </select>

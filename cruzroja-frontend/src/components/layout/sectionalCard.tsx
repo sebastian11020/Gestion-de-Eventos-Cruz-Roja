@@ -10,17 +10,18 @@ import {
 import {
   Users,
   MapPin,
-    Trash2,
+  Trash2,
   Eye,
   ArrowLeftRight,
   BadgePlus,
   User,
+  Hospital,
 } from "lucide-react";
 import Modal from "@/components/layout/modal";
 import GroupTable from "@/components/layout/groupTable";
 import ViewUser from "@/components/layout/viewUser";
 import ChangeLeaderTable from "@/components/layout/changeLeaderTable";
-import {ConfirmDialog} from "@/components/layout/confitmDialog";
+import { ConfirmDialog } from "@/components/layout/confitmDialog";
 
 type SectionalCardProps = {
   sectional: sectional;
@@ -75,10 +76,10 @@ export function SectionalCard({ sectional }: SectionalCardProps) {
   const [openGroups, setOpenGroups] = useState(false);
   const [openChangeLeader, setOpenChangeLeader] = useState(false);
   const [viewUser, setViewUser] = useState<FormState | null>(null);
-    const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const handleCloseView = () => setViewUser(null);
   const [openView, setOpenView] = useState(false);
-  const [openAdvert,setOpenAdvert] = useState(false);
+  const [openAdvert, setOpenAdvert] = useState(false);
   const initials = getInitialsFromFullName(sectional.leader?.name);
 
   function onView(g: string | undefined) {
@@ -122,9 +123,9 @@ export function SectionalCard({ sectional }: SectionalCardProps) {
     });
   }
 
-    function handleDelete() {
-        setConfirmOpen(false);
-    }
+  function handleDelete() {
+    setConfirmOpen(false);
+  }
 
   return (
     <div
@@ -146,12 +147,12 @@ export function SectionalCard({ sectional }: SectionalCardProps) {
         <span className="shrink-0 rounded-full border border-blue-100 bg-blue-50 px-2 py-0.5 text-[11px] font-medium text-blue-700">
           {sectional.type}
         </span>
-          <button
-              type="button"
-              aria-label="Eliminar"
-              title="Eliminar"
-              onClick={() => setConfirmOpen(true)}
-              className="
+        <button
+          type="button"
+          aria-label="Eliminar"
+          title="Eliminar"
+          onClick={() => setConfirmOpen(true)}
+          className="
     inline-flex items-center justify-center
     rounded-full p-2
     text-red-600 bg-red-50
@@ -162,16 +163,16 @@ export function SectionalCard({ sectional }: SectionalCardProps) {
     focus-visible:ring-2 focus-visible:ring-red-500/30 focus-visible:ring-offset-2 focus-visible:ring-offset-white
     disabled:opacity-60 disabled:cursor-not-allowed
   "
-          >
-              <Trash2 className="size-4" />
-          </button>
+        >
+          <Trash2 className="size-4" />
+        </button>
       </div>
 
       {/* Info principal */}
       <div className="space-y-2 text-sm text-gray-600 flex-1">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <MapPin className="h-4 w-4 text-gray-400" />
+            <Hospital className="h-4 w-4 text-gray-400" />
             <span className="truncate">
               <span className="font-medium text-gray-700">
                 N° Agrupaciones:
@@ -246,11 +247,11 @@ export function SectionalCard({ sectional }: SectionalCardProps) {
         <ChangeLeaderTable users={users} />
       </Modal>
       <ViewUser infUser={viewUser} onClose={handleCloseView}></ViewUser>
-        <ConfirmDialog
-            open={confirmOpen}
-            onCancel={() => setConfirmOpen(false)}
-            onConfirm={handleDelete}
-        />
+      <ConfirmDialog
+        open={confirmOpen}
+        onCancel={() => setConfirmOpen(false)}
+        onConfirm={handleDelete}
+      />
     </div>
   );
 }
