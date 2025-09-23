@@ -29,7 +29,7 @@ export class LocationService {
     const entities = await this.locationRepository.find();
     return entities.map((entity) => {
       const dto = new GetLocationDto();
-      dto.id = entity.id;
+      dto.id = String(entity.id);
       dto.name = FormatNamesString(entity.name);
       return dto;
     });
@@ -46,7 +46,7 @@ export class LocationService {
       `No se encontro una ubicaion asociada al sigueinte id: ${id}`,
     );
     const dto = new GetLocationDto();
-    dto.id = id;
+    dto.id = String(id);
     dto.name = FormatNamesString(entity.name);
     return dto;
   }
@@ -86,7 +86,7 @@ export class LocationService {
     });
     return municipalities.map((n: Location): GetLocationDto => {
       const dto = new GetLocationDto();
-      dto.id = n.id;
+      dto.id = String(n.id);
       dto.name = FormatNamesString(n.name);
       return dto;
     });
