@@ -40,14 +40,14 @@ export class HeadquartersService {
   }
 
   async create(dto: CreateHeadquartersDto) {
-    const location = await this.locationService.getById(dto.locationId);
+    const location = await this.locationService.getById(dto.idLocation);
     assertFound(
       location,
-      `No se encontro una ubicacion asociada al id: ${dto.locationId}`,
+      `No se encontro una ubicacion asociada al id: ${dto.idLocation}`,
     );
     assert(
       location.type == LocationTypeEnum.MUNICIPIO,
-      `Las sedes solo se pueden crear en municipios y el id ${dto.locationId} pertenece a un ${location.type}`,
+      `Las sedes solo se pueden crear en municipios y el id ${dto.idLocation} pertenece a un ${location.type}`,
     );
 
     let headquarter: Headquarters | null =

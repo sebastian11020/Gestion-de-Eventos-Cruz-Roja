@@ -1,4 +1,10 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { HeadquartersTypeEnum } from '../enum/headquarters-type.enum';
 import { Location } from '../../location/entity/location.entity';
 
@@ -11,5 +17,6 @@ export class Headquarters {
   @Column()
   state: boolean;
   @ManyToOne(() => Location, (l) => l.headquarters, { nullable: false })
+  @JoinColumn({ name: 'location_id' })
   location: Location;
 }

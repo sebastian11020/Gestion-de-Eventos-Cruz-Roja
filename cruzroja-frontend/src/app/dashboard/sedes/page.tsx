@@ -1,49 +1,21 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { SectionalCard } from "@/components/layout/sectionalCard";
-import type { sectional } from "@/types/usertType";
+import type {createSectional, sectional} from "@/types/usertType";
 import { Button } from "@/components/ui/button";
 import Modal from "@/components/layout/modal";
 import { ChevronLeft, ChevronRight, Search } from "lucide-react";
+import {getCities} from "@/services/serviceSelect";
+import {createSectionalService} from "@/services/serviceCreateSectional";
+import {getSectionalService} from "@/services/serviceGetSectional";
 
 const SECTIONAL_TYPES = [
-  "Sede Seccional",
-  "Unidad Municipal",
-  "Unidad de Apoyo",
+  "SEDE SECCIONAL",
+  "UNIDAD MUNICIPAL",
+  "GRUPO DE APOYO",
 ] as const;
 
 type City = { id: string; name: string; department: string };
-const CITIES: City[] = [
-  { id: "1", name: "Tunja", department: "Boyacá" },
-  { id: "2", name: "Duitama", department: "Boyacá" },
-  { id: "3", name: "Sogamoso", department: "Boyacá" },
-];
-
-const initialSectionals: sectional[] = [
-  {
-    id: "1",
-    city: "Tunja",
-    type: "Sede Seccional",
-    numberVolunteers: "40",
-    numberGroups: "4",
-    leader: { document: "1006576543", name: "Juan Sebastian Rodriguez Mateus" },
-  },
-  {
-    id: "2",
-    city: "Duitama",
-    type: "Unidad Municipal",
-    numberVolunteers: "20",
-    numberGroups: "3",
-    leader: { document: "1007749746", name: "Sebastian Daza Delgadillo" },
-  },
-  {
-    id: "3",
-    city: "Paipa",
-    type: "Unidad de Apoyo",
-    numberVolunteers: "10",
-    numberGroups: "3",
-  },
-];
 
 type FormState = {
   cityId: string;
@@ -52,7 +24,6 @@ type FormState = {
 
 const PAGE_SIZE = 8;
 
-// normaliza para búsqueda (minúsculas + sin tildes)
 const normalize = (v: string) =>
   (v ?? "")
     .toLowerCase()
@@ -60,30 +31,50 @@ const normalize = (v: string) =>
     .replace(/\p{Diacritic}/gu, "");
 
 export default function Sedes() {
-  const [items, setItems] = useState<sectional[]>(initialSectionals);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<FormState>({ cityId: "", type: "" });
-
-  // buscador + paginación
+  const [cities,setCities] = useState<City[]>()
   const [query, setQuery] = useState("");
-  const [page, setPage] = useState(1); // 1-based
-
-  const citySelected = useMemo(
-    () => CITIES.find((c) => c.id === form.cityId) || null,
+  const [page, setPage] = useState(1);
+    const [sectionals, setSectionals] = useState<sectional[]>([]);
+  const citySelected:City|null = useMemo(
+    ():City|null => cities?.find((c) => c.id === form.cityId) || null,
     [form.cityId],
   );
 
-  // filtra por nombre de ciudad
-  const filtered = useMemo(() => {
-    const q = normalize(query);
-    if (!q) return items;
-    return items.filter((s) => normalize(s.city).includes(q));
-  }, [items, query]);
+    useEffect(() => {
+        getMunicipalities();
+        getSectionals();
+    },[sectionals] );
+
+    async function getMunicipalities(){
+        try {
+            const citiesForm: City[] = await getCities();
+            setCities(citiesForm);
+        }catch (error){
+            console.error(error)
+        }
+    }
+
+    async function getSectionals(){
+        try {
+            const sectionalsData: sectional[] = await getSectionalService();
+            setSectionals(sectionalsData);
+        }catch (error){
+            console.error(error)
+        }
+    }
+
+    const filtered = useMemo(() => {
+        const base = sectionals ?? [];
+        const q = normalize(query);
+        if (!q) return base;
+        return base.filter((s) => normalize(s.city).includes(q));
+    }, [sectionals, query]);
 
   const total = filtered.length;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
-  // corrige página si cambia el total
   useEffect(() => {
     if (page > totalPages) setPage(1);
   }, [page, totalPages]);
@@ -91,7 +82,7 @@ export default function Sedes() {
   const start = (page - 1) * PAGE_SIZE;
   const end = Math.min(start + PAGE_SIZE, total);
   const paged = useMemo(
-    () => filtered.slice(start, end),
+    () => filtered?.slice(start, end),
     [filtered, start, end],
   );
 
@@ -115,18 +106,20 @@ export default function Sedes() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const newItem: sectional = {
-      id: String(Date.now()),
-      city: citySelected?.name ?? "",
+    const newItem: createSectional = {
+      idLocation: citySelected?.id ?? '',
       type: form.type,
     };
-
-    setItems((prev) => [newItem, ...prev]);
+    console.log(newItem)
     setOpen(false);
     resetForm();
-    // tras crear, resetea búsqueda y vuelve a página 1 para verla arriba
     setQuery("");
     setPage(1);
+    const response = await createSectionalService(newItem)
+      console.log("Antes",response)
+      if(response.success){
+         console.log(response)
+      }
   }
 
   return (
@@ -189,7 +182,7 @@ export default function Sedes() {
         </div>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {paged.map((sec) => (
+          {paged!.map((sec) => (
             <SectionalCard key={sec.id} sectional={sec} />
           ))}
         </div>
@@ -268,7 +261,7 @@ export default function Sedes() {
               <option value="" disabled>
                 Selecciona una ciudad…
               </option>
-              {CITIES.map((c) => (
+              {cities?.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
                 </option>

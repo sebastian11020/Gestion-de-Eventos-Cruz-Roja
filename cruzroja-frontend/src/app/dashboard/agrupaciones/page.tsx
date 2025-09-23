@@ -1,49 +1,24 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import type { group } from "@/types/usertType";
+import type {createGroup, group} from "@/types/usertType";
 import { Button } from "@/components/ui/button";
 import Modal from "@/components/layout/modal";
 import { GroupCard } from "@/components/layout/groupCard";
 import { Search, ChevronLeft, ChevronRight } from "lucide-react";
+import {getSectionalService} from "@/services/serviceGetSectional";
+import {createGroupService,} from "@/services/serviceCreateGroups";
+import {getGroupService} from "@/services/serviceGetGroup";
+
 
 type sectional = { id: string; city: string };
 type groups = { id: string; name: string };
-const SECTIONALS: sectional[] = [
-  { id: "1", city: "Tunja" },
-  { id: "2", city: "Duitama" },
-  { id: "3", city: "Sogamoso" },
-];
+
 const GROUPS: groups[] = [
   { id: "1", name: "Juventud" },
   { id: "2", name: "Damas Grices" },
   { id: "3", name: "Socorrismo" },
 ];
 
-const initialGroups: group[] = [
-  {
-    id: "1",
-    name: "Damas Grices",
-    sectional: "Tunja",
-    numberVolunteers: "40",
-    numberPrograms: "8",
-    leader: { document: "1006576543", name: "Juan Sebastian Rodriguez Mateus" },
-  },
-  {
-    id: "2",
-    name: "Socorrismo",
-    sectional: "Duitama",
-    numberVolunteers: "20",
-    numberPrograms: "5",
-    leader: { document: "1007749746", name: "Sebastian Daza Delgadillo" },
-  },
-  {
-    id: "3",
-    name: "Juventud",
-    sectional: "Paipa",
-    numberVolunteers: "10",
-    numberPrograms: "10",
-  },
-];
 
 type FormState = {
   name: string;
@@ -58,30 +33,51 @@ const normalize = (v: string) =>
     .replace(/\p{Diacritic}/gu, "");
 
 export default function Agrupaciones() {
-  const [items, setItems] = useState<group[]>(initialGroups);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<FormState>({ name: "", sectional: "" });
   const [isNewGroup, setIsNewGroup] = useState(false);
+  const [sectionals,setSectionals] = useState<sectional[]>([])
+  const [groups,setGroups] = useState<group[]>([])
 
-  // búsqueda + paginación
+    useEffect(() => {
+        getGroups();
+        getSectionals();
+    },[sectionals] );
+
+    async function getGroups(){
+        try {
+            const groupsData: groups[] = await getGroupService();
+            setGroups(groupsData);
+        }catch (error){
+            console.error(error)
+        }
+    }
+    async function getSectionals(){
+        try {
+            const sectionalsData: sectional[] = await getSectionalService();
+            setSectionals(sectionalsData);
+        }catch (error){
+            console.error(error)
+        }
+    }
+
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1); // 1-based
 
   const sectionalSelected = useMemo(
-    () => SECTIONALS.find((c) => c.id === form.sectional) || null,
+    () => sectionals.find((c) => c.id === form.sectional) || null,
     [form.sectional],
   );
 
-  // filtra por nombre de la agrupación o seccional
   const filtered = useMemo(() => {
     const q = normalize(query);
-    if (!q) return items;
-    return items.filter(
+    if (!q) return groups;
+    return groups.filter(
       (g) =>
         normalize(g.name).includes(q) ||
         normalize(g.sectional ?? "").includes(q),
     );
-  }, [items, query]);
+  }, [groups, query]);
 
   const total = filtered.length;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -122,18 +118,19 @@ export default function Agrupaciones() {
   async function handleSubmit(e: React.FormEvent) {
     setIsNewGroup(true);
     e.preventDefault();
-    const newItem: group = {
-      id: String(Date.now()), // asegura key única en el grid
-      name: form.name,
-      sectional: sectionalSelected?.id,
+    const newItem: createGroup = {
+        name: form.name,
+        idHeadquarters: sectionalSelected?.id ?? '',
     };
-
-    setItems((prev) => [newItem, ...prev]);
     setOpen(false);
     resetForm();
-    // al crear, muéstralo arriba: resetea búsqueda y vamos a página 1
     setQuery("");
     setPage(1);
+    console.log(newItem)
+    const response = await createGroupService(newItem)
+      if(response.success){
+          console.log("Agrupación Creada")
+      }
   }
 
   return (
@@ -320,7 +317,7 @@ export default function Agrupaciones() {
               <option value="" disabled>
                 Selecciona una seccional…
               </option>
-              {SECTIONALS.map((s) => (
+              {sectionals.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.city}
                 </option>
@@ -415,7 +412,7 @@ export default function Agrupaciones() {
                 <option value="" disabled>
                   Selecciona una seccional…
                 </option>
-                {SECTIONALS.map((s) => (
+                {sectionals.map((s) => (
                   <option key={s.id} value={s.id}>
                     {s.city}
                   </option>

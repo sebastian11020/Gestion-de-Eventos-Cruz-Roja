@@ -38,7 +38,7 @@ export type FormState = {
 };
 
 export type sectional = {
-  id: string;
+  id?: string;
   city: string;
   type?: string;
   numberVolunteers?: string;
@@ -82,3 +82,13 @@ export type leaderDataTable = {
   group?: string;
   program?: string;
 };
+
+export type createSectional = {
+    idLocation:string,
+    type:string,
+}
+
+export type createGroup = {
+    name:string
+    idHeadquarters:string,
+}
