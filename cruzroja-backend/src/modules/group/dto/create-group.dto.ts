@@ -10,5 +10,4 @@ export class CreateGroupDto {
 
   @IsNumber()
   @Min(1)
-  idHeadquarters?: number;
-}
+  idHeadquarters: number;

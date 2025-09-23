@@ -21,13 +21,13 @@ export class GroupController {
   @Get('/all')
   @HttpCode(HttpStatus.OK)
   async findAll(): Promise<GetGroupDto[]> {
-    return this.groupService.getAllDto();
+    return await this.groupService.getAllDto();
   }
 
   @Post('/create')
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body()dto: CreateGroupDto) {
-    return this.groupService.create(dto);
+  async create(@Body() dto: CreateGroupDto) {
+    return await this.groupService.create(dto);
   }
 
   @Put('/update/:id')
@@ -36,6 +36,6 @@ export class GroupController {
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateGroupDto,
   ) {
-    return this.groupService.update(id, dto);
+    return await this.groupService.update(id, dto);
   }
 }

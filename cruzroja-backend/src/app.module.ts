@@ -20,7 +20,7 @@ import {ProgramModule} from "./modules/program/program.module";
     LocationModule,
     HeadquartersModule,
     GroupModule,
-    ProgramModule
+    ProgramModule,
   ],
   controllers: [AppController],
   providers: [AppService],
