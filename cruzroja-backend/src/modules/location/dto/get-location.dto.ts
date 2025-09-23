@@ -1,4 +1,4 @@
 export class GetLocationDto {
-  id: number;
+  id: string;
   name: string;
 }
