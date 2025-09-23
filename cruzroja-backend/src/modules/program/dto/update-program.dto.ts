@@ -1,9 +1,9 @@
 import { IsNumber, IsOptional, IsString, Matches, Min } from 'class-validator';
 
-export class UpdateGroupDto {
+export class UpdateProgramDto {
   @IsNumber()
   @Min(1)
-  id_group: number;
+  id_program: number;
 
   @IsString()
   @IsOptional()
