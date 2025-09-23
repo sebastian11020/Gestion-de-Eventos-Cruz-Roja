@@ -13,11 +13,12 @@ async function bootstrap() {
       transformOptions: { enableImplicitConversion: true },
     }),
   );
-  const allowedOrigins = process.env.ALLOW_ORIGINS;
+  const allowedOrigins = process.env.ALLOWED_ORIGINS;
 
   app.enableCors({
     origin: allowedOrigins,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   });
   await app.listen(process.env.PORT ?? 8080);

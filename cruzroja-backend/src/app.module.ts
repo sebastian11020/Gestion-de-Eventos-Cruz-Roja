@@ -6,6 +6,8 @@ import { ConfigModule } from '@nestjs/config';
 import * as process from 'node:process';
 import { LocationModule } from './modules/location/location.module';
 import { HeadquartersModule } from './modules/headquarters/headquarters.module';
+import { GroupModule } from './modules/group/group.module';
+import { ProgramModule } from './modules/program/program.module';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { HeadquartersModule } from './modules/headquarters/headquarters.module';
     }),
     LocationModule,
     HeadquartersModule,
+    GroupModule,
+    ProgramModule,
   ],
   controllers: [AppController],
   providers: [AppService],
