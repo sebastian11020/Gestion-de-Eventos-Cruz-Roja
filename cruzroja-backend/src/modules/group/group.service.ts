@@ -10,7 +10,6 @@ import {
 import { assertFound, conflict } from '../../common/utils/assert';
 import { UpdateGroupDto } from './dto/update-group';
 import { GetGroupDto } from './dto/get-group.dto';
-import { GetGroupHeadquartersDto } from '../group-headquarters/dto/get-group-headquarters.dto';
 
 @Injectable()
 export class GroupService {
@@ -24,38 +23,6 @@ export class GroupService {
       const dto = new GetGroupDto();
       dto.id = String(row.id);
       dto.name = FormatNamesString(row.name);
-      return dto;
-    });
-  }
-
-  async getAllGroupHeadquartersDto() {
-    const rows: {
-      id: number;
-      name: string;
-      sectional: string;
-      number_volunteers: number;
-      number_programs: number;
-      leader: {
-        document: string;
-        name: string;
-      };
-      programs: {
-        id: string;
-        name: string;
-      };
-    }[] = await this.groupRepository.query(
-      'select * from public.list_groups_with_details($1)',
-      ['ACTIVO'],
-    );
-    return rows.map((row) => {
-      const dto = new GetGroupHeadquartersDto();
-      dto.id = String(row.id);
-      dto.name = FormatNamesString(row.name);
-      dto.sectional = FormatNamesString(row.sectional);
-      dto.numberVolunteers = String(row.number_volunteers);
-      dto.numberPrograms = String(row.number_programs);
-      dto.leader = row.leader;
-      dto.programs = row.programs;
       return dto;
     });
   }
