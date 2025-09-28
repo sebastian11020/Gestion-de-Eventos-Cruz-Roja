@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString, Matches, Min } from 'class-validator';
+import { IsNotEmpty, IsString, Matches } from 'class-validator';
 
 export class CreateGroupDto {
   @IsString()
@@ -7,7 +7,4 @@ export class CreateGroupDto {
     message: 'Solo se permiten letras y espacios',
   })
   name: string;
-
-  @IsNumber()
-  @Min(1)
-  idHeadquarters: number;
+}
