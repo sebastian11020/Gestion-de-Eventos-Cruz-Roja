@@ -5,6 +5,8 @@ import { Repository } from 'typeorm';
 import { CreateGroupHeadquarters } from './dto/create-group-headquarters.dto';
 import { assertFound, conflict } from '../../common/utils/assert';
 import { HeadquartersService } from '../headquarters/headquarters.service';
+import { GetGroupHeadquartersDto } from './dto/get-group-headquarters.dto';
+import { FormatNamesString } from '../../common/utils/string.utils';
 
 @Injectable()
 export class GroupHeadquartersService {
@@ -13,6 +15,38 @@ export class GroupHeadquartersService {
     private groupHeadquartersRepository: Repository<GroupHeadquarters>,
     private headquartersService: HeadquartersService,
   ) {}
+
+  async getAllGroupHeadquartersDto() {
+    const rows: {
+      id: number;
+      name: string;
+      sectional: string;
+      number_volunteers: number;
+      number_programs: number;
+      leader: {
+        document: string;
+        name: string;
+      };
+      programs: {
+        id: string;
+        name: string;
+      };
+    }[] = await this.groupHeadquartersRepository.query(
+      'select * from public.list_groups_with_details($1)',
+      ['ACTIVO'],
+    );
+    return rows.map((row) => {
+      const dto = new GetGroupHeadquartersDto();
+      dto.id = String(row.id);
+      dto.name = FormatNamesString(row.name);
+      dto.sectional = FormatNamesString(row.sectional);
+      dto.numberVolunteers = String(row.number_volunteers);
+      dto.numberPrograms = String(row.number_programs);
+      dto.leader = row.leader;
+      dto.programs = row.programs;
+      return dto;
+    });
+  }
 
   private async checkStatusHeadquarters(id: number) {
     const headquarters = await this.headquartersService.getById(id);
