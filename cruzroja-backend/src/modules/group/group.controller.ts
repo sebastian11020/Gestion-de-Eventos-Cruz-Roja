@@ -24,12 +24,6 @@ export class GroupController {
     return await this.groupService.getAllGroupDto();
   }
 
-  @Get('/:id')
-  @HttpCode(HttpStatus.OK)
-  async findAllGroupHeadquarters() {
-    return this.groupService.getAllGroupHeadquartersDto();
-  }
-
   @Post('/create')
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() dto: CreateGroupDto) {
