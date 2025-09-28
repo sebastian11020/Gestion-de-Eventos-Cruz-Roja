@@ -31,6 +31,6 @@ export class HeadquartersController {
   @Put('/update/:id')
   @HttpCode(HttpStatus.OK)
   async update(@Param('id', ParseIntPipe) id: number) {
-    return await this.headquartersService.update(id);
+    return await this.headquartersService.deactivate(id);
   }
 }

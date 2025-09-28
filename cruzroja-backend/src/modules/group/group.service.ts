@@ -10,6 +10,7 @@ import {
 import { assertFound, conflict } from '../../common/utils/assert';
 import { UpdateGroupDto } from './dto/update-group';
 import { GetGroupDto } from './dto/get-group.dto';
+import { GetGroupHeadquartersDto } from '../group-headquarters/dto/get-group-headquarters.dto';
 
 @Injectable()
 export class GroupService {
@@ -17,7 +18,17 @@ export class GroupService {
     @InjectRepository(Groups) private groupRepository: Repository<Groups>,
   ) {}
 
-  async getAllDto() {
+  async getAllGroupDto(): Promise<GetGroupDto[]> {
+    const rows = await this.groupRepository.find();
+    return rows.map((row) => {
+      const dto = new GetGroupDto();
+      dto.id = String(row.id);
+      dto.name = FormatNamesString(row.name);
+      return dto;
+    });
+  }
+
+  async getAllGroupHeadquartersDto() {
     const rows: {
       id: number;
       name: string;
@@ -37,7 +48,7 @@ export class GroupService {
       ['ACTIVO'],
     );
     return rows.map((row) => {
-      const dto = new GetGroupDto();
+      const dto = new GetGroupHeadquartersDto();
       dto.id = String(row.id);
       dto.name = FormatNamesString(row.name);
       dto.sectional = FormatNamesString(row.sectional);
@@ -56,7 +67,7 @@ export class GroupService {
   }
 
   async create(dto: CreateGroupDto) {
-      console.log(dto)
+    console.log(dto);
     let group: Groups | null = await this.groupRepository.findOne({
       where: {
         name: NormalizeString(dto.name),

@@ -20,8 +20,14 @@ export class GroupController {
 
   @Get('/all')
   @HttpCode(HttpStatus.OK)
-  async findAll(): Promise<GetGroupDto[]> {
-    return await this.groupService.getAllDto();
+  async findAllGroup(): Promise<GetGroupDto[]> {
+    return await this.groupService.getAllGroupDto();
+  }
+
+  @Get('/:id')
+  @HttpCode(HttpStatus.OK)
+  async findAllGroupHeadquarters() {
+    return this.groupService.getAllGroupHeadquartersDto();
   }
 
   @Post('/create')
