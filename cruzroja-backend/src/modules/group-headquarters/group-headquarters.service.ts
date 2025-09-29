@@ -82,11 +82,11 @@ export class GroupHeadquartersService {
     return { success: true };
   }
 
-  async deactivate(dto: CreateGroupHeadquarters) {
+  async deactivate(idGroup: number, idHeadquarters: number) {
     const object = await this.groupHeadquartersRepository.findOne({
       where: {
-        idGroup: dto.idGroup,
-        idHeadquarters: dto.idHeadquarters,
+        idGroup: idGroup,
+        idHeadquarters: idHeadquarters,
       },
     });
     assertFound(object, `No se encontro la agrupacion que deseas desactivar`);
