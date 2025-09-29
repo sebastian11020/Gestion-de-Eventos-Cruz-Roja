@@ -22,6 +22,11 @@ export class HeadquartersController {
     return await this.headquartersService.getAllDto();
   }
 
+  @Get('/allInfo')
+  async getAllInfo() {
+    return await this.headquartersService.getAllWithGroupsAndPrograms();
+  }
+
   @Post('/create')
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() dto: CreateHeadquartersDto) {
