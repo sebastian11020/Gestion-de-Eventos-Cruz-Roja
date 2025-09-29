@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { X, Check } from "lucide-react";
 import { FormState, sectional, group, program } from "@/types/usertType";
 import { getCities } from "@/services/serviceSelect";
+import {generatePassword} from "@/utils/generatePassword";
 
 type cities = {
   id: string;

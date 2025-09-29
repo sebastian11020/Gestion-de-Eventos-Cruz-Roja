@@ -82,3 +82,14 @@ export type leaderDataTable = {
   group?: string;
   program?: string;
 };
+
+export type event = {
+    id?:string;
+    title: string;
+    description: string;
+    startDate: string;
+    endDate: string;
+    location:string;
+    capacity:string;
+    startAt:string;
+}
