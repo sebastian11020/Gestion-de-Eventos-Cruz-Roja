@@ -39,6 +39,17 @@ export class HeadquartersService {
     });
   }
 
+  async getAllWithGroupsAndPrograms() {
+    const rows: {
+      id: number;
+      city: string;
+      groups: [id: number, name: string, programs: [id: number, name: string]];
+    }[] = await this.headquartersRepository.query(
+      'select * from public.list_headquarters_with_groups_and_programs()',
+    );
+    return rows;
+  }
+
   async create(dto: CreateHeadquartersDto) {
     const location = await this.locationService.getById(dto.idLocation);
     assertFound(
