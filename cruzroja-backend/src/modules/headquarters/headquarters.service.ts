@@ -72,7 +72,7 @@ export class HeadquartersService {
     return { success: true };
   }
 
-  async update(id: number) {
+  async deactivate(id: number) {
     const headquarter: Headquarters | null =
       await this.headquartersRepository.findOne({
         where: {
@@ -83,8 +83,20 @@ export class HeadquartersService {
       headquarter,
       `No se encontro una sede con el sigueinte id: ${id}`,
     );
-    headquarter.state = !headquarter.state;
-    await this.headquartersRepository.update(id, headquarter);
+    await this.headquartersRepository.query(
+      'select * from public.deactivate_headquarters($1)',
+      [id],
+    );
     return { success: true };
+  }
+
+  async getById(id: number) {
+    const headquarter = await this.headquartersRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+    assertFound(headquarter, `No se encontro una sede con el id ${id}`);
+    return headquarter;
   }
 }
