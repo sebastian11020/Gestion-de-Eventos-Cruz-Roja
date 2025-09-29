@@ -4,7 +4,10 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
+  ParseIntPipe,
   Post,
+  Put,
 } from '@nestjs/common';
 import { GroupHeadquartersService } from './group-headquarters.service';
 import { CreateGroupHeadquarters } from './dto/create-group-headquarters.dto';
@@ -25,9 +28,12 @@ export class GroupHeadquartersController {
     return this.groupHeadquartersService.createOrActivate(dto);
   }
 
-  @Post('/deactivate')
+  @Put('/deactivate/:idGroup/:idHeadquarters')
   @HttpCode(HttpStatus.OK)
-  async deactivate(@Body() dto: CreateGroupHeadquarters) {
-    return this.groupHeadquartersService.deactivate(dto);
+  async deactivate(
+    @Param('idGroup', ParseIntPipe) idGroup: number,
+    @Param('idHeadquarters', ParseIntPipe) idHeadquarters: number,
+  ) {
+    return this.groupHeadquartersService.deactivate(idGroup, idHeadquarters);
   }
 }

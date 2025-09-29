@@ -8,6 +8,7 @@ import { LocationModule } from './modules/location/location.module';
 import { HeadquartersModule } from './modules/headquarters/headquarters.module';
 import { GroupModule } from './modules/group/group.module';
 import { ProgramModule } from './modules/program/program.module';
+import { ProgramHeadquartersModule } from './modules/program-headquarters/program-headquarters.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ProgramModule } from './modules/program/program.module';
     GroupModule,
     ProgramModule,
     HeadquartersModule,
+    ProgramHeadquartersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
