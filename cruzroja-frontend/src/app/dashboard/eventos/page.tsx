@@ -2,12 +2,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import { EventCard } from "@/components/layout/eventCard";
+import Modal from "@/components/layout/modal"; // ← tu modal reutilizable
+import Podium from "@/components/layout/podium";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, History, PlusCircle } from "lucide-react";
 import type { event as EventType } from "@/types/usertType";
-import Podium from "@/components/layout/podium";
+import CreateEventForm from "@/components/layout/createEventForm";
 
 const PAGE_SIZE = 8;
 
@@ -17,7 +18,6 @@ function asDateRange(e: Pick<EventType, "startDate" | "endDate">) {
     if (e.startDate && e.endDate) return `${e.startDate} – ${e.endDate}`;
     return e.startDate ?? e.endDate ?? "";
 }
-
 function isPast(startAt?: string) {
     if (!startAt) return false;
     const now = new Date();
@@ -26,59 +26,24 @@ function isPast(startAt?: string) {
 
 export default function EventosPage() {
     const events: EventType[] = [
-        {
-            id: "1",
-            title: "Capacitación en Primeros Auxilios",
-            description:
-                "Aprende técnicas básicas de primeros auxilios con instructores certificados.",
-            startDate: "15 Octubre 2025, 10:00 AM",
-            endDate: "15 Octubre 2025, 12:00 PM",
-            location: "Seccional Tunja",
-            capacity: "30",
-            startAt: "2025-10-15T15:00:00.000Z",
-        },
-        {
-            id: "2",
-            title: "Jornada de Donación de Sangre",
-            description: "Participa en nuestra jornada de donación y ayuda a salvar vidas.",
-            startDate: "20 Octubre 2025, 8:00 AM",
-            endDate: "",
-            location: "Hospital Regional",
-            capacity: "30",
-            startAt: "2025-10-20T13:00:00.000Z",
-        },
-        {
-            id: "3",
-            title: "Simulacro de Evacuación",
-            description: "Práctica de rutas de evacuación en la sede municipal.",
-            startDate: "01 Septiembre 2025, 9:00 AM",
-            endDate: "01 Septiembre 2025, 10:30 AM",
-            location: "Unidad Municipal",
-            capacity: "50",
-            // Pasado
-            startAt: "2025-09-01T14:00:00.000Z",
-        },
+        // ... tus mocks
     ];
 
-    // 🔹 Podio (mock). En producción: GET /reports/top-volunteers?month=YYYY-MM
     const topVolunteers: TopVolunteer[] = [
-        { id: "u1", name: "Ana Rodríguez", hours: 42 },
-        { id: "u2", name: "Carlos Pérez", hours: 36 },
-        { id: "u3", name: "Luisa Gómez", hours: 29 },
+        // ... tus mocks
     ];
 
     const [page, setPage] = useState(1);
     const [showHistory, setShowHistory] = useState(false);
 
-    const filtered = useMemo(() => {
-        return events.filter((e) => (showHistory ? isPast((e as any).startAt) : !isPast((e as any).startAt)));
-    }, [events, showHistory]);
+    // 🔹 estado para abrir/cerrar el modal de crear
+    const [openCreate, setOpenCreate] = useState(false);
 
-    const totalPages = useMemo(
-        () => Math.max(1, Math.ceil(filtered.length / PAGE_SIZE)),
-        [filtered.length]
+    const filtered = useMemo(
+        () => events.filter((e) => (showHistory ? isPast((e as any).startAt) : !isPast((e as any).startAt))),
+        [events, showHistory]
     );
-
+    const totalPages = useMemo(() => Math.max(1, Math.ceil(filtered.length / PAGE_SIZE)), [filtered.length]);
     const pageSlice = useMemo(() => {
         const start = (page - 1) * PAGE_SIZE;
         const end = start + PAGE_SIZE;
@@ -89,22 +54,16 @@ export default function EventosPage() {
         () => (filtered.length === 0 ? 0 : (page - 1) * PAGE_SIZE + 1),
         [filtered.length, page]
     );
-    const showingTo = useMemo(
-        () => Math.min(page * PAGE_SIZE, filtered.length),
-        [filtered.length, page]
-    );
+    const showingTo = useMemo(() => Math.min(page * PAGE_SIZE, filtered.length), [filtered.length, page]);
 
     const handleSubscribe = (eventId: string) => {
         console.log("Inscrito en evento", eventId);
     };
 
-
     return (
         <div className="p-6 space-y-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <h1 className="text-xl md:text-2xl font-bold text-gray-800 tracking-tight">
-                    Eventos
-                </h1>
+                <h1 className="text-xl md:text-2xl font-bold text-gray-800 tracking-tight">Eventos</h1>
 
                 <div className="flex items-center gap-2">
                     <Button
@@ -117,17 +76,15 @@ export default function EventosPage() {
                         {showHistory ? "Ver próximos" : "Ver historial"}
                     </Button>
 
-                    {/* Crear evento */}
-                    <Link href="/dashboard/eventos/crear">
-                        <Button type="button" className="rounded-xl">
-                            <PlusCircle className="w-4 h-4 mr-2" />
-                            Crear evento
-                        </Button>
-                    </Link>
+                    {/* 👉 Abre modal de crear */}
+                    <Button type="button" className="rounded-xl" onClick={() => setOpenCreate(true)}>
+                        <PlusCircle className="w-4 h-4 mr-2" />
+                        Crear evento
+                    </Button>
                 </div>
             </div>
 
-            <Podium top={topVolunteers}></Podium>
+            <Podium top={topVolunteers} />
 
             {/* Grid de tarjetas */}
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -146,14 +103,11 @@ export default function EventosPage() {
                             onSubscribe={() => handleSubscribe(id)}
                             onViewEnrolled={() => console.log("Ver inscritos de", id)}
                         />
-
                     );
                 })}
                 {pageSlice.length === 0 && (
                     <div className="col-span-full text-sm text-gray-600">
-                        {showHistory
-                            ? "No hay eventos en el historial."
-                            : "No hay eventos próximos."}
+                        {showHistory ? "No hay eventos en el historial." : "No hay eventos próximos."}
                     </div>
                 )}
             </div>
@@ -163,7 +117,6 @@ export default function EventosPage() {
         <span className="text-sm text-gray-600">
           Mostrando {showingFrom}–{showingTo} de {filtered.length}
         </span>
-
                 <div className="flex items-center gap-2">
                     <Button
                         type="button"
@@ -190,6 +143,20 @@ export default function EventosPage() {
                     </Button>
                 </div>
             </div>
+
+            {/* 🧩 Modal con el formulario de crear evento */}
+            <Modal
+                open={openCreate}
+                onClose={() => setOpenCreate(false)}
+                title="Crear evento"
+            >
+                <CreateEventForm
+                    onCancel={() => setOpenCreate(false)}
+                    onSuccess={() => {
+                        setOpenCreate(false);
+                    }}
+                />
+            </Modal>
         </div>
     );
 }

@@ -4,12 +4,10 @@ import { Headquarters } from '../../headquarters/entity/headquarters.entity';
 
 @Entity()
 export class GroupHeadquarters {
-  @PrimaryColumn()
-  @JoinColumn({ name: 'id_group' })
+  @PrimaryColumn({ name: 'id_group' })
   idGroup: number;
 
-  @PrimaryColumn()
-  @JoinColumn({ name: 'id_headquarters' })
+  @PrimaryColumn({ name: 'id_headquarters' })
   idHeadquarters: number;
 
   @Column()

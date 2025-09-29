@@ -89,8 +89,9 @@ export type createSectional = {
 }
 
 export type createGroup = {
-    name:string
-    idHeadquarters:string,
+    idGroup?:string;
+    name?:string;
+    idHeadquarters:string;
 }
 
 export type event = {
@@ -103,3 +104,27 @@ export type event = {
     capacity:string;
     startAt:string;
 }
+
+export type createEvent = {
+    ambit:string;
+    classification:string;
+    applyDecreet:boolean;
+    marcActivity:string;
+    sectional:string;
+    group:string;
+    startDate:string;
+    endDate:string;
+    name:string;
+    description:string;
+    department:string;
+    city:string;
+    attendant:{
+        name:string;
+        phone:string;
+    }
+    capacity:string;
+    isVirtual:boolean;
+    latitud:string;
+    longitud:string;
+}
+

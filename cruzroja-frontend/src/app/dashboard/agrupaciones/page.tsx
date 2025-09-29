@@ -6,21 +6,16 @@ import Modal from "@/components/layout/modal";
 import { GroupCard } from "@/components/layout/groupCard";
 import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 import {getSectionalService} from "@/services/serviceGetSectional";
-import {createGroupService,} from "@/services/serviceCreateGroups";
-import {getGroupService} from "@/services/serviceGetGroup";
+import {associateGroupService, createGroupService,} from "@/services/serviceCreateGroups";
+import {getGroup, getGroupService} from "@/services/serviceGetGroup";
 
 
 type sectional = { id: string; city: string };
 type groups = { id: string; name: string };
 
-const GROUPS: groups[] = [
-  { id: "1", name: "Juventud" },
-  { id: "2", name: "Damas Grices" },
-  { id: "3", name: "Socorrismo" },
-];
-
 
 type FormState = {
+  idGroup?:string;
   name: string;
   sectional: string;
 };
@@ -34,20 +29,23 @@ const normalize = (v: string) =>
 
 export default function Agrupaciones() {
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState<FormState>({ name: "", sectional: "" });
+  const [form, setForm] = useState<FormState>({ idGroup:"",name: "", sectional: "" });
   const [isNewGroup, setIsNewGroup] = useState(false);
   const [sectionals,setSectionals] = useState<sectional[]>([])
   const [groups,setGroups] = useState<group[]>([])
+    const [groupsData,setGroupsData] = useState<group[]>([])
 
     useEffect(() => {
         getGroups();
         getSectionals();
-    },[sectionals] );
+    },[groupsData] );
 
     async function getGroups(){
         try {
             const groupsData: groups[] = await getGroupService();
-            setGroups(groupsData);
+            const allGroups: groups[] = await getGroup();
+            setGroups(allGroups);
+            setGroupsData(groupsData);
         }catch (error){
             console.error(error)
         }
@@ -69,15 +67,20 @@ export default function Agrupaciones() {
     [form.sectional],
   );
 
+    const groupSelected = useMemo(
+        () => groups.find((c) => c.id === form.sectional) || null,
+        [form.sectional],
+    );
+
   const filtered = useMemo(() => {
     const q = normalize(query);
-    if (!q) return groups;
-    return groups.filter(
+    if (!q) return groupsData;
+    return groupsData.filter(
       (g) =>
         normalize(g.name).includes(q) ||
         normalize(g.sectional ?? "").includes(q),
     );
-  }, [groups, query]);
+  }, [groupsData, query]);
 
   const total = filtered.length;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -119,7 +122,7 @@ export default function Agrupaciones() {
     setIsNewGroup(true);
     e.preventDefault();
     const newItem: createGroup = {
-        name: form.name,
+        name: groupSelected?.id ?? '',
         idHeadquarters: sectionalSelected?.id ?? '',
     };
     setOpen(false);
@@ -132,6 +135,24 @@ export default function Agrupaciones() {
           console.log("Agrupación Creada")
       }
   }
+
+    async function handleAssociate(e: React.FormEvent) {
+        setIsNewGroup(true);
+        e.preventDefault();
+        const newItem: createGroup = {
+            idGroup: form.idGroup,
+            idHeadquarters: sectionalSelected?.id ?? '',
+        };
+        setOpen(false);
+        resetForm();
+        setQuery("");
+        setPage(1);
+        console.log(newItem)
+        const response = await associateGroupService(newItem)
+        if(response.success){
+            console.log("Agrupación Asociada")
+        }
+    }
 
   return (
     <div className="space-y-6">
@@ -297,37 +318,6 @@ export default function Agrupaciones() {
             </p>
           </div>
 
-          {/* Seccional */}
-          <div className="grid gap-1.5">
-            <label
-              htmlFor="sectional"
-              className="text-sm font-medium text-gray-800"
-            >
-              Seccional
-            </label>
-            <select
-              id="sectional"
-              required
-              value={form.sectional}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, sectional: e.target.value }))
-              }
-              className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-            >
-              <option value="" disabled>
-                Selecciona una seccional…
-              </option>
-              {sectionals.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.city}
-                </option>
-              ))}
-            </select>
-            <p className="text-xs text-gray-500">
-              La agrupación quedará asociada a la seccional seleccionada.
-            </p>
-          </div>
-
           {/* Acciones */}
           <div className="flex items-center justify-end gap-2 pt-1">
             <Button
@@ -343,7 +333,7 @@ export default function Agrupaciones() {
             </Button>
             <Button
               type="submit"
-              disabled={!form.name.trim() || !form.sectional}
+              disabled={!form.name.trim()}
               className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-md hover:bg-blue-700 disabled:opacity-60"
             >
               Guardar
@@ -362,7 +352,7 @@ export default function Agrupaciones() {
           }}
           title="Nueva Agrupación"
         >
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleAssociate} className="space-y-5">
             <div className="grid gap-1.5">
               <label
                 htmlFor="group"
@@ -373,16 +363,16 @@ export default function Agrupaciones() {
               <select
                 id="group"
                 required
-                value={form.name}
+                value={form.idGroup}
                 onChange={(e) =>
-                  setForm((f) => ({ ...f, name: e.target.value }))
+                  setForm((f) => ({ ...f, idGroup: e.target.value }))
                 }
                 className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
               >
                 <option value="" disabled>
                   Selecciona una agrupación…
                 </option>
-                {GROUPS.map((s) => (
+                {groups.map((s) => (
                   <option key={s.id} value={s.id}>
                     {s.name}
                   </option>
@@ -437,12 +427,7 @@ export default function Agrupaciones() {
               </Button>
               <Button
                 type="submit"
-                onClick={() => {
-                  resetForm();
-                  setOpen(false);
-                  setIsNewGroup(false);
-                }}
-                disabled={!form.name.trim() || !form.sectional}
+                disabled={!form.sectional}
                 className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-md hover:bg-blue-700 disabled:opacity-60"
               >
                 Guardar
