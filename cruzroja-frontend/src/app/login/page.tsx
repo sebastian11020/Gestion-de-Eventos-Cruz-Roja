@@ -18,7 +18,6 @@ export default function LoginCR() {
   const [err, setErr] = useState<string | null>(null);
 
   async function login(e: React.FormEvent) {
-    // 👈 recibe siempre el submit event
     e.preventDefault();
     setLoading(true);
     setErr(null);
