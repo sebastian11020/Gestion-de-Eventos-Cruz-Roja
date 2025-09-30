@@ -11,3 +11,12 @@ export async function createSectionalService(sectional:createSectional) {
         console.error(error);
     }
 }
+
+export async function getSectionalInfo() {
+    try {
+        const response = await axios.get('http://localhost:8080/headquarters/allInfo')
+        return response.data;
+    }catch (error) {
+        console.error(error);
+    }
+}

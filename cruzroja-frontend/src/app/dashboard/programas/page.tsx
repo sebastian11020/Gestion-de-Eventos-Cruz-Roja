@@ -1,47 +1,19 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import type { group, program } from "@/types/usertType";
+import type {createProgram, group, program, sectional} from "@/types/usertType";
 import { Button } from "@/components/ui/button";
 import Modal from "@/components/layout/modal";
 import { GroupCard } from "@/components/layout/groupCard";
 import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { ProgramCard } from "@/components/layout/programCard";
+import {getSectionalService} from "@/services/serviceGetSectional";
+import {getSectionalInfo} from "@/services/serviceCreateSectional";
+import {createProgramService} from "@/services/serviceCreateProgram";
 
 type ProgramItem = { id: string; name: string };
 type GroupNode = { id: string; name: string; program: ProgramItem[] };
-type SectionalNode = { id: string; city: string; group: GroupNode[] };
+type SectionalNode = { id: string; city: string; groups: GroupNode[] };
 
-const SECTIONALS: SectionalNode[] = [
-  {
-    id: "1",
-    city: "Tunja",
-    group: [
-      { id: "1", name: "Juventud", program: [{ id: "1", name: "Aire Libre" }] },
-      {
-        id: "2",
-        name: "Damas Grices",
-        program: [{ id: "1", name: "Lavar Ropa" }],
-      },
-      {
-        id: "3",
-        name: "Socorrismo",
-        program: [{ id: "1", name: "Busqueda y Rescate" }],
-      },
-    ],
-  },
-  {
-    id: "2",
-    city: "Duitama",
-    group: [
-      { id: "1", name: "Juventud", program: [{ id: "1", name: "Aire Libre" }] },
-      {
-        id: "2",
-        name: "Socorrismo",
-        program: [{ id: "1", name: "Busqueda y Rescate" }],
-      },
-    ],
-  },
-];
 
 const initialPrograms: program[] = [
   {
@@ -82,6 +54,7 @@ const normalize = (v: string) =>
 export default function Agrupaciones() {
   const [items, setItems] = useState<program[]>(initialPrograms);
   const [open, setOpen] = useState(false);
+  const [sectionals, setSectionals] = useState<SectionalNode[]>([]);
   const [form, setForm] = useState<FormState>({
     name: "",
     sectional: "",
@@ -94,12 +67,21 @@ export default function Agrupaciones() {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1); // 1-based
 
+  async function getSectionals(){
+    try {
+      const sectionalsData: SectionalNode[] = await getSectionalInfo();
+      console.log(sectionalsData);
+      setSectionals(sectionalsData);
+    }catch (error){
+      console.error(error)
+    }
+  }
   // dependencias
   const sectionalSelected = useMemo(
-    () => SECTIONALS.find((c) => c.id === form.sectional) || null,
+    () => sectionals.find((c) => c.id === form.sectional) || null,
     [form.sectional],
   );
-  const groupOptions: GroupNode[] = sectionalSelected?.group ?? [];
+  const groupOptions: GroupNode[] = sectionalSelected?.groups ?? [];
   const groupSelected = useMemo(
     () => groupOptions.find((g) => g.id === form.group) || null,
     [groupOptions, form.group],
@@ -117,6 +99,8 @@ export default function Agrupaciones() {
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   useEffect(() => {
+    getSectionals();
+    console.log(sectionals);
     if (page > totalPages) setPage(1);
   }, [page, totalPages]);
 
@@ -150,22 +134,23 @@ export default function Agrupaciones() {
   }
 
   // Crear manual (elige seccional + grupo, escribe nombre del programa)
-  function handleSubmitManual(e: React.FormEvent) {
+  async function handleSubmitManual(e: React.FormEvent) {
     e.preventDefault();
     if (!form.sectional || !form.group || !form.name.trim()) return;
 
-    const newItem: program = {
-      id: String(Date.now()),
+    const newItem: createProgram = {
       name: form.name.trim(),
-      sectional: sectionalSelected?.city ?? "",
-      group: groupSelected?.name ?? "",
+      id_group: form.group ?? "",
     };
-
-    setItems((prev) => [newItem, ...prev]);
     setOpen(false);
     resetForm();
     setQuery("");
     setPage(1);
+    const response = await createProgramService(newItem);
+
+    if (response.success){
+      console.log("Programa Creado")
+    }
   }
 
   // Crear desde catálogo (elige seccional + grupo + programa existente)
@@ -345,7 +330,7 @@ export default function Agrupaciones() {
               <option value="" disabled>
                 Selecciona una seccional…
               </option>
-              {SECTIONALS.map((s) => (
+              {sectionals.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.city}
                 </option>
@@ -367,7 +352,7 @@ export default function Agrupaciones() {
               disabled={!form.sectional}
               value={form.group}
               onChange={(e) =>
-                setForm((f) => ({ ...f, group: e.target.value, programId: "" }))
+                setForm((f) => ({ ...f, group: e.target.value}))
               }
               className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:opacity-60"
             >
@@ -469,7 +454,7 @@ export default function Agrupaciones() {
                 <option value="" disabled>
                   Selecciona una seccional…
                 </option>
-                {SECTIONALS.map((s) => (
+                {sectionals.map((s) => (
                   <option key={s.id} value={s.id}>
                     {s.city}
                   </option>

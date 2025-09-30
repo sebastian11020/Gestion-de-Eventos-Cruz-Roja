@@ -92,3 +92,9 @@ export type createGroup = {
     name:string
     idHeadquarters:string,
 }
+
+
+export type createProgram = {
+  name:string;
+  id_group:string;
+}
