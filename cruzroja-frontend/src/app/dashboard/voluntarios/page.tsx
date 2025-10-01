@@ -7,7 +7,7 @@ import { Eye, PencilLine } from "lucide-react";
 import { FormState, sectional } from "@/types/usertType";
 import ViewUser from "@/components/layout/viewUser";
 import { supabase } from "@/lib/supabase-browser";
-import {generatePassword} from "@/utils/generatePassword";
+import { generatePassword } from "@/utils/generatePassword";
 
 const PAGE_SIZE = 7;
 
@@ -347,11 +347,11 @@ export default function voluntarios() {
   }, []);
 
   async function register(form: FormState) {
-    const provisional:string  = generatePassword(12);
+    const provisional: string = generatePassword(12);
     const sb = supabase();
-    const { data,error } = await sb.auth.signUp({
+    const { data, error } = await sb.auth.signUp({
       email: form.email,
-      password:provisional,
+      password: provisional,
     });
   }
 

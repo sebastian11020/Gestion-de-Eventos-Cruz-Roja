@@ -26,6 +26,8 @@ import type {
   leaderDataTable,
   program,
 } from "@/types/usertType";
+import toast from "react-hot-toast";
+import {deleteGroup, updateGroup} from "@/services/serviceCreateGroups";
 
 type SectionalCardProps = {
   sectional?: TSectional;
@@ -63,7 +65,8 @@ export function GroupCard({ group }: SectionalCardProps) {
   const [viewUser, setViewUser] = useState<FormState | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [openView, setOpenView] = useState(false);
-
+  const [deleteGroupId,setDeleteGroupId] = useState("")
+    const [deleteSectionalId,setDeleteSectionalId] = useState("")
   // --- Edición de nombre ---
   const [localName, setLocalName] = useState(group?.name ?? "");
   const [editing, setEditing] = useState(false);
@@ -77,12 +80,18 @@ export function GroupCard({ group }: SectionalCardProps) {
     setEditing(false);
     setNameDraft(localName);
   }
-  function handleSaveName(id: string | undefined) {
+  async function handleSaveName(id: string) {
     const next = nameDraft.trim();
     if (!next) return;
     setLocalName(next);
     setEditing(false);
-    console.log(id);
+    toast.loading("Editando agrupacion",{duration:1000})
+    const response = await updateGroup(id,localName)
+    if(response.success){
+        toast.success("Actualizada correctamente",{duration:3000})
+    }else {
+        toast.error(response.message,{duration:3000})
+    }
   }
 
   function onView(g: string | undefined) {
@@ -120,7 +129,14 @@ export function GroupCard({ group }: SectionalCardProps) {
     });
   }
 
-  function handleDelete() {
+  async function handleDelete() {
+    toast.loading("Eliminando Agrupacion",{duration:1000})
+    const response = await deleteGroup(deleteGroupId,deleteSectionalId)
+    if(response.data){
+        toast.success("Agrupacion eliminada correctamente",{duration:3000})
+    }else {
+        toast.error(response.message,{duration:3000})
+    }
     setConfirmOpen(false);
   }
 
@@ -165,7 +181,7 @@ export function GroupCard({ group }: SectionalCardProps) {
                 value={nameDraft}
                 onChange={(e) => setNameDraft(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") handleSaveName(group?.id);
+                  if (e.key === "Enter") handleSaveName(group?.id ?? '');
                   if (e.key === "Escape") cancelEdit();
                 }}
                 required={true}
@@ -179,7 +195,7 @@ export function GroupCard({ group }: SectionalCardProps) {
               <button
                 type="button"
                 onClick={() => {
-                  handleSaveName(group?.id);
+                  handleSaveName(group?.id ?? '');
                 }}
                 className="inline-flex items-center justify-center rounded-md bg-green-600 text-white p-1.5 hover:bg-green-700 active:bg-green-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500/30"
                 title="Guardar"
@@ -203,7 +219,7 @@ export function GroupCard({ group }: SectionalCardProps) {
           type="button"
           aria-label="Eliminar"
           title="Eliminar"
-          onClick={() => setConfirmOpen(true)}
+          onClick={() => {setConfirmOpen(true); setDeleteGroupId(group?.id ?? '');setDeleteSectionalId(group?.sectional?.id ?? '')}}
           className="
             inline-flex items-center justify-center
             rounded-full p-2
@@ -225,7 +241,7 @@ export function GroupCard({ group }: SectionalCardProps) {
           <MapPin className="h-4 w-4 text-gray-400" />
           <span className="truncate">
             <span className="font-medium text-gray-700">Seccional:</span>{" "}
-            {group?.sectional}
+            {group?.sectional?.name}
           </span>
         </div>
         <div className="flex items-center justify-between">

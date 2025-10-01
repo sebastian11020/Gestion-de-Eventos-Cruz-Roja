@@ -1,13 +1,14 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { SectionalCard } from "@/components/layout/sectionalCard";
-import type {createSectional, sectional} from "@/types/usertType";
+import type { createSectional, sectional } from "@/types/usertType";
 import { Button } from "@/components/ui/button";
 import Modal from "@/components/layout/modal";
 import { ChevronLeft, ChevronRight, Search } from "lucide-react";
-import {getCities} from "@/services/serviceSelect";
-import {createSectionalService} from "@/services/serviceCreateSectional";
-import {getSectionalService} from "@/services/serviceGetSectional";
+import { getCities } from "@/services/serviceSelect";
+import { createSectionalService } from "@/services/serviceCreateSectional";
+import { getSectionalService } from "@/services/serviceGetSectional";
+import toast from "react-hot-toast";
 
 const SECTIONAL_TYPES = [
   "SEDE SECCIONAL",
@@ -33,44 +34,44 @@ const normalize = (v: string) =>
 export default function Sedes() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<FormState>({ cityId: "", type: "" });
-  const [cities,setCities] = useState<City[]>()
+  const [cities, setCities] = useState<City[]>();
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
-    const [sectionals, setSectionals] = useState<sectional[]>([]);
-  const citySelected:City|null = useMemo(
-    ():City|null => cities?.find((c) => c.id === form.cityId) || null,
+  const [sectionals, setSectionals] = useState<sectional[]>([]);
+  const citySelected: City | null = useMemo(
+    (): City | null => cities?.find((c) => c.id === form.cityId) || null,
     [form.cityId],
   );
 
-    useEffect(() => {
-        getMunicipalities();
-        getSectionals();
-    },[sectionals] );
+  useEffect(() => {
+    getMunicipalities();
+    getSectionals();
+  }, [sectionals]);
 
-    async function getMunicipalities(){
-        try {
-            const citiesForm: City[] = await getCities();
-            setCities(citiesForm);
-        }catch (error){
-            console.error(error)
-        }
+  async function getMunicipalities() {
+    try {
+      const citiesForm: City[] = await getCities();
+      setCities(citiesForm);
+    } catch (error) {
+      console.error(error);
     }
+  }
 
-    async function getSectionals(){
-        try {
-            const sectionalsData: sectional[] = await getSectionalService();
-            setSectionals(sectionalsData);
-        }catch (error){
-            console.error(error)
-        }
+  async function getSectionals() {
+    try {
+      const sectionalsData: sectional[] = await getSectionalService();
+      setSectionals(sectionalsData);
+    } catch (error) {
+      console.error(error);
     }
+  }
 
-    const filtered = useMemo(() => {
-        const base = sectionals ?? [];
-        const q = normalize(query);
-        if (!q) return base;
-        return base.filter((s) => normalize(s.city).includes(q));
-    }, [sectionals, query]);
+  const filtered = useMemo(() => {
+    const base = sectionals ?? [];
+    const q = normalize(query);
+    if (!q) return base;
+    return base.filter((s) => normalize(s.city).includes(q));
+  }, [sectionals, query]);
 
   const total = filtered.length;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -107,19 +108,21 @@ export default function Sedes() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const newItem: createSectional = {
-      idLocation: citySelected?.id ?? '',
+      idLocation: citySelected?.id ?? "",
       type: form.type,
     };
-    console.log(newItem)
+    console.log(newItem);
     setOpen(false);
     resetForm();
     setQuery("");
     setPage(1);
-    const response = await createSectionalService(newItem)
-      console.log("Antes",response)
-      if(response.success){
-         console.log(response)
-      }
+    toast.loading("Creando sede",{duration:1000})
+    const response = await createSectionalService(newItem);
+    if (response.success) {
+      toast.success("Sede creada correctamente")
+    }else {
+        toast.error("No se ha podido crear la sede")
+    }
   }
 
   return (

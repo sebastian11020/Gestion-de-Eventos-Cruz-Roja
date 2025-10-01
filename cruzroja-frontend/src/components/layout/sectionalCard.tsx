@@ -22,6 +22,8 @@ import GroupTable from "@/components/layout/groupTable";
 import ViewUser from "@/components/layout/viewUser";
 import ChangeLeaderTable from "@/components/layout/changeLeaderTable";
 import { ConfirmDialog } from "@/components/layout/confitmDialog";
+import {deleteSectional} from "@/services/serviceCreateSectional";
+import toast from "react-hot-toast";
 
 type SectionalCardProps = {
   sectional: sectional;
@@ -77,6 +79,7 @@ export function SectionalCard({ sectional }: SectionalCardProps) {
   const [openChangeLeader, setOpenChangeLeader] = useState(false);
   const [viewUser, setViewUser] = useState<FormState | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [idDelete,setIdDelete] = useState("")
   const handleCloseView = () => setViewUser(null);
   const [openView, setOpenView] = useState(false);
   const [openAdvert, setOpenAdvert] = useState(false);
@@ -123,7 +126,14 @@ export function SectionalCard({ sectional }: SectionalCardProps) {
     });
   }
 
-  function handleDelete() {
+ async function handleDelete() {
+    toast.loading("Eliminando sede",{duration:1000})
+    const response = await deleteSectional(idDelete);
+    if (response.success){
+        toast.success("Sede eliminada correctamente",{duration:3000})
+    }else {
+        toast.error("No se ha podido eliminar la sede",{duration:3000})
+    }
     setConfirmOpen(false);
   }
 
@@ -151,7 +161,8 @@ export function SectionalCard({ sectional }: SectionalCardProps) {
           type="button"
           aria-label="Eliminar"
           title="Eliminar"
-          onClick={() => setConfirmOpen(true)}
+          onClick={() => {setConfirmOpen(true);
+                                setIdDelete(sectional.id ?? '')}}
           className="
     inline-flex items-center justify-center
     rounded-full p-2

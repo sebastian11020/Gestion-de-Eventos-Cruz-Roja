@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { X, Check } from "lucide-react";
 import { FormState, sectional, group, program } from "@/types/usertType";
 import { getCities } from "@/services/serviceSelect";
-import {generatePassword} from "@/utils/generatePassword";
+import { generatePassword } from "@/utils/generatePassword";
 
 type cities = {
   id: string;
@@ -18,6 +18,7 @@ let INITIAL_FORM: FormState = {
   lastName: "",
   bloodType: "",
   sex: "",
+  gender: "",
   state: "Formacion",
   bornDate: "",
   department: "Boyacá",
@@ -40,12 +41,12 @@ let INITIAL_FORM: FormState = {
     },
   },
   eps: { name: "", type: "" },
-  picture: "",
 };
 
 const DOCUMENT_TYPES = ["CC", "TI", "CE", "PAS"];
 const BLOOD_TYPES = ["O+", "O-", "A+", "A-", "B+", "B-", "AB+", "AB-"];
-const SEX_OPTIONS = ["Masculino", "Femenino"];
+const SEX_OPTIONS = ["HOMBRE", "MUJER", "INTERSEXUAL"];
+const GEN_OPTIONS = ["MASCULINO", "FEMENINO", "OTRO"];
 const EPS_CO = [
   "Nueva EPS",
   "Sura",
@@ -187,13 +188,13 @@ export default function VolunteerWizard({
     }
   }, [open, editForm]);
 
-  async function getMunicipalities(){
-      try {
-          const citiesForm: cities[] = await getCities();
-          setCities(citiesForm);
-      }catch (error){
-          console.error(error)
-      }
+  async function getMunicipalities() {
+    try {
+      const citiesForm: cities[] = await getCities();
+      setCities(citiesForm);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   const handleChange = (
@@ -515,6 +516,29 @@ export default function VolunteerWizard({
                 </div>
               </div>
               <div>
+                <label className={labelBase}>
+                  Genero<span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <select
+                    name="gender"
+                    value={form.gender}
+                    onChange={handleChange}
+                    className={`${fieldBase} appearance-none`}
+                    required
+                  >
+                    <option value="" disabled>
+                      Seleccione…
+                    </option>
+                    {GEN_OPTIONS.map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div>
                 <label className={labelBase}>Estado</label>
                 <div className="relative">
                   <select
@@ -704,17 +728,6 @@ export default function VolunteerWizard({
                   onChange={handleChange}
                   className={fieldBase}
                   required
-                />
-              </div>
-              <div>
-                <label className={labelBase}>URL Foto </label>
-                <input
-                  type="url"
-                  name="picture"
-                  value={form.picture ?? ""}
-                  onChange={handleChange}
-                  placeholder="https://…"
-                  className={fieldBase}
                 />
               </div>
             </section>

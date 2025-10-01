@@ -1,21 +1,23 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import type {createGroup, group} from "@/types/usertType";
+import type { createGroup, group } from "@/types/usertType";
 import { Button } from "@/components/ui/button";
 import Modal from "@/components/layout/modal";
 import { GroupCard } from "@/components/layout/groupCard";
 import { Search, ChevronLeft, ChevronRight } from "lucide-react";
-import {getSectionalService} from "@/services/serviceGetSectional";
-import {associateGroupService, createGroupService,} from "@/services/serviceCreateGroups";
-import {getGroup, getGroupService} from "@/services/serviceGetGroup";
-
+import { getSectionalService } from "@/services/serviceGetSectional";
+import {
+  associateGroupService,
+  createGroupService,
+} from "@/services/serviceCreateGroups";
+import { getGroup, getGroupService } from "@/services/serviceGetGroup";
+import toast from "react-hot-toast";
 
 type sectional = { id: string; city: string };
 type groups = { id: string; name: string };
 
-
 type FormState = {
-  idGroup?:string;
+  idGroup?: string;
   name: string;
   sectional: string;
 };
@@ -29,35 +31,39 @@ const normalize = (v: string) =>
 
 export default function Agrupaciones() {
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState<FormState>({ idGroup:"",name: "", sectional: "" });
+  const [form, setForm] = useState<FormState>({
+    idGroup: "",
+    name: "",
+    sectional: "",
+  });
   const [isNewGroup, setIsNewGroup] = useState(false);
-  const [sectionals,setSectionals] = useState<sectional[]>([])
-  const [groups,setGroups] = useState<group[]>([])
-    const [groupsData,setGroupsData] = useState<group[]>([])
+  const [sectionals, setSectionals] = useState<sectional[]>([]);
+  const [groups, setGroups] = useState<group[]>([]);
+  const [groupsData, setGroupsData] = useState<group[]>([]);
 
-    useEffect(() => {
-        getGroups();
-        getSectionals();
-    },[groupsData] );
+  useEffect(() => {
+    getGroups();
+    getSectionals();
+  }, [groupsData]);
 
-    async function getGroups(){
-        try {
-            const groupsData: groups[] = await getGroupService();
-            const allGroups: groups[] = await getGroup();
-            setGroups(allGroups);
-            setGroupsData(groupsData);
-        }catch (error){
-            console.error(error)
-        }
+  async function getGroups() {
+    try {
+      const groupsData: groups[] = await getGroupService();
+      const allGroups: groups[] = await getGroup();
+      setGroups(allGroups);
+      setGroupsData(groupsData);
+    } catch (error) {
+      console.error(error);
     }
-    async function getSectionals(){
-        try {
-            const sectionalsData: sectional[] = await getSectionalService();
-            setSectionals(sectionalsData);
-        }catch (error){
-            console.error(error)
-        }
+  }
+  async function getSectionals() {
+    try {
+      const sectionalsData: sectional[] = await getSectionalService();
+      setSectionals(sectionalsData);
+    } catch (error) {
+      console.error(error);
     }
+  }
 
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1); // 1-based
@@ -67,10 +73,10 @@ export default function Agrupaciones() {
     [form.sectional],
   );
 
-    const groupSelected = useMemo(
-        () => groups.find((c) => c.id === form.sectional) || null,
-        [form.sectional],
-    );
+  const groupSelected = useMemo(
+    () => groups.find((c) => c.id === form.sectional) || null,
+    [form.sectional],
+  );
 
   const filtered = useMemo(() => {
     const q = normalize(query);
@@ -122,48 +128,51 @@ export default function Agrupaciones() {
     setIsNewGroup(true);
     e.preventDefault();
     const newItem: createGroup = {
-        name: groupSelected?.id ?? '',
-        idHeadquarters: sectionalSelected?.id ?? '',
+      name: form.name,
     };
     setOpen(false);
     resetForm();
     setQuery("");
     setPage(1);
-    console.log(newItem)
-    const response = await createGroupService(newItem)
-      if(response.success){
-          console.log("Agrupación Creada")
+    console.log(newItem);
+    toast.loading("Creando agrupacion",{duration:1000})
+    const response = await createGroupService(newItem);
+    if (response.success) {
+      toast.success("Agrupacion creada",{duration:3000})
+    }else{
+        toast.error(response.message)
       }
   }
 
-    async function handleAssociate(e: React.FormEvent) {
-        setIsNewGroup(true);
-        e.preventDefault();
-        const newItem: createGroup = {
-            idGroup: form.idGroup,
-            idHeadquarters: sectionalSelected?.id ?? '',
-        };
-        setOpen(false);
-        resetForm();
-        setQuery("");
-        setPage(1);
-        console.log(newItem)
-        const response = await associateGroupService(newItem)
-        if(response.success){
-            console.log("Agrupación Asociada")
-        }
+  async function handleAssociate(e: React.FormEvent) {
+    setIsNewGroup(true);
+    e.preventDefault();
+    const newItem: createGroup = {
+      idGroup: form.idGroup,
+      idHeadquarters: sectionalSelected?.id ?? "",
+    };
+    setOpen(false);
+    resetForm();
+    setQuery("");
+    setPage(1);
+    console.log(newItem);
+      toast.loading("Creando agrupacion",{duration:1000})
+    const response = await associateGroupService(newItem);
+    if (response.success) {
+        toast.success("Agrupacion creada",{duration:3000})
+    }else {
+        toast.error("No se ha podido crear la agrupacion",{duration:3000})
     }
+  }
 
   return (
     <div className="space-y-6">
-      {/* Toolbar */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center overflow-auto">
         <h1 className="text-xl md:text-2xl font-bold text-gray-800 tracking-tight">
           Agrupaciones
         </h1>
 
         <div className="ml-auto flex w-full items-center gap-2 sm:w-auto">
-          {/* Search */}
           <div className="relative w-full sm:w-80">
             <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
             <input
@@ -183,8 +192,6 @@ export default function Agrupaciones() {
               aria-label="Buscar agrupación"
             />
           </div>
-
-          {/* Botones */}
           <Button
             type="button"
             onClick={() => isNewGroupForm()}
@@ -213,7 +220,6 @@ export default function Agrupaciones() {
         {total === 1 ? "" : "es"}
       </div>
 
-      {/* Grid paginado */}
       {paged.length === 0 ? (
         <div className="rounded-xl border border-dashed border-gray-300 bg-white p-8 text-center text-sm text-gray-600">
           {total === 0
@@ -223,12 +229,11 @@ export default function Agrupaciones() {
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {paged.map((sec) => (
-            <GroupCard key={sec.id} group={sec} />
+            <GroupCard key={`${sec.id}-${sec.sectional}`} group={sec} />
           ))}
         </div>
       )}
 
-      {/* Paginación */}
       <nav
         className="flex flex-col items-center justify-between gap-3 sm:flex-row"
         aria-label="Paginación"
@@ -279,7 +284,6 @@ export default function Agrupaciones() {
         </div>
       </nav>
 
-      {/* Modal: crear manual */}
       <Modal
         open={open}
         onClose={() => {
@@ -289,7 +293,6 @@ export default function Agrupaciones() {
         title="Nueva Agrupación"
       >
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Nombre */}
           <div className="grid gap-1.5">
             <label
               htmlFor="groupName"
@@ -317,8 +320,6 @@ export default function Agrupaciones() {
               Usa un nombre claro y corto (2–60 caracteres).
             </p>
           </div>
-
-          {/* Acciones */}
           <div className="flex items-center justify-end gap-2 pt-1">
             <Button
               type="button"
@@ -342,7 +343,6 @@ export default function Agrupaciones() {
         </form>
       </Modal>
 
-      {/* Modal: seleccionar de catálogo (si lo usas) */}
       {isNewGroup && (
         <Modal
           open={open}

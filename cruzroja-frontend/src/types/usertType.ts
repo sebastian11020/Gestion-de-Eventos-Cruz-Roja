@@ -6,6 +6,7 @@ export type FormState = {
   lastName?: string;
   bloodType?: string;
   sex?: string;
+  gender?: string;
   state: string;
   bornDate?: string;
   department?: string;
@@ -52,7 +53,10 @@ export type sectional = {
 export type group = {
   id?: string;
   name: string;
-  sectional?: string;
+  sectional?:{
+      id:string;
+      name:string;
+  };
   numberVolunteers?: string;
   numberPrograms?: string;
   leader?: {
@@ -84,26 +88,26 @@ export type leaderDataTable = {
 };
 
 export type createSectional = {
-    idLocation:string,
-    type:string,
-}
+  idLocation: string;
+  type: string;
+};
 
 export type createGroup = {
-    idGroup?:string;
-    name?:string;
-    idHeadquarters:string;
-}
+  idGroup?: string;
+  name?: string;
+  idHeadquarters?: string;
+};
 
 export type event = {
-    id?:string;
-    title: string;
-    description: string;
-    startDate: string;
-    endDate: string;
-    location:string;
-    capacity:string;
-    startAt:string;
-}
+  id?: string;
+  title: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  location: string;
+  capacity: string;
+  startAt: string;
+};
 
 
 export type createProgram = {
@@ -111,25 +115,24 @@ export type createProgram = {
   id_group:string;
 }
 export type createEvent = {
-    ambit:string;
-    classification:string;
-    applyDecreet:boolean;
-    marcActivity:string;
-    sectional:string;
-    group:string;
-    startDate:string;
-    endDate:string;
-    name:string;
-    description:string;
-    department:string;
-    city:string;
-    attendant:{
-        name:string;
-        phone:string;
-    }
-    capacity:string;
-    isVirtual:boolean;
-    latitud:string;
-    longitud:string;
-}
-
+  ambit: string;
+  classification: string;
+  applyDecreet: boolean;
+  marcActivity: string;
+  sectional: string;
+  group: string;
+  startDate: string;
+  endDate: string;
+  name: string;
+  description: string;
+  department: string;
+  city: string;
+  attendant: {
+    name: string;
+    phone: string;
+  };
+  capacity: string;
+  isVirtual: boolean;
+  latitud: string;
+  longitud: string;
+};

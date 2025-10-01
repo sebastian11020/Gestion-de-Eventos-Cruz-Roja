@@ -1,12 +1,10 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import type {createProgram, group, program, sectional} from "@/types/usertType";
+import type {createProgram, program} from "@/types/usertType";
 import { Button } from "@/components/ui/button";
 import Modal from "@/components/layout/modal";
-import { GroupCard } from "@/components/layout/groupCard";
 import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { ProgramCard } from "@/components/layout/programCard";
-import {getSectionalService} from "@/services/serviceGetSectional";
 import {getSectionalInfo} from "@/services/serviceCreateSectional";
 import {createProgramService} from "@/services/serviceCreateProgram";
 
@@ -35,13 +33,10 @@ const initialPrograms: program[] = [
 ];
 
 type FormState = {
-  // comunes
-  sectional: string; // id de seccional
-  group: string; // id de agrupación
-  // manual
+  sectional: string;
+  group: string;
   name: string;
-  // catálogo
-  programId?: string; // id del programa del catálogo
+  programId?: string;
 };
 
 const PAGE_SIZE = 8;
@@ -62,8 +57,6 @@ export default function Agrupaciones() {
     programId: "",
   });
   const [isNewProgram, setIsNewProgram] = useState(false);
-
-  // búsqueda + paginación
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1); // 1-based
 
@@ -76,17 +69,17 @@ export default function Agrupaciones() {
       console.error(error)
     }
   }
-  // dependencias
-  const sectionalSelected = useMemo(
-    () => sectionals.find((c) => c.id === form.sectional) || null,
-    [form.sectional],
-  );
-  const groupOptions: GroupNode[] = sectionalSelected?.groups ?? [];
-  const groupSelected = useMemo(
-    () => groupOptions.find((g) => g.id === form.group) || null,
-    [groupOptions, form.group],
-  );
-  const programOptions: ProgramItem[] = groupSelected?.program ?? [];
+    const sectionalSelected = useMemo(
+        () => sectionals.find((c) => String(c.id) === String(form.sectional)) || null,
+        [form.sectional, sectionals] // 👈 importante
+    );
+    const groupOptions: GroupNode[] = sectionalSelected?.groups ?? [];
+
+    const groupSelected = useMemo(
+        () => groupOptions.find((g) => String(g.id) === String(form.group)) || null,
+        [groupOptions, form.group]
+    );
+    const programOptions: ProgramItem[] = groupSelected?.program ?? [];
 
   // filtra (por nombre de programa)
   const filtered = useMemo(() => {
@@ -98,11 +91,13 @@ export default function Agrupaciones() {
   const total = filtered.length;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
-  useEffect(() => {
-    getSectionals();
-    console.log(sectionals);
-    if (page > totalPages) setPage(1);
-  }, [page, totalPages]);
+    useEffect(() => {
+        getSectionals();
+    }, []);
+
+    useEffect(() => {
+        if (page > totalPages) setPage(1);
+    }, [page, totalPages]);
 
   const start = (page - 1) * PAGE_SIZE;
   const end = Math.min(start + PAGE_SIZE, total);
@@ -133,7 +128,6 @@ export default function Agrupaciones() {
     setOpen(true);
   }
 
-  // Crear manual (elige seccional + grupo, escribe nombre del programa)
   async function handleSubmitManual(e: React.FormEvent) {
     e.preventDefault();
     if (!form.sectional || !form.group || !form.name.trim()) return;
@@ -219,7 +213,6 @@ export default function Agrupaciones() {
         </div>
       </div>
 
-      {/* Meta */}
       <div className="text-xs text-gray-500">
         Mostrando{" "}
         <span className="font-medium">
@@ -229,7 +222,6 @@ export default function Agrupaciones() {
         {total === 1 ? "" : "s"}
       </div>
 
-      {/* Grid paginado (OJO: ahora sigues usando GroupCard, cámbialo a ProgramCard si ya lo tienes) */}
       {paged.length === 0 ? (
         <div className="rounded-xl border border-dashed border-gray-300 bg-white p-8 text-center text-sm text-gray-600">
           {total === 0
