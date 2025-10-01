@@ -19,29 +19,12 @@ export class ProgramService {
     private groupService: GroupService,
   ) {}
 
-  async getAllDto() {
-    const rows: {
-      id: number;
-      name: string;
-      sectional: string;
-      group: number;
-      number_volunteers: number;
-      leader: {
-        document: string;
-        name: string;
-      };
-    }[] = await this.programRepository.query(
-      'select * from public.list_programs_with_details($1)',
-      ['ACTIVO'],
-    );
+  async getAllDto(): Promise<GetProgramDto[]> {
+    const rows = await this.programRepository.find();
     return rows.map((row) => {
       const dto = new GetProgramDto();
       dto.id = String(row.id);
       dto.name = FormatNamesString(row.name);
-      dto.sectional = FormatNamesString(row.sectional);
-      dto.numberVolunteers = String(row.number_volunteers);
-      dto.group = String(row.group);
-      dto.leader = row.leader;
       return dto;
     });
   }
@@ -77,10 +60,7 @@ export class ProgramService {
         id: id,
       },
     });
-    assertFound(
-      program,
-      `No se encontro un programa asociado al id ${dto.id_program}`,
-    );
+    assertFound(program, `No se encontro un programa asociado al id ${id}`);
     if (
       await this.programRepository.findOne({
         where: {

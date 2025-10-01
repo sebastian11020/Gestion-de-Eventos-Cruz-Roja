@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { LocationTypeEnum } from '../enum/location-type.enum';
 import { Headquarters } from '../../headquarters/entity/headquarters.entity';
+import { Person } from '../../person/entity/person.entity';
 
 @Entity()
 export class Location {
@@ -26,6 +27,8 @@ export class Location {
   parent?: Location;
   @OneToMany(() => Location, (location) => location.parent)
   children: Location[];
-  @OneToMany(() => Headquarters, (h) => h.location)
+  @OneToMany(() => Headquarters, (h) => h.id)
   headquarters: Headquarters[];
+  @OneToMany(() => Person, (p) => p.id)
+  persons: Person[];
 }

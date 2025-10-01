@@ -4,7 +4,7 @@ import { Headquarters } from '../../headquarters/entity/headquarters.entity';
 
 @Entity()
 export class GroupHeadquarters {
-  @PrimaryColumn({ name: 'id_grupo' })
+  @PrimaryColumn({ name: 'id_group' })
   idGroup: number;
 
   @PrimaryColumn({ name: 'id_headquarters' })
