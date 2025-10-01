@@ -10,6 +10,7 @@ import { GroupModule } from './modules/group/group.module';
 import { ProgramModule } from './modules/program/program.module';
 import { ProgramHeadquartersModule } from './modules/program-headquarters/program-headquarters.module';
 import { GroupHeadquartersModule } from './modules/group-headquarters/group-headquarters.module';
+import { EpsModule } from './modules/eps/eps.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { GroupHeadquartersModule } from './modules/group-headquarters/group-head
     HeadquartersModule,
     GroupHeadquartersModule,
     ProgramHeadquartersModule,
+    EpsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
