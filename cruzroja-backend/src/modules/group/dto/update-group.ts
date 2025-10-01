@@ -1,10 +1,6 @@
-import { IsNumber, IsOptional, IsString, Matches, Min } from 'class-validator';
+import { IsOptional, IsString, Matches } from 'class-validator';
 
 export class UpdateGroupDto {
-  @IsNumber()
-  @Min(1)
-  id_group: number;
-
   @IsString()
   @IsOptional()
   @Matches(/^[A-Za-zÁÉÍÓÚÜáéíóúüñÑ\s]+$/, {

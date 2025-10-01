@@ -11,6 +11,8 @@ import { ProgramModule } from './modules/program/program.module';
 import { ProgramHeadquartersModule } from './modules/program-headquarters/program-headquarters.module';
 import { GroupHeadquartersModule } from './modules/group-headquarters/group-headquarters.module';
 import { EpsModule } from './modules/eps/eps.module';
+import { PersonModule } from './modules/person/person.module';
+import { EpsPersonModule } from './modules/eps-person/eps-person.module';
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { EpsModule } from './modules/eps/eps.module';
     GroupHeadquartersModule,
     ProgramHeadquartersModule,
     EpsModule,
+    PersonModule,
+    EpsPersonModule,
   ],
   controllers: [AppController],
   providers: [AppService],

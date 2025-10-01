@@ -70,7 +70,7 @@ export class GroupService {
       );
     }
     group.name = NormalizeString(dto.name);
-    await this.groupRepository.update(dto.id_group, group);
+    await this.groupRepository.update(id, group);
     return { success: true };
   }
 }
