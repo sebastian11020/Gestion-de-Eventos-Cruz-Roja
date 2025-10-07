@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Person } from './entity/person.entity';
 import { EntityManager, Repository } from 'typeorm';
 import { CreatePersonDto } from './dto/create-person.dto';
-import { EpsPersonService } from '../eps-person/eps-person.service';
 import { type_affiliation } from '../eps-person/enum/eps-person.enum';
 import { CreateEpsPersonDTO } from '../eps-person/dto/create-eps-person.dto';
 import { EpsPerson } from '../eps-person/entity/eps-person.entity';

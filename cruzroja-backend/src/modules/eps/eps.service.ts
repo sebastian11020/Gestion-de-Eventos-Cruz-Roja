@@ -17,7 +17,7 @@ export class EpsService {
   async create(dto: CreateEpsDto) {
     let eps = await this.epsRepository.findOne({
       where: {
-        name: dto.name,
+        name: NormalizeString(dto.name),
       },
     });
     if (eps) {
@@ -28,7 +28,7 @@ export class EpsService {
       });
     }
     await this.epsRepository.save(eps);
-    return { success: true };
+    return { success: true, message: 'Eps creada exitosamente' };
   }
 
   async getAllDto(): Promise<GetEpsDto[]> {

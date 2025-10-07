@@ -13,6 +13,7 @@ import { GroupHeadquartersModule } from './modules/group-headquarters/group-head
 import { EpsModule } from './modules/eps/eps.module';
 import { PersonModule } from './modules/person/person.module';
 import { EpsPersonModule } from './modules/eps-person/eps-person.module';
+import { RoleModule } from './modules/role/role.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { EpsPersonModule } from './modules/eps-person/eps-person.module';
     EpsModule,
     PersonModule,
     EpsPersonModule,
+    RoleModule,
   ],
   controllers: [AppController],
   providers: [AppService],
