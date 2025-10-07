@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { EpsPerson } from '../../eps-person/entity/eps-person.entity';
 
 @Entity()
 export class Eps {
@@ -7,4 +8,7 @@ export class Eps {
 
   @Column()
   name: string;
+
+  @OneToMany(() => EpsPerson, (epsP) => epsP.eps)
+  eps_person: EpsPerson[];
 }

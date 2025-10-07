@@ -20,7 +20,10 @@ export class GroupHeadquartersService {
     const rows: {
       id: number;
       name: string;
-      sectional: string;
+      sectional: {
+        id: string;
+        name: string;
+      };
       number_volunteers: number;
       number_programs: number;
       leader: {
@@ -39,7 +42,10 @@ export class GroupHeadquartersService {
       const dto = new GetGroupHeadquartersDto();
       dto.id = String(row.id);
       dto.name = FormatNamesString(row.name);
-      dto.sectional = FormatNamesString(row.sectional);
+      dto.sectional = {
+        id: row.sectional.id,
+        name: FormatNamesString(row.sectional.name),
+      };
       dto.numberVolunteers = String(row.number_volunteers);
       dto.numberPrograms = String(row.number_programs);
       dto.leader = row.leader;

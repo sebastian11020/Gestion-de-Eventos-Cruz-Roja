@@ -15,11 +15,14 @@ export class ProgramHeadquarters {
   @Column()
   state: boolean;
 
-  @ManyToOne(() => Program, (program) => program.id)
+  @ManyToOne(() => Program, (program) => program.programHeadquarters)
   @JoinColumn({ name: 'id_program' })
   program: Program;
 
-  @ManyToOne(() => Headquarters, (headquarters) => headquarters.id)
+  @ManyToOne(
+    () => Headquarters,
+    (headquarters) => headquarters.programHeadquarters,
+  )
   @JoinColumn({ name: 'id_headquarters' })
   headquarters: Headquarters;
 }

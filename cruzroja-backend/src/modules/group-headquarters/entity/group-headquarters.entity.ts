@@ -13,11 +13,14 @@ export class GroupHeadquarters {
   @Column()
   state: boolean;
 
-  @ManyToOne(() => Groups, (group) => group.id)
+  @ManyToOne(() => Groups, (group) => group.groupHeadquarters)
   @JoinColumn({ name: 'id_group' })
   group: Groups;
 
-  @ManyToOne(() => Headquarters, (headquarters) => headquarters.id)
+  @ManyToOne(
+    () => Headquarters,
+    (headquarters) => headquarters.groupHeadquarters,
+  )
   @JoinColumn({ name: 'id_headquarters' })
   headquarters: Headquarters;
 }

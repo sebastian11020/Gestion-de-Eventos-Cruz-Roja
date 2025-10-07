@@ -1,4 +1,11 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryColumn,
+} from 'typeorm';
 import {
   type_blood,
   type_document,
@@ -11,6 +18,7 @@ import { Groups } from '../../group/entity/groups.entity';
 import { Headquarters } from '../../headquarters/entity/headquarters.entity';
 import { Address } from '../dto/address.dto';
 import { EmergencyContact } from '../dto/emergency.dto';
+import { EpsPerson } from '../../eps-person/entity/eps-person.entity';
 
 @Entity()
 export class Person {
@@ -37,7 +45,7 @@ export class Person {
   @Column('jsonb')
   emergency_contact: EmergencyContact;
   @Column()
-  blood: type_blood;
+  type_blood: type_blood;
   @Column()
   birth_date: Date;
   @Column()
@@ -47,16 +55,18 @@ export class Person {
   @Column('jsonb')
   address: Address;
 
-  @ManyToOne(() => Location, (l) => l.id)
+  @ManyToOne(() => Location, (l) => l.persons)
   @JoinColumn({ name: 'id_location' })
   location: Location;
-  @ManyToOne(() => Headquarters, (h) => h.id)
+  @ManyToOne(() => Headquarters, (h) => h.persons)
   @JoinColumn({ name: 'id_headquarters' })
   headquarters: Headquarters;
-  @ManyToOne(() => Groups, (g) => g.id)
+  @ManyToOne(() => Groups, (g) => g.persons)
   @JoinColumn({ name: 'id_group' })
   group: Groups;
-  @ManyToOne(() => Program, (p) => p.id)
+  @ManyToOne(() => Program, (p) => p.persons)
   @JoinColumn({ name: 'id_program' })
   program: Program;
+  @OneToMany(() => EpsPerson, (epsPerson) => epsPerson.person)
+  epsPerson: EpsPerson[];
 }
