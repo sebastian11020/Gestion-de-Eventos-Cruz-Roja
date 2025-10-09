@@ -11,6 +11,7 @@ import { Location } from '../../location/entity/location.entity';
 import { GroupHeadquarters } from '../../group-headquarters/entity/group-headquarters.entity';
 import { ProgramHeadquarters } from '../../program-headquarters/entity/program-headquarters.entity';
 import { PersonRole } from '../../person-role/entity/person-role.entity';
+import { HeadquartersStatus } from '../../headquarters-status/entity/headquarters-status.entity';
 
 @Entity()
 export class Headquarters {
@@ -29,4 +30,6 @@ export class Headquarters {
   programHeadquarters: ProgramHeadquarters[];
   @OneToMany(() => PersonRole, (pr) => pr.headquarters)
   personRole: PersonRole[];
+  @OneToMany(() => HeadquartersStatus, (hs) => hs.headquarters)
+  status: HeadquartersStatus[];
 }

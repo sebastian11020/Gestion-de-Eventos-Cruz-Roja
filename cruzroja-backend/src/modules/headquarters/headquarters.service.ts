@@ -1,13 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { Headquarters } from './entity/headquarters.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager, IsNull, Repository } from 'typeorm';
 import { CreateHeadquartersDto } from './dto/create-headquarters.dto';
 import { LocationService } from '../location/location.service';
 import { assert, assertFound, conflict } from '../../common/utils/assert';
 import { LocationTypeEnum } from '../location/enum/location-type.enum';
 import { GetHeadquartersDto } from './dto/get-headquarters.dto';
 import { FormatNamesString } from '../../common/utils/string.utils';
+import { Location } from '../location/entity/location.entity';
+import { HeadquartersStatus } from '../headquarters-status/entity/headquarters-status.entity';
+import { PersonRole } from '../person-role/entity/person-role.entity';
+import { HeadquartersTypeEnum } from './enum/headquarters-type.enum';
 
 @Injectable()
 export class HeadquartersService {
@@ -51,36 +55,158 @@ export class HeadquartersService {
   }
 
   async create(dto: CreateHeadquartersDto) {
-    const location = await this.locationService.getById(dto.idLocation);
-    assertFound(
-      location,
-      `No se encontro una ubicacion asociada al id: ${dto.idLocation}`,
-    );
-    assert(
-      location.type == LocationTypeEnum.MUNICIPIO,
-      `Las sedes solo se pueden crear en municipios y el id ${dto.idLocation} pertenece a un ${location.type}`,
-    );
+    return await this.headquartersRepository.manager.transaction(
+      async (manager) => {
+        console.log('creando sede');
+        console.log(dto);
+        let message: string = '';
+        const location = await manager.findOne(Location, {
+          where: {
+            id: dto.idLocation,
+          },
+        });
+        assertFound(
+          location,
+          `No se encontro una ubicacion asociada al id: ${dto.idLocation}`,
+        );
+        assert(
+          location.type == LocationTypeEnum.MUNICIPIO,
+          `Las sedes solo se pueden crear en municipios y el id ${dto.idLocation} pertenece a un ${location.type}`,
+        );
 
-    let headquarter: Headquarters | null =
-      await this.headquartersRepository.findOne({
-        where: {
-          location: { id: location.id },
+        let headquarter: Headquarters | null = await manager.findOne(
+          Headquarters,
+          {
+            where: {
+              location: { id: location.id },
+            },
+          },
+        );
+        if (headquarter) {
+          if (await this.verifiedHeadquartersStatus(manager, headquarter.id)) {
+            conflict(`No se puede crear otra sede en ${location.name}`);
+          } else {
+            message = 'La sede se reactivo correctamente';
+            await this.changeHeadquartersStatus(manager, headquarter.id);
+          }
+        } else {
+          message = 'La sede se creo correctamente';
+          headquarter = manager.create(Headquarters, {
+            type: dto.type,
+            location,
+          });
+          await manager.save(headquarter);
+          await this.changeHeadquartersStatus(manager, headquarter.id);
+        }
+        await this.assignLeader(
+          manager,
+          dto.document_leader,
+          headquarter.id,
+          headquarter.type === HeadquartersTypeEnum.SEDE_SECCIONAL,
+        );
+        return { success: true, message: message };
+      },
+    );
+  }
+
+  private async assignLeader(
+    manager: EntityManager,
+    document: string,
+    id_headquarters: number,
+    isSectional: boolean,
+  ) {
+    const personRol = await manager.findOne(PersonRole, {
+      where: {
+        person: {
+          document: document,
+        },
+        end_date: IsNull(),
+      },
+      relations: {
+        person: true,
+      },
+    });
+    assertFound(
+      personRol,
+      `No se encontro una persona asociada al siguiente documento: ${document}`,
+    );
+    personRol.end_date = new Date();
+    await manager.update(PersonRole, personRol.id, {
+      end_date: new Date(),
+    });
+    console.log('Rol persona actual');
+    console.log(personRol);
+    let aux: number = 2;
+    if (isSectional) {
+      aux = 1;
+    }
+    await manager.save(
+      manager.create(PersonRole, {
+        person: {
+          id: personRol.person.id,
+        },
+        role: {
+          id: aux,
+        },
+        headquarters: {
+          id: id_headquarters,
+        },
+      }),
+    );
+  }
+
+  private async verifiedHeadquartersStatus(manager: EntityManager, id: number) {
+    const row = await manager.findOne(HeadquartersStatus, {
+      where: {
+        id: id,
+        end_date: IsNull(),
+      },
+    });
+    return !!(row && row.state.name === 'ACTIVO');
+  }
+
+  private async changeHeadquartersStatus(manager: EntityManager, id: number) {
+    const row = await manager.findOne(HeadquartersStatus, {
+      where: {
+        id: id,
+        end_date: IsNull(),
+      },
+    });
+    let newStatus: HeadquartersStatus;
+    if (row) {
+      await manager.update(HeadquartersStatus, id, {
+        end_date: new Date(),
+      });
+      if (row.state.name === 'ACTIVO') {
+        newStatus = manager.create(HeadquartersStatus, {
+          state: {
+            id: 2,
+          },
+          headquarters: {
+            id: id,
+          },
+        });
+      } else {
+        newStatus = manager.create(HeadquartersStatus, {
+          state: {
+            id: 1,
+          },
+          headquarters: {
+            id: id,
+          },
+        });
+      }
+    } else {
+      newStatus = manager.create(HeadquartersStatus, {
+        state: {
+          id: 1,
+        },
+        headquarters: {
+          id: id,
         },
       });
-
-    if (headquarter) {
-      if (headquarter.state) {
-        conflict(`No se puede crear otra sede en ${location.name}`);
-      } else headquarter.state = true;
-    } else {
-      headquarter = this.headquartersRepository.create({
-        type: dto.type,
-        location,
-        state: true,
-      });
     }
-    await this.headquartersRepository.save(headquarter);
-    return { success: true };
+    await manager.save(newStatus);
   }
 
   async deactivate(id: number) {

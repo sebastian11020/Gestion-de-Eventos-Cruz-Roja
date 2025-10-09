@@ -27,8 +27,6 @@ export class PersonService {
   }
 
   async create(dto: CreatePersonDto) {
-    console.log('Creating new person');
-    console.log(dto);
     return this.personRepository.manager.transaction(async (manager) => {
       const person: Person = manager.create(Person, {
         id: dto.id,
@@ -186,8 +184,6 @@ export class PersonService {
     id_person: string,
     id_state: number,
   ) {
-    console.log('Asociando Stado');
-    console.log(id_person);
     const person_state = manager.create(PersonStatus, {
       person: {
         id: id_person,
