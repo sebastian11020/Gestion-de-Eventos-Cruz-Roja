@@ -19,8 +19,6 @@ export class Headquarters {
   id: number;
   @Column()
   type: HeadquartersTypeEnum;
-  @Column()
-  state: boolean;
   @ManyToOne(() => Location, (l) => l.headquarters, { nullable: false })
   @JoinColumn({ name: 'location_id' })
   location: Location;
