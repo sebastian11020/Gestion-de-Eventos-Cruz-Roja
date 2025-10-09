@@ -17,6 +17,7 @@ import { Address } from '../dto/address.dto';
 import { EmergencyContact } from '../dto/emergency.dto';
 import { EpsPerson } from '../../eps-person/entity/eps-person.entity';
 import { PersonRole } from '../../person-role/entity/person-role.entity';
+import { PersonStatus } from '../../person-status/entity/person-status.entity';
 
 @Entity()
 export class Person {
@@ -60,4 +61,6 @@ export class Person {
   eps_person: EpsPerson[];
   @OneToMany(() => PersonRole, (rp) => rp.person)
   person_roles: PersonRole[];
+  @OneToMany(() => PersonStatus, (personStatus) => personStatus.person)
+  person_status: PersonStatus[];
 }

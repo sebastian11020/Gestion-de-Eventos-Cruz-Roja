@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { type_state } from '../enum/state-type.enum';
+import { PersonStatus } from '../../person-status/entity/person-status.entity';
 
 @Entity()
 export class State {
@@ -9,4 +10,6 @@ export class State {
   name: string;
   @Column()
   type: type_state;
+  @OneToMany(() => PersonStatus, (personStatus) => personStatus.person)
+  person_status: PersonStatus[];
 }

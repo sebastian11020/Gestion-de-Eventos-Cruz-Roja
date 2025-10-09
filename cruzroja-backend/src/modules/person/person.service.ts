@@ -13,6 +13,7 @@ import { ProgramHeadquarters } from '../program-headquarters/entity/program-head
 import { Role } from '../role/entity/role.entity';
 import { Headquarters } from '../headquarters/entity/headquarters.entity';
 import { assertFound } from '../../common/utils/assert';
+import { PersonStatus } from '../person-status/entity/person-status.entity';
 
 @Injectable()
 export class PersonService {
@@ -71,6 +72,7 @@ export class PersonService {
         dto.id_group,
         dto.id_program,
       );
+      await this.associateStatusInitial(manager, dto.id, dto.id_state);
       return { success: true, message: 'Persona creada exitosamente.' };
     });
   }
@@ -119,8 +121,6 @@ export class PersonService {
   }
 
   private createRolePerson(manager: EntityManager, dto: CreatePersonRoleDto) {
-    console.log('Creando el rol inicial');
-    console.log(dto);
     const personStub = manager
       .getRepository(Person)
       .create({ id: dto.id_person });
@@ -179,5 +179,25 @@ export class PersonService {
     });
     assertFound(ph, 'No se encontro el programa en la sede especificada');
     return ph.id;
+  }
+
+  private async associateStatusInitial(
+    manager: EntityManager,
+    id_person: string,
+    id_state: number,
+  ) {
+    console.log('Asociando Stado');
+    console.log(id_person);
+    const person_state = manager.create(PersonStatus, {
+      person: {
+        id: id_person,
+      },
+      state: {
+        id: id_state,
+      },
+    });
+    console.log('Estado creado');
+    console.log(person_state);
+    await manager.save(person_state);
   }
 }

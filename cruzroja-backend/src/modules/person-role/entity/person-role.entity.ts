@@ -19,7 +19,7 @@ export class PersonRole {
   start_date: Date;
   @Column({ nullable: true })
   end_date: Date;
-  @ManyToOne(() => Role, (role) => role)
+  @ManyToOne(() => Role, (role) => role.person_roles)
   @JoinColumn({ name: 'id_role' })
   role: Role;
   @ManyToOne(() => Person, (p) => p.person_roles)

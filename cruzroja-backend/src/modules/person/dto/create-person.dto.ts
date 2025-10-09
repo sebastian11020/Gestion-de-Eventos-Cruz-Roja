@@ -93,5 +93,5 @@ export class CreatePersonDto {
   @IsNumber()
   @IsOptional()
   @Min(1)
-  id_state?: number;
+  id_state: number;
 }

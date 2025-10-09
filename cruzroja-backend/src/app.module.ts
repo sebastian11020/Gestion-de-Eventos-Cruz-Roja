@@ -16,6 +16,7 @@ import { EpsPersonModule } from './modules/eps-person/eps-person.module';
 import { RoleModule } from './modules/role/role.module';
 import { PersonRoleModule } from './modules/person-role/person-role.module';
 import { StateModule } from './modules/state/state.module';
+import { PersonStatusModule } from './modules/person-status/person-status.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { StateModule } from './modules/state/state.module';
     RoleModule,
     PersonRoleModule,
     StateModule,
+    PersonStatusModule,
   ],
   controllers: [AppController],
   providers: [AppService],
