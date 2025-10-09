@@ -78,7 +78,7 @@ export class CreatePersonDto {
   id_program?: number;
   @IsNumber()
   @Min(1)
-  id_headquarter: number;
+  id_headquarters: number;
   @IsNumber()
   @Min(1)
   id_location: number;

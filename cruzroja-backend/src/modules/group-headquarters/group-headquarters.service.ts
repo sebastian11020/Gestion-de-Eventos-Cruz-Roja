@@ -15,7 +15,7 @@ export class GroupHeadquartersService {
     private groupHeadquartersRepository: Repository<GroupHeadquarters>,
     private headquartersService: HeadquartersService,
   ) {}
-
+  /*
   async getAllGroupHeadquartersDto() {
     const rows: {
       id: number;
@@ -65,8 +65,12 @@ export class GroupHeadquartersService {
     }
     let object = await this.groupHeadquartersRepository.findOne({
       where: {
-        idGroup: dto.idGroup,
-        idHeadquarters: dto.idHeadquarters,
+        group: {
+          id: dto.idGroup,
+        },
+        headquarters: {
+          id: dto.idHeadquarters,
+        },
       },
     });
     if (!object) {
@@ -100,4 +104,6 @@ export class GroupHeadquartersService {
     await this.groupHeadquartersRepository.save(object);
     return { success: true };
   }
+
+ */
 }

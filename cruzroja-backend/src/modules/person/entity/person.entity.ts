@@ -13,12 +13,10 @@ import {
   type_sex,
 } from '../enum/person.enums';
 import { Location } from '../../location/entity/location.entity';
-import { Program } from '../../program/entity/program.entity';
-import { Groups } from '../../group/entity/groups.entity';
-import { Headquarters } from '../../headquarters/entity/headquarters.entity';
 import { Address } from '../dto/address.dto';
 import { EmergencyContact } from '../dto/emergency.dto';
 import { EpsPerson } from '../../eps-person/entity/eps-person.entity';
+import { PersonRole } from '../../person-role/entity/person-role.entity';
 
 @Entity()
 export class Person {
@@ -58,15 +56,8 @@ export class Person {
   @ManyToOne(() => Location, (l) => l.persons)
   @JoinColumn({ name: 'id_location' })
   location: Location;
-  @ManyToOne(() => Headquarters, (h) => h.persons)
-  @JoinColumn({ name: 'id_headquarters' })
-  headquarters: Headquarters;
-  @ManyToOne(() => Groups, (g) => g.persons)
-  @JoinColumn({ name: 'id_group' })
-  group: Groups;
-  @ManyToOne(() => Program, (p) => p.persons)
-  @JoinColumn({ name: 'id_program' })
-  program: Program;
   @OneToMany(() => EpsPerson, (epsPerson) => epsPerson.person)
-  epsPerson: EpsPerson[];
+  eps_person: EpsPerson[];
+  @OneToMany(() => PersonRole, (rp) => rp.person)
+  person_roles: PersonRole[];
 }

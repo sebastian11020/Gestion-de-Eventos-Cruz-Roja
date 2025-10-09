@@ -1,19 +1,18 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import {
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryColumn,
+} from 'typeorm';
 import { Headquarters } from '../../headquarters/entity/headquarters.entity';
 import { Program } from '../../program/entity/program.entity';
+import { PersonRole } from '../../person-role/entity/person-role.entity';
 
 @Entity()
 export class ProgramHeadquarters {
   @PrimaryColumn()
-  @JoinColumn({ name: 'id_program' })
-  idProgram: number;
-
-  @PrimaryColumn()
-  @JoinColumn({ name: 'id_headquarters' })
-  idHeadquarters: number;
-
-  @Column()
-  state: boolean;
+  id: number;
 
   @ManyToOne(() => Program, (program) => program.programHeadquarters)
   @JoinColumn({ name: 'id_program' })
@@ -25,4 +24,7 @@ export class ProgramHeadquarters {
   )
   @JoinColumn({ name: 'id_headquarters' })
   headquarters: Headquarters;
+
+  @OneToMany(() => PersonRole, (pr) => pr.program)
+  personRole: PersonRole[];
 }

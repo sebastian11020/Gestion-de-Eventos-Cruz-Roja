@@ -11,7 +11,7 @@ export class EpsPerson {
   id_eps: number;
   @Column()
   affiliation: type_affiliation;
-  @ManyToOne(() => Person, (person) => person)
+  @ManyToOne(() => Person, (person) => person.eps_person)
   @JoinColumn({ name: 'id_person' })
   person: Person;
   @ManyToOne(() => Eps, (eps) => eps.eps_person)

@@ -6,9 +6,13 @@ import { CreatePersonDto } from './dto/create-person.dto';
 import { type_affiliation } from '../eps-person/enum/eps-person.enum';
 import { CreateEpsPersonDTO } from '../eps-person/dto/create-eps-person.dto';
 import { EpsPerson } from '../eps-person/entity/eps-person.entity';
-import { Groups } from '../group/entity/groups.entity';
+import { CreatePersonRoleDto } from '../person-role/dto/create-person-rol.dto';
+import { PersonRole } from '../person-role/entity/person-role.entity';
+import { GroupHeadquarters } from '../group-headquarters/entity/group-headquarters.entity';
+import { ProgramHeadquarters } from '../program-headquarters/entity/program-headquarters.entity';
+import { Role } from '../role/entity/role.entity';
+import { Headquarters } from '../headquarters/entity/headquarters.entity';
 import { assertFound } from '../../common/utils/assert';
-import { Program } from '../program/entity/program.entity';
 
 @Injectable()
 export class PersonService {
@@ -22,6 +26,8 @@ export class PersonService {
   }
 
   async create(dto: CreatePersonDto) {
+    console.log('Creating new person');
+    console.log(dto);
     return this.personRepository.manager.transaction(async (manager) => {
       const person: Person = manager.create(Person, {
         id: dto.id,
@@ -44,19 +50,10 @@ export class PersonService {
           streetAddress: dto.address.streetAddress,
           zone: dto.address.zone,
         },
-        headquarters: {
-          id: dto.id_headquarter,
-        },
         location: {
           id: dto.id_location,
         },
       });
-      if (dto.id_group) {
-        person.group = await this.associateGroup(manager, dto.id_group);
-      }
-      if (dto.id_program) {
-        person.program = await this.associateProgram(manager, dto.id_program);
-      }
       if (dto.carnet) {
         person.license = dto.carnet;
       }
@@ -66,6 +63,13 @@ export class PersonService {
         dto.id,
         dto.id_eps,
         dto.type_affiliation,
+      );
+      await this.associateRoleInitial(
+        manager,
+        dto.id,
+        dto.id_headquarters,
+        dto.id_group,
+        dto.id_program,
       );
       return { success: true, message: 'Persona creada exitosamente.' };
     });
@@ -84,25 +88,96 @@ export class PersonService {
     await manager.save(manager.create(EpsPerson, dto));
   }
 
-  private async associateGroup(
+  private async associateRoleInitial(
     manager: EntityManager,
+    id_person: string,
+    id_headquarters: number,
     id_group?: number,
-  ): Promise<Groups> {
-    const group = await manager.findOne(Groups, {
-      where: { id: id_group },
-    });
-    assertFound(group);
-    return group;
+    id_program?: number,
+  ) {
+    const dto = new CreatePersonRoleDto();
+    dto.id_role = 5;
+    dto.id_person = id_person;
+    dto.id_headquarters = id_headquarters;
+    if (id_group) {
+      dto.id_group_headquarters = await this.verifiedGroupStatus(
+        manager,
+        id_headquarters,
+        id_group,
+      );
+    }
+    if (id_program) {
+      dto.id_program_headquarters = await this.verifiedProgramStatus(
+        manager,
+        id_headquarters,
+        id_program,
+      );
+    }
+    await manager
+      .getRepository(PersonRole)
+      .insert(this.createRolePerson(manager, dto));
   }
 
-  private async associateProgram(
-    manager: EntityManager,
-    id_program: number,
-  ): Promise<Program> {
-    const program = await manager.findOne(Program, {
-      where: { id: id_program },
+  private createRolePerson(manager: EntityManager, dto: CreatePersonRoleDto) {
+    console.log('Creando el rol inicial');
+    console.log(dto);
+    const personStub = manager
+      .getRepository(Person)
+      .create({ id: dto.id_person });
+    const roleStub = manager.getRepository(Role).create({ id: dto.id_role });
+    const headquartersStub = manager
+      .getRepository(Headquarters)
+      .create({ id: dto.id_headquarters });
+    const groupHeadquartersStub = manager
+      .getRepository(GroupHeadquarters)
+      .create({ id: dto.id_group_headquarters });
+    const programHeadquartersStub = manager
+      .getRepository(ProgramHeadquarters)
+      .create({ id: dto.id_program_headquarters });
+    return manager.create(PersonRole, {
+      person: personStub,
+      role: roleStub,
+      headquarters: headquartersStub,
+      ...(groupHeadquartersStub ? { group: groupHeadquartersStub } : {}),
+      ...(programHeadquartersStub ? { program: programHeadquartersStub } : {}),
     });
-    assertFound(program);
-    return program;
+  }
+
+  private async verifiedGroupStatus(
+    manager: EntityManager,
+    id_headquarters: number,
+    id_group: number,
+  ) {
+    const gh = await manager.findOne(GroupHeadquarters, {
+      where: {
+        group: {
+          id: id_group,
+        },
+        headquarters: {
+          id: id_headquarters,
+        },
+      },
+    });
+    assertFound(gh, 'No se encontro la agrupacion en la sede especificada');
+    return gh.id;
+  }
+
+  private async verifiedProgramStatus(
+    manager: EntityManager,
+    id_headquarters: number,
+    id_program: number,
+  ) {
+    const ph = await manager.findOne(ProgramHeadquarters, {
+      where: {
+        program: {
+          id: id_program,
+        },
+        headquarters: {
+          id: id_headquarters,
+        },
+      },
+    });
+    assertFound(ph, 'No se encontro el programa en la sede especificada');
+    return ph.id;
   }
 }

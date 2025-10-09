@@ -15,7 +15,7 @@ export class ProgramHeadquartersService {
     private programHeadquartersRepository: Repository<ProgramHeadquarters>,
     private headquartersService: HeadquartersService,
   ) {}
-
+  /*
   async getAllProgramHeadquartersDto() {
     const rows: {
       id: number;
@@ -88,4 +88,6 @@ export class ProgramHeadquartersService {
     await this.programHeadquartersRepository.save(object);
     return { success: true };
   }
+
+ */
 }

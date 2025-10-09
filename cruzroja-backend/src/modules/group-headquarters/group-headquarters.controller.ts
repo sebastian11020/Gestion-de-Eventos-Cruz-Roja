@@ -15,7 +15,7 @@ import { CreateGroupHeadquarters } from './dto/create-group-headquarters.dto';
 @Controller('group-headquarters')
 export class GroupHeadquartersController {
   constructor(private groupHeadquartersService: GroupHeadquartersService) {}
-
+  /*
   @Get('/all')
   @HttpCode(HttpStatus.OK)
   async findAllGroupHeadquarters() {
@@ -36,4 +36,6 @@ export class GroupHeadquartersController {
   ) {
     return this.groupHeadquartersService.deactivate(idGroup, idHeadquarters);
   }
+
+ */
 }
