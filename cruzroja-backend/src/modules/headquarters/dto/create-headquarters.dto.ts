@@ -1,4 +1,4 @@
-import { IsEnum, IsNumber, Min } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
 import { HeadquartersTypeEnum } from '../enum/headquarters-type.enum';
 
 export class CreateHeadquartersDto {
@@ -7,4 +7,7 @@ export class CreateHeadquartersDto {
   @IsNumber()
   @Min(1)
   idLocation: number;
+  @IsString()
+  @IsNotEmpty()
+  document_leader: string;
 }

@@ -27,8 +27,8 @@ export class Location {
   parent?: Location;
   @OneToMany(() => Location, (location) => location.parent)
   children: Location[];
-  @OneToMany(() => Headquarters, (h) => h.id)
+  @OneToMany(() => Headquarters, (h) => h.location)
   headquarters: Headquarters[];
-  @OneToMany(() => Person, (p) => p.id)
+  @OneToMany(() => Person, (p) => p.location)
   persons: Person[];
 }

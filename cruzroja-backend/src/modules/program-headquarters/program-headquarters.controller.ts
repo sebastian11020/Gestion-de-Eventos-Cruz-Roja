@@ -15,7 +15,7 @@ import { AssociateProgramHeadquarters } from './dto/associate-program-headquarte
 @Controller('program-headquarters')
 export class ProgramHeadquartersController {
   constructor(private programHeadquartersService: ProgramHeadquartersService) {}
-
+  /*
   @Get('/all')
   async getAll() {
     return this.programHeadquartersService.getAllProgramHeadquartersDto();
@@ -38,4 +38,6 @@ export class ProgramHeadquartersController {
       idHeadquarters,
     );
   }
+
+ */
 }

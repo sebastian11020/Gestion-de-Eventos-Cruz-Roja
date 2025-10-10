@@ -13,6 +13,12 @@ import { GroupHeadquartersModule } from './modules/group-headquarters/group-head
 import { EpsModule } from './modules/eps/eps.module';
 import { PersonModule } from './modules/person/person.module';
 import { EpsPersonModule } from './modules/eps-person/eps-person.module';
+import { RoleModule } from './modules/role/role.module';
+import { PersonRoleModule } from './modules/person-role/person-role.module';
+import { StateModule } from './modules/state/state.module';
+import { PersonStatusModule } from './modules/person-status/person-status.module';
+import { HeadquartersStatusModule } from './modules/headquarters-status/headquarters-status.module';
+import { GroupStatusModule } from './modules/group-status/group-status.module';
 
 @Module({
   imports: [
@@ -32,6 +38,12 @@ import { EpsPersonModule } from './modules/eps-person/eps-person.module';
     EpsModule,
     PersonModule,
     EpsPersonModule,
+    RoleModule,
+    PersonRoleModule,
+    StateModule,
+    PersonStatusModule,
+    HeadquartersStatusModule,
+    GroupStatusModule,
   ],
   controllers: [AppController],
   providers: [AppService],

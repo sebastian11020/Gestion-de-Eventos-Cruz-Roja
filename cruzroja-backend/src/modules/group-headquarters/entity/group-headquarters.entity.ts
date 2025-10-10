@@ -1,23 +1,34 @@
-import { PrimaryColumn, Entity, JoinColumn, Column, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Groups } from '../../group/entity/groups.entity';
 import { Headquarters } from '../../headquarters/entity/headquarters.entity';
+import { PersonRole } from '../../person-role/entity/person-role.entity';
+import { GroupStatus } from '../../group-status/entity/group-status.entity';
 
 @Entity()
 export class GroupHeadquarters {
-  @PrimaryColumn({ name: 'id_group' })
-  idGroup: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-  @PrimaryColumn({ name: 'id_headquarters' })
-  idHeadquarters: number;
-
-  @Column()
-  state: boolean;
-
-  @ManyToOne(() => Groups, (group) => group.id)
+  @ManyToOne(() => Groups, (group) => group.groupHeadquarters)
   @JoinColumn({ name: 'id_group' })
   group: Groups;
 
-  @ManyToOne(() => Headquarters, (headquarters) => headquarters.id)
+  @ManyToOne(
+    () => Headquarters,
+    (headquarters) => headquarters.groupHeadquarters,
+  )
   @JoinColumn({ name: 'id_headquarters' })
   headquarters: Headquarters;
+
+  @OneToMany(() => PersonRole, (pr) => pr.group)
+  personRole: PersonRole[];
+
+  @OneToMany(() => GroupStatus, (gs) => gs.groupHeadquarters)
+  states: GroupStatus[];
 }
