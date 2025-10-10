@@ -1,17 +1,18 @@
 import {
-  PrimaryColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   OneToMany,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Groups } from '../../group/entity/groups.entity';
 import { Headquarters } from '../../headquarters/entity/headquarters.entity';
 import { PersonRole } from '../../person-role/entity/person-role.entity';
+import { GroupStatus } from '../../group-status/entity/group-status.entity';
 
 @Entity()
 export class GroupHeadquarters {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   id: number;
 
   @ManyToOne(() => Groups, (group) => group.groupHeadquarters)
@@ -27,4 +28,7 @@ export class GroupHeadquarters {
 
   @OneToMany(() => PersonRole, (pr) => pr.group)
   personRole: PersonRole[];
+
+  @OneToMany(() => GroupStatus, (gs) => gs.groupHeadquarters)
+  states: GroupStatus[];
 }

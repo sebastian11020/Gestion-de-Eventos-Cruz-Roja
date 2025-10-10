@@ -5,7 +5,10 @@ import { HeadquartersStatus } from './entity/headquarters-status.entity';
 import { HeadquartersStatusService } from './headquarters-status.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([HeadquartersStatus])],
+  imports: [
+    TypeOrmModule.forFeature([HeadquartersStatus]),
+    HeadquartersStatusModule,
+  ],
   controllers: [HeadquartersStatusController],
   providers: [HeadquartersStatusService],
   exports: [HeadquartersStatusService],

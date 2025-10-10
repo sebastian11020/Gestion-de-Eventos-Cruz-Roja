@@ -57,8 +57,6 @@ export class HeadquartersService {
   async create(dto: CreateHeadquartersDto) {
     return await this.headquartersRepository.manager.transaction(
       async (manager) => {
-        console.log('creando sede');
-        console.log(dto);
         let message: string = '';
         const location = await manager.findOne(Location, {
           where: {
@@ -87,7 +85,6 @@ export class HeadquartersService {
             conflict(`No se puede crear otra sede en ${location.name}`);
           } else {
             message = 'La sede se reactivo correctamente';
-            await this.changeHeadquartersStatus(manager, headquarter.id);
           }
         } else {
           message = 'La sede se creo correctamente';
@@ -96,8 +93,8 @@ export class HeadquartersService {
             location,
           });
           await manager.save(headquarter);
-          await this.changeHeadquartersStatus(manager, headquarter.id);
         }
+        await this.changeHeadquartersStatus(manager, headquarter.id);
         await this.assignLeader(
           manager,
           dto.document_leader,

@@ -18,6 +18,7 @@ import { PersonRoleModule } from './modules/person-role/person-role.module';
 import { StateModule } from './modules/state/state.module';
 import { PersonStatusModule } from './modules/person-status/person-status.module';
 import { HeadquartersStatusModule } from './modules/headquarters-status/headquarters-status.module';
+import { GroupStatusModule } from './modules/group-status/group-status.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { HeadquartersStatusModule } from './modules/headquarters-status/headquar
     StateModule,
     PersonStatusModule,
     HeadquartersStatusModule,
+    GroupStatusModule,
   ],
   controllers: [AppController],
   providers: [AppService],

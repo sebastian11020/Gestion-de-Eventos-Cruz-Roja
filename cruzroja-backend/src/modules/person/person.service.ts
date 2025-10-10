@@ -14,6 +14,8 @@ import { Role } from '../role/entity/role.entity';
 import { Headquarters } from '../headquarters/entity/headquarters.entity';
 import { assertFound } from '../../common/utils/assert';
 import { PersonStatus } from '../person-status/entity/person-status.entity';
+import { GetPersonTableDto } from './dto/get-person-table.dto';
+import { FormatNamesString } from '../../common/utils/string.utils';
 
 @Injectable()
 export class PersonService {
@@ -21,6 +23,38 @@ export class PersonService {
     @InjectRepository(Person)
     private personRepository: Repository<Person>,
   ) {}
+
+  async findAllDtoTable() {
+    const rows = await this.personRepository.find({
+      relations: {
+        person_status: {
+          state: true,
+        },
+        person_roles: {
+          program: {
+            program: true,
+          },
+          group: {
+            group: true,
+          },
+        },
+      },
+    });
+    return rows.map((row) => {
+      const dto = new GetPersonTableDto();
+      dto.typeDocument = FormatNamesString(row.type_document);
+      dto.document = FormatNamesString(row.document);
+      dto.name = FormatNamesString(row.name) + ' ' + FormatNamesString(row.last_name);
+      const openState = row.person_status.find((ps) => ps.end_date == null);
+      dto.state = openState
+        ? FormatNamesString(openState.state?.name ?? '')
+        : '';
+      const activeRole = row.person_roles.find(r => r.end_date == null);
+      dto.program = FormatNamesString(activeRole?.program?.program?.name ?? '');
+      dto.group = FormatNamesString(activeRole?.group?.group?.name ?? '');
+      return dto;
+    });
+  }
 
   async findAllDto(): Promise<Person[]> {
     return this.personRepository.find();

@@ -2,6 +2,7 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { type_state } from '../enum/state-type.enum';
 import { PersonStatus } from '../../person-status/entity/person-status.entity';
 import { HeadquartersStatus } from '../../headquarters-status/entity/headquarters-status.entity';
+import { GroupStatus } from '../../group-status/entity/group-status.entity';
 
 @Entity()
 export class State {
@@ -15,4 +16,6 @@ export class State {
   person_status: PersonStatus[];
   @OneToMany(() => HeadquartersStatus, (hs) => hs.state)
   headquarters_status: HeadquartersStatus[];
+  @OneToMany(() => GroupStatus, (gs) => gs.state)
+  group_status: GroupStatus[];
 }
