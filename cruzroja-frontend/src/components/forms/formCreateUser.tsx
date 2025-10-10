@@ -1,14 +1,16 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { X, Check } from "lucide-react";
+import { sectional, group, formCreatePerson, eps } from "@/types/usertType";
+import { getCities, getEPS } from "@/services/serviceSelect";
 import {
-  FormState,
-  sectional,
-  group,
-  formCreatePerson,
-  eps,
-} from "@/types/usertType";
-import { getCities } from "@/services/serviceSelect";
+  DOCUMENT_TYPES,
+  GEN_OPTIONS,
+  SEX_OPTIONS,
+  BLOOD_TYPES,
+  STATE_TYPES,
+  EPS_TYPES,
+} from "@/const/consts";
 import { generatePassword } from "@/utils/generatePassword";
 
 type cities = {
@@ -42,42 +44,6 @@ let INITIAL_FORM: formCreatePerson = {
   id_eps: "",
   type_affiliation: "",
 };
-
-const DOCUMENT_TYPES = ["CC", "TI", "CE", "PAS"];
-const BLOOD_TYPES = ["O+", "O-", "A+", "A-", "B+", "B-", "AB+", "AB-"];
-const SEX_OPTIONS = ["HOMBRE", "MUJER", "INTERSEXUAL"];
-const GEN_OPTIONS = ["MASCULINO", "FEMENINO", "OTRO"];
-const EPS_CO = [
-  "Nueva EPS",
-  "Sura",
-  "Sanitas",
-  "Salud Total",
-  "Compensar",
-  "Coosalud",
-  "Famisanar",
-  "Capital Salud",
-  "Mutual Ser",
-  "Savia Salud",
-  "SOS (Comfandi)",
-  "Asmet Salud",
-  "Emssanar",
-  "Ecoopsos",
-  "Cajacopi",
-  "Otra",
-];
-const EPS_TYPES: eps[] = [
-  {
-    id: "1",
-    name: "Contributivo",
-  },
-];
-const STATE_TYPES = [
-  "Formacion",
-  "Activo",
-  "Inactivo",
-  "Licencia",
-  "Desvinculado",
-];
 
 const SECTIONAL_TYPES: sectional[] = [
   {
@@ -122,15 +88,15 @@ const GRUOP_TYPES: group[] = [
     name: "Socorrismo",
     program: [
       {
-        id: "1",
+        id: "5",
         name: "Busqueda y Rescate",
       },
       {
-        id: "2",
+        id: "6",
         name: "Busqueda y rescate con caninos",
       },
       {
-        id: "3",
+        id: "7",
         name: "Servicios especiales",
       },
     ],
@@ -140,11 +106,11 @@ const GRUOP_TYPES: group[] = [
     name: "Damas Grises",
     program: [
       {
-        id: "1",
+        id: "8",
         name: "PAMES",
       },
       {
-        id: "2",
+        id: "9",
         name: "PEDEC",
       },
     ],
@@ -182,10 +148,12 @@ export default function VolunteerWizard({
   const progress = Math.round(((step + 1) / steps.length) * 100);
   const [form, setForm] = useState<formCreatePerson>(INITIAL_FORM);
   const [cities, setCities] = useState<cities[]>();
+  const [eps, setEps] = useState<eps[]>([]);
 
   useEffect(() => {
     if (!open) return;
     getMunicipalities();
+    getEps();
     if (editForm) {
       setForm(editForm);
     } else {
@@ -197,6 +165,15 @@ export default function VolunteerWizard({
     try {
       const citiesForm: cities[] = await getCities();
       setCities(citiesForm);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async function getEps() {
+    try {
+      const epsForm: eps[] = await getEPS();
+      setEps(epsForm);
     } catch (error) {
       console.error(error);
     }
@@ -243,7 +220,7 @@ export default function VolunteerWizard({
 
   const cityMap = useMemo(() => {
     const m = new Map<string, string>();
-    (cities ?? []).forEach((c) => m.set(String(c.id), c.name));
+    (cities ?? []).forEach((c) => m.set(c.id, c.name));
     return m;
   }, [cities]);
 
@@ -268,10 +245,10 @@ export default function VolunteerWizard({
   }, []);
 
   const epsMap = useMemo(() => {
-    const m = new Map<string, string>();
-    EPS_TYPES.forEach((g) => m.set(String(g.id), g.name));
-    return m;
-  }, []);
+      const m = new Map<string, string>();
+      (eps ?? []).forEach((e) => m.set(String(e.id), e.name));
+      return m;
+      }, [eps]);
 
   const canNext = useMemo(() => {
     if (step === 0) {
@@ -749,9 +726,9 @@ export default function VolunteerWizard({
                         <option value="" disabled>
                           Seleccione…
                         </option>
-                        {EPS_CO.map((e) => (
-                          <option key={e} value={e}>
-                            {e}
+                        {eps.map((e) => (
+                          <option key={e.id} value={e.id}>
+                            {e.name}
                           </option>
                         ))}
                       </select>
@@ -787,8 +764,8 @@ export default function VolunteerWizard({
                           Seleccione…
                         </option>
                         {EPS_TYPES.map((t) => (
-                          <option key={t.id} value={t.id}>
-                            {t.name}
+                          <option key={t} value={t}>
+                            {t}
                           </option>
                         ))}
                       </select>
@@ -907,7 +884,7 @@ export default function VolunteerWizard({
                   <ul className="text-sm text-gray-700 space-y-1">
                     <li>
                       <strong>Ciudad:</strong>{" "}
-                      {cityMap.get(String(form.id_location)) ?? "—"}
+                      {cityMap.get(form.id_location) ?? "—"}
                     </li>
                     <li>
                       <strong>Dirección:</strong>{" "}

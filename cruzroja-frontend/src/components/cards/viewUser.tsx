@@ -9,14 +9,12 @@ import {
   User2,
   MapPin,
   Home,
-  Hash,
   ShieldCheck,
   X,
   Flame,
   CalendarClock,
   HardHat,
   Siren,
-  BriefcaseBusiness,
 } from "lucide-react";
 import { CardBlock } from "@/components/ui/cardBlock";
 import { DL } from "@/components/ui/dl";
@@ -74,8 +72,7 @@ export default function ViewUser({ infUser, onClose }: viewUserProps) {
 
   const age = calcAgeFromDate(data?.bornDate);
   const fullName = `${data?.name} ${data?.lastName}`.trim();
-  const photo =
-    data?.picture && data?.picture !== "#" ? data?.picture : "/4792929.png";
+  const photo =  "/4792929.png";
 
   const viewUI = (
     <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto md:overflow-hidden ">
@@ -204,7 +201,7 @@ export default function ViewUser({ infUser, onClose }: viewUserProps) {
               <DL
                 items={[
                   ["Departamento", data?.department],
-                  ["Ciudad", data?.city],
+                  ["Ciudad", data?.city?.name],
                   ["Barrio/Vereda", data?.zone],
                   ["Dirección", data?.address],
                 ]}

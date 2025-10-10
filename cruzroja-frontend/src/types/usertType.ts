@@ -10,7 +10,10 @@ export type FormState = {
   state: string;
   bornDate?: string;
   department?: string;
-  city?: string;
+  city?: {
+      id: string;
+      name: string;
+  } ;
   zone?: string;
   address?: string;
   email: string;
@@ -32,7 +35,7 @@ export type FormState = {
       name: string;
     };
   };
-  eps: { name?: string; type?: string };
+  eps: {id?:string, name?: string; type?: string };
   totalHours?: string;
   monthHours?: string;
 };

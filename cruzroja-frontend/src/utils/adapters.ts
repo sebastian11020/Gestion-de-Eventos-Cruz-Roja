@@ -1,17 +1,14 @@
 import type { formCreatePerson, FormState } from "@/types/usertType";
-
-import { SECTIONALS } from "@/mocks/sectionals";
-
 type Legacy = FormState;
 
 export function toFormCreatePerson(u: Legacy): formCreatePerson {
-  const sectional = SECTIONALS.find((s) => s.city === u.sectional.city);
+  const sectional = u.sectional;
   const id_headquarter = sectional?.id ? String(sectional.id) : "";
-  const id_location = u.city ? String(u.city) : "";
-  const group = sectional?.groups.find((g) => g.name === u.group.name);
+  const id_location = u.city?.id ? String(u.city.id) : "";
+  const group = u.group;
   const id_group = group?.id ? String(group.id) : "";
-
-  const program = group?.programs.find((p) => p.name === u.group.program.name);
+  const id_eps = u.eps.id ? String(u.eps.id) : "";
+  const program = group?.program;
   const id_program = program?.id ? String(program.id) : "";
 
   return {
@@ -41,7 +38,7 @@ export function toFormCreatePerson(u: Legacy): formCreatePerson {
     id_headquarter,
     id_group,
     id_program,
-    id_eps: u.eps?.name ?? "",
+    id_eps,
     type_affiliation: u.eps?.type ?? "",
   };
 }

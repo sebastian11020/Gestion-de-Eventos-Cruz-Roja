@@ -10,3 +10,11 @@ export async function getCities() {
     console.error(error);
   }
 }
+export async function getEPS() {
+  try {
+    const response = await axios.get(`http://localhost:8080/eps/all`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}

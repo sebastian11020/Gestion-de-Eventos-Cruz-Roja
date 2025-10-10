@@ -4,7 +4,7 @@ import { SectionalCard } from "@/components/cards/sectionalCard";
 import { createSectional, sectional } from "@/types/usertType";
 import { Button } from "@/components/ui/button";
 import Modal from "@/components/layout/modal";
-import { ChevronLeft, ChevronRight,Search } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { createSectionalService } from "@/services/serviceCreateSectional";
 import toast from "react-hot-toast";
 import ChangeLeaderTable from "@/components/tables/changeLeaderTable";
