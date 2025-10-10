@@ -14,9 +14,9 @@ import {
   Hospital,
 } from "lucide-react";
 import Modal from "@/components/layout/modal";
-import ViewUser from "@/components/layout/viewUser";
-import ChangeLeaderTable from "@/components/layout/changeLeaderTable";
-import { ConfirmDialog } from "@/components/layout/confitmDialog";
+import ViewUser from "@/components/cards/viewUser";
+import ChangeLeaderTable from "@/components/tables/changeLeaderTable";
+import { ConfirmDialog } from "@/components/cards/confitmDialog";
 import type {
   FormState,
   leaderDataTable,

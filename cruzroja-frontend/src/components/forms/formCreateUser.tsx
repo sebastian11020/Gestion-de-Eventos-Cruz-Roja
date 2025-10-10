@@ -1,50 +1,52 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { X, Check } from "lucide-react";
-import { FormState, sectional, group, program } from "@/types/usertType";
+import {
+  FormState,
+  sectional,
+  group,
+  formCreatePerson,
+  eps,
+} from "@/types/usertType";
 import { getCities } from "@/services/serviceSelect";
+import { generatePassword } from "@/utils/generatePassword";
 
 type cities = {
   id: string;
   name: string;
 };
 
-let INITIAL_FORM: FormState = {
-  typeDocument: "",
+let INITIAL_FORM: formCreatePerson = {
+  id: "",
+  type_document: "",
   document: "",
   carnet: "",
   name: "",
   lastName: "",
-  bloodType: "",
+  blood: "",
   sex: "",
-  state: "Formacion",
-  bornDate: "",
-  department: "Boyacá",
-  city: "",
-  zone: "",
-  address: "",
+  gender: "",
+  id_state: "Formacion",
+  birthDate: "",
+  id_location: "",
+  address: {
+    streetAddress: "",
+    zone: "",
+  },
   email: "",
-  cellphone: "",
+  phone: "",
   emergencyContact: { name: "", relationShip: "", phone: "" },
-  sectional: {
-    id: "",
-    city: "",
-  },
-  group: {
-    id: "",
-    name: "",
-    program: {
-      id: "",
-      name: "",
-    },
-  },
-  eps: { name: "", type: "" },
-  picture: "",
+  id_headquarter: "",
+  id_group: "",
+  id_program: "",
+  id_eps: "",
+  type_affiliation: "",
 };
 
 const DOCUMENT_TYPES = ["CC", "TI", "CE", "PAS"];
 const BLOOD_TYPES = ["O+", "O-", "A+", "A-", "B+", "B-", "AB+", "AB-"];
-const SEX_OPTIONS = ["Masculino", "Femenino"];
+const SEX_OPTIONS = ["HOMBRE", "MUJER", "INTERSEXUAL"];
+const GEN_OPTIONS = ["MASCULINO", "FEMENINO", "OTRO"];
 const EPS_CO = [
   "Nueva EPS",
   "Sura",
@@ -63,7 +65,12 @@ const EPS_CO = [
   "Cajacopi",
   "Otra",
 ];
-const EPS_TYPES = ["Contributivo", "Subsidiado"];
+const EPS_TYPES: eps[] = [
+  {
+    id: "1",
+    name: "Contributivo",
+  },
+];
 const STATE_TYPES = [
   "Formacion",
   "Activo",
@@ -145,11 +152,11 @@ const GRUOP_TYPES: group[] = [
 ];
 
 const fieldBase =
-  "w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 pr-8 text-sm text-gray-700 shadow-sm " +
+  "w-full rounded-md border border-gray-300 bg-white px-2.5 py-1.5 pr-7 text-sm text-gray-700 shadow-sm " +
   "placeholder:text-gray-400 transition-colors hover:border-gray-400 " +
-  "focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 " +
+  "focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/40 " +
   "disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed " +
-  "aria-[invalid=true]:border-red-500 aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-red-500/20";
+  "aria-[invalid=true]:border-red-500 aria-[invalid=true]:ring-1 aria-[invalid=true]:ring-red-500/20";
 
 const labelBase = "mb-1 block text-sm font-medium text-gray-700";
 
@@ -161,8 +168,8 @@ export default function VolunteerWizard({
 }: {
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: FormState) => void;
-  editForm: FormState | null;
+  onSubmit: (data: formCreatePerson) => void;
+  editForm: formCreatePerson | null;
 }) {
   const [step, setStep] = useState(0);
   const steps = [
@@ -173,7 +180,7 @@ export default function VolunteerWizard({
     "Revisión",
   ];
   const progress = Math.round(((step + 1) / steps.length) * 100);
-  const [form, setForm] = useState<FormState>(INITIAL_FORM);
+  const [form, setForm] = useState<formCreatePerson>(INITIAL_FORM);
   const [cities, setCities] = useState<cities[]>();
 
   useEffect(() => {
@@ -186,13 +193,13 @@ export default function VolunteerWizard({
     }
   }, [open, editForm]);
 
-  async function getMunicipalities(){
-      try {
-          const citiesForm: cities[] = await getCities();
-          setCities(citiesForm);
-      }catch (error){
-          console.error(error)
-      }
+  async function getMunicipalities() {
+    try {
+      const citiesForm: cities[] = await getCities();
+      setCities(citiesForm);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   const handleChange = (
@@ -202,12 +209,12 @@ export default function VolunteerWizard({
     setForm((s) => ({ ...s, [name]: value }));
   };
   const programs = useMemo(() => {
-    const g = GRUOP_TYPES.find((g) => g.id === form.group.id);
+    const g = GRUOP_TYPES.find((g) => g.id === form.id_group);
     return g?.program ?? [];
-  }, [form.group.id]);
+  }, [form.id_group]);
 
   const handleNested = (
-    group: "emergencyContact" | "eps",
+    group: "emergencyContact" | "address",
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
@@ -221,11 +228,7 @@ export default function VolunteerWizard({
     const g = GRUOP_TYPES.find((x) => x.id === groupId);
     setForm((s) => ({
       ...s,
-      group: {
-        id: g?.id ?? "",
-        name: g?.name ?? "",
-        program: { id: "", name: "" }, // reset
-      },
+      id_group: groupId,
     }));
   }
 
@@ -234,25 +237,54 @@ export default function VolunteerWizard({
     const p = programs.find((x) => x.id === programId);
     setForm((s) => ({
       ...s,
-      group: {
-        ...s.group,
-        program: { id: p?.id ?? "", name: p?.name ?? "" },
-      },
+      id_program: programId,
     }));
   }
 
+  const cityMap = useMemo(() => {
+    const m = new Map<string, string>();
+    (cities ?? []).forEach((c) => m.set(String(c.id), c.name));
+    return m;
+  }, [cities]);
+
+  const sectionalMap = useMemo(() => {
+    const m = new Map<string, string>();
+    SECTIONAL_TYPES.forEach((s) => m.set(String(s.id), s.city));
+    return m;
+  }, []);
+
+  const groupMap = useMemo(() => {
+    const m = new Map<string, string>();
+    GRUOP_TYPES.forEach((g) => m.set(String(g.id), g.name));
+    return m;
+  }, []);
+
+  const programMap = useMemo(() => {
+    const m = new Map<string, string>();
+    GRUOP_TYPES.forEach((g) =>
+      g.program?.forEach((p) => m.set(String(p.id), p.name)),
+    );
+    return m;
+  }, []);
+
+  const epsMap = useMemo(() => {
+    const m = new Map<string, string>();
+    EPS_TYPES.forEach((g) => m.set(String(g.id), g.name));
+    return m;
+  }, []);
+
   const canNext = useMemo(() => {
     if (step === 0) {
-      return form.typeDocument && form.document && form.bloodType;
+      return form.type_document && form.document && form.blood;
     }
     if (step === 1) {
       return form.name && form.lastName && form.sex;
     }
     if (step === 2) {
-      return form.city && form.address && form.email && form.cellphone;
+      return form.id_location && form.address && form.email && form.phone;
     }
     if (step === 3) {
-      return form.eps.name && form.eps.type;
+      return form.id_eps && form.type_affiliation;
     }
     return true;
   }, [step, form]);
@@ -355,107 +387,78 @@ export default function VolunteerWizard({
         <div className="max-h[65vh] md:max-h-[65vh] overflow-y-auto px-6 pb-6 pt-4">
           {step === 0 && (
             <section className="rounded-xl border border-gray-100 bg-white/70 p-4 shadow-sm space-y-4">
-              <div>
-                <label className={labelBase}>
-                  Tipo de documento <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <select
-                    name="typeDocument"
-                    value={form.typeDocument}
-                    onChange={handleChange}
-                    className={`${fieldBase} appearance-none`}
-                    required
-                  >
-                    <option value="" disabled>
-                      Seleccione…
-                    </option>
-                    {DOCUMENT_TYPES.map((d) => (
-                      <option key={d} value={d}>
-                        {d}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400">
-                    <svg
-                      className="h-4 w-4"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
+              <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))] items-start">
+                <div>
+                  <label className={labelBase}>
+                    Tipo de documento <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <select
+                      name="type_document"
+                      value={form.type_document}
+                      onChange={handleChange}
+                      className={fieldBase}
+                      required
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M6 9l6 6 6-6"
-                      />
-                    </svg>
+                      <option value="" disabled>
+                        Seleccione…
+                      </option>
+                      {DOCUMENT_TYPES.map((d) => (
+                        <option key={d} value={d}>
+                          {d}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
-              </div>
 
-              <div>
-                <label className={labelBase}>
-                  Documento <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="number"
-                  inputMode="numeric"
-                  name="document"
-                  value={form.document}
-                  onChange={handleChange}
-                  className={fieldBase}
-                  required
-                />
-              </div>
-
-              <div>
-                <label className={labelBase}>N° Carnet</label>
-                <input
-                  type="text"
-                  inputMode="text"
-                  name="carnet"
-                  value={form.carnet}
-                  onChange={handleChange}
-                  className={fieldBase}
-                />
-              </div>
-
-              <div>
-                <label className={labelBase}>
-                  Tipo de sangre <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <select
-                    name="bloodType"
-                    value={form.bloodType}
+                <div>
+                  <label className={labelBase}>
+                    Documento <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    name="document"
+                    value={form.document}
                     onChange={handleChange}
-                    className={`${fieldBase} appearance-none`}
+                    className={fieldBase} // 👈 sin max-w
                     required
-                  >
-                    <option value="" disabled>
-                      Seleccione…
-                    </option>
-                    {BLOOD_TYPES.map((b) => (
-                      <option key={b} value={b}>
-                        {b}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400">
-                    <svg
-                      className="h-4 w-4"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
+                  />
+                </div>
+
+                <div>
+                  <label className={labelBase}>N° Carnet</label>
+                  <input
+                    type="text"
+                    name="carnet"
+                    value={form.carnet}
+                    onChange={handleChange}
+                    className={fieldBase} // 👈 sin max-w
+                  />
+                </div>
+
+                <div>
+                  <label className={labelBase}>
+                    Tipo de sangre <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <select
+                      name="blood"
+                      value={form.blood}
+                      onChange={handleChange}
+                      className={fieldBase} // 👈 sin max-w
+                      required
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M6 9l6 6 6-6"
-                      />
-                    </svg>
+                      <option value="" disabled>
+                        Seleccione…
+                      </option>
+                      {BLOOD_TYPES.map((b) => (
+                        <option key={b} value={b}>
+                          {b}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
               </div>
@@ -514,11 +517,34 @@ export default function VolunteerWizard({
                 </div>
               </div>
               <div>
+                <label className={labelBase}>
+                  Genero<span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <select
+                    name="gender"
+                    value={form.gender}
+                    onChange={handleChange}
+                    className={`${fieldBase} appearance-none`}
+                    required
+                  >
+                    <option value="" disabled>
+                      Seleccione…
+                    </option>
+                    {GEN_OPTIONS.map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div>
                 <label className={labelBase}>Estado</label>
                 <div className="relative">
                   <select
-                    name="state"
-                    value={form.state}
+                    name="id_state"
+                    value={form.id_state}
                     onChange={handleChange}
                     className={`${fieldBase} appearance-none`}
                     required
@@ -537,8 +563,8 @@ export default function VolunteerWizard({
                 </label>
                 <input
                   type="date"
-                  name="bornDate"
-                  value={form.bornDate}
+                  name="birthDate"
+                  value={form.birthDate}
                   onChange={handleChange}
                   className={fieldBase}
                   max={new Date().toISOString().split("T")[0]}
@@ -551,23 +577,13 @@ export default function VolunteerWizard({
           {step === 2 && (
             <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
               <div>
-                <label className={labelBase}>Departamento</label>
-                <input
-                  type="text"
-                  name="department"
-                  value={form.department}
-                  readOnly
-                  className={`${fieldBase} bg-gray-50`}
-                />
-              </div>
-              <div>
                 <label className={labelBase}>
                   Ciudad / Municipio <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <select
-                    name="city"
-                    value={form.city}
+                    name="id_location"
+                    value={form.id_location}
                     onChange={handleChange}
                     className={`${fieldBase} appearance-none`}
                     required
@@ -605,8 +621,10 @@ export default function VolunteerWizard({
                 <input
                   type="text"
                   name="zone"
-                  value={form.zone}
-                  onChange={handleChange}
+                  value={form.address.zone}
+                  onChange={(e) => {
+                    handleNested("address", e);
+                  }}
                   className={fieldBase}
                 />
               </div>
@@ -614,8 +632,8 @@ export default function VolunteerWizard({
               <div className="relative">
                 <label className={labelBase}>Seccional</label>
                 <select
-                  name="sectional"
-                  value={form.sectional.city}
+                  name="id_headquarter"
+                  value={form.id_headquarter}
                   onChange={handleChange}
                   className={`${fieldBase} appearance-none`}
                   required
@@ -624,7 +642,7 @@ export default function VolunteerWizard({
                     Seleccione…
                   </option>
                   {SECTIONAL_TYPES.map((s) => (
-                    <option key={s.id} value={s.city}>
+                    <option key={s.id} value={s.id}>
                       {s.city}
                     </option>
                   ))}
@@ -633,8 +651,8 @@ export default function VolunteerWizard({
               <div className="relative">
                 <label className={labelBase}>Agrupacion</label>
                 <select
-                  name="group"
-                  value={form.group.id}
+                  name="id_group"
+                  value={form.id_group}
                   onChange={handleGroupChange}
                   className={`${fieldBase} appearance-none`}
                 >
@@ -651,8 +669,8 @@ export default function VolunteerWizard({
               <div className="relative">
                 <label className={labelBase}>Programa</label>
                 <select
-                  name="program"
-                  value={form.group.program.id}
+                  name="id_program"
+                  value={form.id_program}
                   onChange={handleProgramChange}
                   className={`${fieldBase} appearance-none`}
                 >
@@ -672,9 +690,11 @@ export default function VolunteerWizard({
                 </label>
                 <input
                   type="text"
-                  name="address"
-                  value={form.address}
-                  onChange={handleChange}
+                  name="streetAddress"
+                  value={form.address.streetAddress}
+                  onChange={(e) => {
+                    handleNested("address", e);
+                  }}
                   className={fieldBase}
                 />
               </div>
@@ -698,22 +718,11 @@ export default function VolunteerWizard({
                 </label>
                 <input
                   type="tel"
-                  name="cellphone"
-                  value={form.cellphone}
+                  name="phone"
+                  value={form.phone}
                   onChange={handleChange}
                   className={fieldBase}
                   required
-                />
-              </div>
-              <div>
-                <label className={labelBase}>URL Foto </label>
-                <input
-                  type="url"
-                  name="picture"
-                  value={form.picture ?? ""}
-                  onChange={handleChange}
-                  placeholder="https://…"
-                  className={fieldBase}
                 />
               </div>
             </section>
@@ -732,9 +741,9 @@ export default function VolunteerWizard({
                     </label>
                     <div className="relative">
                       <select
-                        name="name"
-                        value={form.eps.name}
-                        onChange={(e) => handleNested("eps", e)}
+                        name="id_eps"
+                        value={form.id_eps}
+                        onChange={handleChange}
                         className={`${fieldBase} appearance-none`}
                       >
                         <option value="" disabled>
@@ -769,17 +778,17 @@ export default function VolunteerWizard({
                     </label>
                     <div className="relative">
                       <select
-                        name="type"
-                        value={form.eps.type}
-                        onChange={(e) => handleNested("eps", e)}
+                        name="type_affiliation"
+                        value={form.type_affiliation}
+                        onChange={handleChange}
                         className={`${fieldBase} appearance-none`}
                       >
                         <option value="" disabled>
                           Seleccione…
                         </option>
                         {EPS_TYPES.map((t) => (
-                          <option key={t} value={t}>
-                            {t}
+                          <option key={t.id} value={t.id}>
+                            {t.name}
                           </option>
                         ))}
                       </select>
@@ -861,7 +870,7 @@ export default function VolunteerWizard({
                   </h5>
                   <ul className="text-sm text-gray-700 space-y-1">
                     <li>
-                      <strong>Tipo Doc:</strong> {form.typeDocument}
+                      <strong>Tipo Doc:</strong> {form.type_document}
                     </li>
                     <li>
                       <strong>Documento:</strong> {form.document}
@@ -870,7 +879,7 @@ export default function VolunteerWizard({
                       <strong>N° Carnet:</strong> {form.carnet || "-"}
                     </li>
                     <li>
-                      <strong>Sangre:</strong> {form.bloodType}
+                      <strong>Sangre:</strong> {form.blood}
                     </li>
                   </ul>
                 </div>
@@ -884,10 +893,10 @@ export default function VolunteerWizard({
                       <strong>Sexo:</strong> {form.sex}
                     </li>
                     <li>
-                      <strong>Estado:</strong> {form.state}
+                      <strong>Estado:</strong> {form.id_state}
                     </li>
                     <li>
-                      <strong>Fecha de nacimiento:</strong> {form.bornDate}
+                      <strong>Fecha de nacimiento:</strong> {form.birthDate}
                     </li>
                   </ul>
                 </div>
@@ -897,28 +906,54 @@ export default function VolunteerWizard({
                   </h5>
                   <ul className="text-sm text-gray-700 space-y-1">
                     <li>
-                      <strong>Depto/Ciudad:</strong> {form.department} /{" "}
-                      {form.city}
+                      <strong>Ciudad:</strong>{" "}
+                      {cityMap.get(String(form.id_location)) ?? "—"}
                     </li>
                     <li>
-                      <strong>Dirección:</strong> {form.address}
+                      <strong>Dirección:</strong>{" "}
+                      {form.address.streetAddress || "—"}
                     </li>
                     <li>
-                      <strong>Celular:</strong> {form.cellphone}
+                      <strong>Barrio:</strong> {form.address.zone || "—"}
                     </li>
                     <li>
-                      <strong>Email:</strong> {form.email}
+                      <strong>Celular:</strong> {form.phone || "—"}
+                    </li>
+                    <li>
+                      <strong>Email:</strong> {form.email || "—"}
                     </li>
                   </ul>
                 </div>
+
+                <div className="rounded-lg border p-3">
+                  <h5 className="font-medium text-gray-800 mb-2">Asignación</h5>
+                  <ul className="text-sm text-gray-700 space-y-1">
+                    <li>
+                      <strong>Seccional:</strong>{" "}
+                      {sectionalMap.get(String(form.id_headquarter)) ?? "—"}
+                    </li>
+                    <li>
+                      <strong>Agrupación:</strong>{" "}
+                      {groupMap.get(String(form.id_group)) ?? "—"}
+                    </li>
+                    <li>
+                      <strong>Programa:</strong>{" "}
+                      {programMap.get(String(form.id_program)) ?? "—"}
+                    </li>
+                  </ul>
+                </div>
+
                 <div className="rounded-lg border p-3">
                   <h5 className="font-medium text-gray-800 mb-2">
                     EPS & Emergencia
                   </h5>
                   <ul className="text-sm text-gray-700 space-y-1">
                     <li>
-                      <strong>EPS:</strong> {form.eps.name || "—"} (
-                      {form.eps.type || "—"})
+                      <strong>EPS:</strong>{" "}
+                      {epsMap
+                        ? (epsMap.get(String(form.id_eps)) ?? "—")
+                        : form.id_eps || "—"}{" "}
+                      ({form.type_affiliation || "—"})
                     </li>
                     <li>
                       <strong>Emergencia:</strong>{" "}

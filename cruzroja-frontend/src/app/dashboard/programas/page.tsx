@@ -1,598 +1,238 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
-import type { group, program } from "@/types/usertType";
+import { useState } from "react";
+import { createProgram, program } from "@/types/usertType";
 import { Button } from "@/components/ui/button";
 import Modal from "@/components/layout/modal";
-import { GroupCard } from "@/components/layout/groupCard";
 import { Search, ChevronLeft, ChevronRight } from "lucide-react";
-import { ProgramCard } from "@/components/layout/programCard";
+import { ProgramCard } from "@/components/cards/programCard";
+import { associateProgramService, createProgramService } from "@/services/serviceCreateProgram";
+import toast from "react-hot-toast";
+import ChangeLeaderTable from "@/components/tables/changeLeaderTable";
+import { users } from "@/mocks/sectionals";
+import { useProgramsData } from "@/hooks/useProgramsData";
+import { usePaginatedSearch } from "@/hooks/usePaginatedSearch";
+import { usePageNumbers } from "@/hooks/usedPaginatedNumbers";
+import { normalize } from "@/utils/normalize";
+import { PAGE_SIZE } from "@/const/consts";
+import { PageBtn } from "@/components/buttons/pageButton";
+import {CreateProgramForm} from "@/components/forms/createProgramForm";
+import {AssociateProgramForm} from "@/components/forms/associateProgramForm";
 
-type ProgramItem = { id: string; name: string };
-type GroupNode = { id: string; name: string; program: ProgramItem[] };
-type SectionalNode = { id: string; city: string; group: GroupNode[] };
+export default function Programas() {
+    const [open, setOpen] = useState(false);
+    const [openChangeLeader, setOpenChangeLeader] = useState(false);
+    const [isNewProgram, setIsNewProgram] = useState(false);
+    const [query, setQuery] = useState("");
+    const { items, sectionals, loading , reload } = useProgramsData();
+    const {
+        page,
+        setPage,
+        paged,
+        total,
+        totalPages,
+        start,
+        end,
+        canPrev,
+        canNext,
+    } = usePaginatedSearch<program>({
+        data: items,
+        query: normalize(query),
+        pageSize: PAGE_SIZE,
+        filterFn: (g, q) => normalize(g.name).includes(q),
+    });
 
-const SECTIONALS: SectionalNode[] = [
-  {
-    id: "1",
-    city: "Tunja",
-    group: [
-      { id: "1", name: "Juventud", program: [{ id: "1", name: "Aire Libre" }] },
-      {
-        id: "2",
-        name: "Damas Grices",
-        program: [{ id: "1", name: "Lavar Ropa" }],
-      },
-      {
-        id: "3",
-        name: "Socorrismo",
-        program: [{ id: "1", name: "Busqueda y Rescate" }],
-      },
-    ],
-  },
-  {
-    id: "2",
-    city: "Duitama",
-    group: [
-      { id: "1", name: "Juventud", program: [{ id: "1", name: "Aire Libre" }] },
-      {
-        id: "2",
-        name: "Socorrismo",
-        program: [{ id: "1", name: "Busqueda y Rescate" }],
-      },
-    ],
-  },
-];
+    const pageNumbers = usePageNumbers(page, totalPages);
 
-const initialPrograms: program[] = [
-  {
-    id: "1",
-    name: "Busqueda y Rescate",
-    sectional: "Tunja",
-    group: "Socorrismo",
-    numberVolunteers: "40",
-    leader: { document: "1006576543", name: "Juan Sebastian Rodriguez Mateus" },
-  },
-  {
-    id: "2",
-    name: "Aire Libre",
-    sectional: "Duitama",
-    group: "Juventud",
-    numberVolunteers: "20",
-    leader: { document: "1007749746", name: "Sebastian Daza Delgadillo" },
-  },
-];
+    function openAssociate() {
+        setIsNewProgram(true);
+        setOpen(true);
+    }
+    function openCreate() {
+        setIsNewProgram(false);
+        setOpen(true);
+    }
 
-type FormState = {
-  // comunes
-  sectional: string; // id de seccional
-  group: string; // id de agrupación
-  // manual
-  name: string;
-  // catálogo
-  programId?: string; // id del programa del catálogo
-};
+    async function handleCreateManual(payload: createProgram) {
+        setOpen(false);
+        setQuery("");
+        setPage(1);
+        toast.loading("Creando Programa", { duration: 1000 });
 
-const PAGE_SIZE = 8;
-const normalize = (v: string) =>
-  (v ?? "")
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "");
+        const response = await createProgramService(payload);
+        if (response.success) {
+            toast.success("Programa Creado Correctamente", { duration: 3000 });
+            await reload();
+        } else {
+            toast.error(response.message, { duration: 3000 });
+        }
+    }
+    async function handleAssociateCatalog(payload: createProgram) {
+        setOpen(false);
+        setQuery("");
+        setPage(1);
+        toast.loading("Asociando Programa", { duration: 1000 });
 
-export default function Agrupaciones() {
-  const [items, setItems] = useState<program[]>(initialPrograms);
-  const [open, setOpen] = useState(false);
-  const [form, setForm] = useState<FormState>({
-    name: "",
-    sectional: "",
-    group: "",
-    programId: "",
-  });
-  const [isNewProgram, setIsNewProgram] = useState(false);
+        const response = await associateProgramService(payload);
+        if (response.success) {
+            toast.success("Programa Asociado Correctamente", { duration: 3000 });
+            // Opcional: refresh
+            // await reload();
+        } else {
+            toast.error(response.message, { duration: 3000 });
+        }
+    }
 
-  // búsqueda + paginación
-  const [query, setQuery] = useState("");
-  const [page, setPage] = useState(1); // 1-based
+    return (
+        <div className="space-y-6">
+            {/* Toolbar */}
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <h1 className="text-xl md:text-2xl font-bold text-gray-800 tracking-tight">Programas</h1>
 
-  // dependencias
-  const sectionalSelected = useMemo(
-    () => SECTIONALS.find((c) => c.id === form.sectional) || null,
-    [form.sectional],
-  );
-  const groupOptions: GroupNode[] = sectionalSelected?.group ?? [];
-  const groupSelected = useMemo(
-    () => groupOptions.find((g) => g.id === form.group) || null,
-    [groupOptions, form.group],
-  );
-  const programOptions: ProgramItem[] = groupSelected?.program ?? [];
+                <div className="ml-auto flex w-full items-center gap-2 sm:w-auto">
+                    {/* Search */}
+                    <div className="relative w-full sm:w-80">
+                        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
+                        <input
+                            type="text"
+                            placeholder="Buscar programa…"
+                            value={query}
+                            onChange={(e) => {
+                                setQuery(e.target.value);
+                                setPage(1);
+                            }}
+                            className="w-full rounded-lg border border-gray-300 bg-white pl-10 pr-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                            aria-label="Buscar programa"
+                        />
+                    </div>
 
-  // filtra (por nombre de programa)
-  const filtered = useMemo(() => {
-    const q = normalize(query);
-    if (!q) return items;
-    return items.filter((p) => normalize(p.name).includes(q));
-  }, [items, query]);
+                    {/* Botones */}
+                    <Button
+                        type="button"
+                        onClick={openAssociate}
+                        className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-md hover:bg-blue-700 transition"
+                    >
+                        + Agregar Programa (catálogo)
+                    </Button>
 
-  const total = filtered.length;
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+                    <Button
+                        type="button"
+                        onClick={openCreate}
+                        className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-md hover:bg-blue-700 transition"
+                    >
+                        + Crear Programa
+                    </Button>
+                </div>
+            </div>
 
-  useEffect(() => {
-    if (page > totalPages) setPage(1);
-  }, [page, totalPages]);
+            {/* Meta */}
+            <div className="text-xs text-gray-500">
+                Mostrando <span className="font-medium">{total === 0 ? 0 : start + 1}–{end}</span>{" "}
+                de <span className="font-medium">{total}</span> programa{total === 1 ? "" : "s"}
+            </div>
 
-  const start = (page - 1) * PAGE_SIZE;
-  const end = Math.min(start + PAGE_SIZE, total);
-  const paged = useMemo(
-    () => filtered.slice(start, end),
-    [filtered, start, end],
-  );
+            {/* Grid */}
+            {loading ? (
+                <div className="rounded-xl border border-dashed border-gray-300 bg-white p-8 text-center text-sm text-gray-600">
+                    Cargando…
+                </div>
+            ) : paged.length === 0 ? (
+                <div className="rounded-xl border border-dashed border-gray-300 bg-white p-8 text-center text-sm text-gray-600">
+                    {total === 0 ? "No hay programas registrados." : `No se encontraron resultados para “${query}”.`}
+                </div>
+            ) : (
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                    {paged.map((sec) => (
+                        <ProgramCard key={sec.id} program={sec} />
+                    ))}
+                </div>
+            )}
 
-  const canPrev = page > 1;
-  const canNext = page < totalPages;
-
-  const pageNumbers = useMemo(() => {
-    const maxButtons = 5;
-    if (totalPages <= maxButtons)
-      return Array.from({ length: totalPages }, (_, i) => i + 1);
-    const half = Math.floor(maxButtons / 2);
-    let from = Math.max(1, page - half);
-    let to = Math.min(totalPages, from + maxButtons - 1);
-    if (to - from + 1 < maxButtons) from = Math.max(1, to - maxButtons + 1);
-    return Array.from({ length: to - from + 1 }, (_, i) => from + i);
-  }, [page, totalPages]);
-
-  function resetForm() {
-    setForm({ name: "", sectional: "", group: "", programId: "" });
-  }
-  function isNewGroupForm() {
-    setIsNewProgram(true);
-    setOpen(true);
-  }
-
-  // Crear manual (elige seccional + grupo, escribe nombre del programa)
-  function handleSubmitManual(e: React.FormEvent) {
-    e.preventDefault();
-    if (!form.sectional || !form.group || !form.name.trim()) return;
-
-    const newItem: program = {
-      id: String(Date.now()),
-      name: form.name.trim(),
-      sectional: sectionalSelected?.city ?? "",
-      group: groupSelected?.name ?? "",
-    };
-
-    setItems((prev) => [newItem, ...prev]);
-    setOpen(false);
-    resetForm();
-    setQuery("");
-    setPage(1);
-  }
-
-  // Crear desde catálogo (elige seccional + grupo + programa existente)
-  function handleSubmitCatalog(e: React.FormEvent) {
-    e.preventDefault();
-    if (!form.sectional || !form.group || !form.programId) return;
-
-    const selectedProgram = programOptions.find((p) => p.id === form.programId);
-    if (!selectedProgram) return;
-
-    const newItem: program = {
-      id: String(Date.now()),
-      name: selectedProgram.name,
-      sectional: sectionalSelected?.city ?? "",
-      group: groupSelected?.name ?? "",
-    };
-
-    setItems((prev) => [newItem, ...prev]);
-    setOpen(false);
-    resetForm();
-    setQuery("");
-    setPage(1);
-  }
-
-  return (
-    <div className="space-y-6">
-      {/* Toolbar */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <h1 className="text-xl md:text-2xl font-bold text-gray-800 tracking-tight">
-          Programas
-        </h1>
-
-        <div className="ml-auto flex w-full items-center gap-2 sm:w-auto">
-          {/* Search */}
-          <div className="relative w-full sm:w-80">
-            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Buscar programa…"
-              value={query}
-              onChange={(e) => {
-                setQuery(e.target.value);
-                setPage(1);
-              }}
-              className="w-full rounded-lg border border-gray-300 bg-white pl-10 pr-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-              aria-label="Buscar programa"
-            />
-          </div>
-
-          {/* Botones */}
-          <Button
-            type="button"
-            onClick={() => isNewGroupForm()}
-            className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-md hover:bg-blue-700 transition"
-          >
-            + Agregar Programa (catálogo)
-          </Button>
-
-          <Button
-            type="button"
-            onClick={() => setOpen(true)}
-            className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-md hover:bg-blue-700 transition"
-          >
-            + Crear Programa
-          </Button>
-        </div>
-      </div>
-
-      {/* Meta */}
-      <div className="text-xs text-gray-500">
-        Mostrando{" "}
-        <span className="font-medium">
-          {total === 0 ? 0 : start + 1}–{end}
-        </span>{" "}
-        de <span className="font-medium">{total}</span> programa
-        {total === 1 ? "" : "s"}
-      </div>
-
-      {/* Grid paginado (OJO: ahora sigues usando GroupCard, cámbialo a ProgramCard si ya lo tienes) */}
-      {paged.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-gray-300 bg-white p-8 text-center text-sm text-gray-600">
-          {total === 0
-            ? "No hay programas registrados."
-            : `No se encontraron resultados para “${query}”.`}
-        </div>
-      ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {paged.map((sec) => (
-            <ProgramCard key={sec.id} program={sec} />
-          ))}
-        </div>
-      )}
-
-      {/* Paginación */}
-      <nav
-        className="flex flex-col items-center justify-between gap-3 sm:flex-row"
-        aria-label="Paginación"
-      >
+            {/* Paginación */}
+            <nav className="flex flex-col items-center justify-between gap-3 sm:flex-row" aria-label="Paginación">
         <span className="text-xs text-gray-500">
           Página <span className="font-medium">{page}</span> de{" "}
-          <span className="font-medium">{totalPages}</span>
+            <span className="font-medium">{totalPages}</span>
         </span>
 
-        <div className="flex items-center gap-1">
-          <button
-            type="button"
-            onClick={() => canPrev && setPage((p) => p - 1)}
-            disabled={!canPrev}
-            className="inline-flex items-center gap-1 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/20"
-          >
-            <ChevronLeft className="size-4" />
-            Anterior
-          </button>
+                <div className="flex items-center gap-1">
+                    <button
+                        type="button"
+                        onClick={() => canPrev && setPage((p) => p - 1)}
+                        disabled={!canPrev}
+                        className="inline-flex items-center gap-1 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/20"
+                    >
+                        <ChevronLeft className="size-4" />
+                        Anterior
+                    </button>
 
-          <div className="mx-1 hidden sm:flex">
-            {pageNumbers[0] > 1 && (
-              <>
-                <PageBtn n={1} current={page} onClick={setPage} />
-                <span className="px-1 text-gray-400">…</span>
-              </>
-            )}
-            {pageNumbers.map((n) => (
-              <PageBtn key={n} n={n} current={page} onClick={setPage} />
-            ))}
-            {pageNumbers[pageNumbers.length - 1] < totalPages && (
-              <>
-                <span className="px-1 text-gray-400">…</span>
-                <PageBtn n={totalPages} current={page} onClick={setPage} />
-              </>
-            )}
-          </div>
+                    <div className="mx-1 hidden sm:flex">
+                        {pageNumbers[0] > 1 && (
+                            <>
+                                <PageBtn n={1} current={page} onClick={setPage} />
+                                <span className="px-1 text-gray-400">…</span>
+                            </>
+                        )}
+                        {pageNumbers.map((n) => (
+                            <PageBtn key={n} n={n} current={page} onClick={setPage} />
+                        ))}
+                        {pageNumbers[pageNumbers.length - 1] < totalPages && (
+                            <>
+                                <span className="px-1 text-gray-400">…</span>
+                                <PageBtn n={totalPages} current={page} onClick={setPage} />
+                            </>
+                        )}
+                    </div>
 
-          <button
-            type="button"
-            onClick={() => canNext && setPage((p) => p + 1)}
-            disabled={!canNext}
-            className="inline-flex items-center gap-1 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/20"
-          >
-            Siguiente
-            <ChevronRight className="size-4" />
-          </button>
-        </div>
-      </nav>
+                    <button
+                        type="button"
+                        onClick={() => canNext && setPage((p) => p + 1)}
+                        disabled={!canNext}
+                        className="inline-flex items-center gap-1 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/20"
+                    >
+                        Siguiente
+                        <ChevronRight className="size-4" />
+                    </button>
+                </div>
+            </nav>
 
-      {/* Modal: crear manual (seccional -> agrupación -> nombre programa) */}
-      <Modal
-        open={open}
-        onClose={() => {
-          setOpen(false);
-          setIsNewProgram(false);
-        }}
-        title="Nuevo Programa"
-      >
-        <form onSubmit={handleSubmitManual} className="space-y-5">
-          {/* Seccional */}
-          <div className="grid gap-1.5">
-            <label
-              htmlFor="sectional"
-              className="text-sm font-medium text-gray-800"
-            >
-              Seccional
-            </label>
-            <select
-              id="sectional"
-              required
-              value={form.sectional}
-              onChange={(e) =>
-                setForm((f) => ({
-                  ...f,
-                  sectional: e.target.value,
-                  group: "",
-                  programId: "",
-                }))
-              }
-              className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-            >
-              <option value="" disabled>
-                Selecciona una seccional…
-              </option>
-              {SECTIONALS.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.city}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Agrupación (depende de Seccional) */}
-          <div className="grid gap-1.5">
-            <label
-              htmlFor="group"
-              className="text-sm font-medium text-gray-800"
-            >
-              Agrupación
-            </label>
-            <select
-              id="group"
-              required
-              disabled={!form.sectional}
-              value={form.group}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, group: e.target.value, programId: "" }))
-              }
-              className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:opacity-60"
-            >
-              <option value="" disabled>
-                {form.sectional
-                  ? "Selecciona una agrupación…"
-                  : "Primero elige una seccional"}
-              </option>
-              {groupOptions.map((g) => (
-                <option key={g.id} value={g.id}>
-                  {g.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Nombre del programa (manual) */}
-          <div className="grid gap-1.5">
-            <label
-              htmlFor="programName"
-              className="text-sm font-medium text-gray-800"
-            >
-              Nombre del programa
-            </label>
-            <input
-              id="programName"
-              type="text"
-              required
-              minLength={2}
-              maxLength={60}
-              disabled={!form.group}
-              placeholder="Ej. Aire Libre"
-              value={form.name}
-              onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-              onBlur={(e) =>
-                setForm((f) => ({ ...f, name: e.target.value.trim() }))
-              }
-              className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:opacity-60"
-            />
-          </div>
-
-          {/* Acciones */}
-          <div className="flex items-center justify-end gap-2 pt-1">
-            <Button
-              type="button"
-              onClick={() => {
-                resetForm();
-                setOpen(false);
-                setIsNewProgram(false);
-              }}
-              className="rounded-lg border border-gray-300 bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600"
-            >
-              Cancelar
-            </Button>
-            <Button
-              type="submit"
-              disabled={!form.sectional || !form.group || !form.name.trim()}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-md hover:bg-blue-700 disabled:opacity-60"
-            >
-              Guardar
-            </Button>
-          </div>
-        </form>
-      </Modal>
-
-      {/* Modal: seleccionar de catálogo (Seccional -> Agrupación -> Programa) */}
-      {isNewProgram && (
-        <Modal
-          open={open}
-          onClose={() => {
-            setOpen(false);
-            setIsNewProgram(false);
-          }}
-          title="Agregar Programa (catálogo)"
-        >
-          <form onSubmit={handleSubmitCatalog} className="space-y-5">
-            {/* Seccional */}
-            <div className="grid gap-1.5">
-              <label
-                htmlFor="sectionalCat"
-                className="text-sm font-medium text-gray-800"
-              >
-                Seccional
-              </label>
-              <select
-                id="sectionalCat"
-                required
-                value={form.sectional}
-                onChange={(e) =>
-                  setForm((f) => ({
-                    ...f,
-                    sectional: e.target.value,
-                    group: "",
-                    programId: "",
-                  }))
-                }
-                className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-              >
-                <option value="" disabled>
-                  Selecciona una seccional…
-                </option>
-                {SECTIONALS.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.city}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Agrupación */}
-            <div className="grid gap-1.5">
-              <label
-                htmlFor="groupCat"
-                className="text-sm font-medium text-gray-800"
-              >
-                Agrupación
-              </label>
-              <select
-                id="groupCat"
-                required
-                disabled={!form.sectional}
-                value={form.group}
-                onChange={(e) =>
-                  setForm((f) => ({
-                    ...f,
-                    group: e.target.value,
-                    programId: "",
-                  }))
-                }
-                className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:opacity-60"
-              >
-                <option value="" disabled>
-                  {form.sectional
-                    ? "Selecciona una agrupación…"
-                    : "Primero elige una seccional"}
-                </option>
-                {groupOptions.map((g) => (
-                  <option key={g.id} value={g.id}>
-                    {g.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Programa (depende de Agrupación) */}
-            <div className="grid gap-1.5">
-              <label
-                htmlFor="programCat"
-                className="text-sm font-medium text-gray-800"
-              >
-                Programa
-              </label>
-              <select
-                id="programCat"
-                required
-                disabled={!form.group}
-                value={form.programId}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, programId: e.target.value }))
-                }
-                className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:opacity-60"
-              >
-                <option value="" disabled>
-                  {form.group
-                    ? "Selecciona un programa…"
-                    : "Primero elige una agrupación"}
-                </option>
-                {programOptions.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Acciones */}
-            <div className="flex items-center justify-end gap-2 pt-1">
-              <Button
-                type="button"
-                onClick={() => {
-                  resetForm();
-                  setOpen(false);
-                  setIsNewProgram(false);
+            {/* Modal único con contenido variable */}
+            <Modal
+                open={open}
+                onClose={() => {
+                    setOpen(false);
+                    setIsNewProgram(false);
                 }}
-                className="rounded-lg border border-gray-300 bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600"
-              >
-                Cancelar
-              </Button>
-              <Button
-                type="submit"
-                disabled={!form.sectional || !form.group || !form.programId}
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-md hover:bg-blue-700 disabled:opacity-60"
-              >
-                Guardar
-              </Button>
-            </div>
-          </form>
-        </Modal>
-      )}
-    </div>
-  );
-}
+                title={isNewProgram ? "Agregar Programa (catálogo)" : "Nuevo Programa"}
+            >
+                {isNewProgram ? (
+                    <AssociateProgramForm
+                        sectionals={sectionals}
+                        onOpenLeader={() => setOpenChangeLeader(true)}
+                        onCancel={() => {
+                            setOpen(false);
+                            setIsNewProgram(false);
+                        }}
+                        onSubmit={handleAssociateCatalog}
+                    />
+                ) : (
+                    <CreateProgramForm
+                        sectionals={sectionals}
+                        onCancel={() => {
+                            setOpen(false);
+                        }}
+                        onSubmit={handleCreateManual}
+                    />
+                )}
+            </Modal>
 
-function PageBtn({
-  n,
-  current,
-  onClick,
-}: {
-  n: number;
-  current: number;
-  onClick: (n: number) => void;
-}) {
-  const active = n === current;
-  return (
-    <button
-      type="button"
-      onClick={() => onClick(n)}
-      aria-current={active ? "page" : undefined}
-      className={`mx-0.5 inline-flex min-w-8 items-center justify-center rounded-md px-2 py-1 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/20 ${
-        active
-          ? "bg-blue-600 text-white shadow-sm"
-          : "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
-      }`}
-    >
-      {n}
-    </button>
-  );
+            {/* Modal: Seleccionar líder */}
+            <Modal
+                open={openChangeLeader}
+                onClose={() => setOpenChangeLeader(false)}
+                title={"Seleccionar Lider"}
+            >
+                <ChangeLeaderTable users={users} />
+            </Modal>
+        </div>
+    );
 }

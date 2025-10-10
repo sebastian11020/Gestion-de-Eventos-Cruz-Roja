@@ -6,6 +6,7 @@ export type FormState = {
   lastName?: string;
   bloodType?: string;
   sex?: string;
+  gender?: string;
   state: string;
   bornDate?: string;
   department?: string;
@@ -34,7 +35,37 @@ export type FormState = {
   eps: { name?: string; type?: string };
   totalHours?: string;
   monthHours?: string;
-  picture?: string;
+};
+
+export type formCreatePerson = {
+  id: string;
+  type_document: string;
+  document: string;
+  carnet: string;
+  name: string;
+  lastName: string;
+  email: string;
+  sex: string;
+  gender: string;
+  phone: string;
+  emergencyContact: {
+    name: string;
+    relationShip: string;
+    phone: string;
+  };
+  blood: string;
+  id_state: string;
+  birthDate: string;
+  address: {
+    streetAddress: string;
+    zone: string;
+  };
+  id_group?: string;
+  id_program?: string;
+  id_headquarter: string;
+  id_location: string;
+  id_eps: string;
+  type_affiliation: string;
 };
 
 export type sectional = {
@@ -52,7 +83,10 @@ export type sectional = {
 export type group = {
   id?: string;
   name: string;
-  sectional?: string;
+  sectional?: {
+    id: string;
+    name: string;
+  };
   numberVolunteers?: string;
   numberPrograms?: string;
   leader?: {
@@ -84,11 +118,57 @@ export type leaderDataTable = {
 };
 
 export type createSectional = {
-    idLocation:string,
-    type:string,
-}
+  idLocation: string;
+  type: string;
+};
 
 export type createGroup = {
-    name:string
-    idHeadquarters:string,
-}
+  idGroup?: string;
+  name?: string;
+  idHeadquarters?: string;
+};
+
+export type event = {
+  id?: string;
+  title: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  location: string;
+  capacity: string;
+  startAt: string;
+};
+
+export type createProgram = {
+  name?: string;
+  id_group?: string;
+  idProgram?: string;
+  idHeadquarters?: string;
+};
+export type createEvent = {
+  ambit: string;
+  classification: string;
+  applyDecreet: boolean;
+  marcActivity: string;
+  sectional: string;
+  group: string;
+  startDate: string;
+  endDate: string;
+  name: string;
+  description: string;
+  department: string;
+  city: string;
+  attendant: {
+    name: string;
+    phone: string;
+  };
+  capacity: string;
+  isVirtual: boolean;
+  latitud: string;
+  longitud: string;
+};
+
+export type eps = {
+  id: string;
+  name: string;
+};
