@@ -78,7 +78,7 @@ export class GroupHeadquartersService {
           dto.idGroup,
         );
         if (group_headquarters) {
-          if (await this.verifiedGroupHeadquarters(group_headquarters.id)) {
+          if (await this.checkGroupHeadquarters(group_headquarters.id)) {
             conflict(
               `La sede de ${group_headquarters.headquarters.location.name} ya tiene la agrupacion ${group_headquarters.group.name} activa`,
             );
@@ -101,7 +101,7 @@ export class GroupHeadquartersService {
         }
         await this.assignCoordinator(
           manager,
-          dto.document_leader,
+          dto.document_coordinator,
           dto.idHeadquarters,
           group_headquarters.id,
         );
@@ -125,7 +125,7 @@ export class GroupHeadquartersService {
   }
    */
 
-  private async verifiedGroupHeadquarters(id: number) {
+  private async checkGroupHeadquarters(id: number) {
     const row: GroupStatus | null =
       await this.groupHeadquartersStatusService.findOneOpenStateByIdPk(id);
     return row && row.state.name === 'ACTIVO';

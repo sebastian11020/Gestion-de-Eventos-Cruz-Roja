@@ -3,6 +3,7 @@ import { type_state } from '../enum/state-type.enum';
 import { PersonStatus } from '../../person-status/entity/person-status.entity';
 import { HeadquartersStatus } from '../../headquarters-status/entity/headquarters-status.entity';
 import { GroupStatus } from '../../group-status/entity/group-status.entity';
+import { ProgramStatus } from '../../program-status/entity/program-status.entity';
 
 @Entity()
 export class State {
@@ -18,4 +19,6 @@ export class State {
   headquarters_status: HeadquartersStatus[];
   @OneToMany(() => GroupStatus, (gs) => gs.state)
   group_status: GroupStatus[];
+  @OneToMany(() => ProgramStatus, (ps) => ps.state)
+  program_status: GroupStatus[];
 }

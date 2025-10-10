@@ -21,10 +21,7 @@ import { Address } from './address.dto';
 import { Type } from 'class-transformer';
 import { type_affiliation } from 'src/modules/eps-person/enum/eps-person.enum';
 
-export class CreatePersonDto {
-  @IsNotEmpty()
-  @IsString()
-  id: string;
+export class UpdatePersonDto {
   @IsEnum(type_document)
   type_document: type_document;
   @IsNotEmpty()
@@ -94,7 +91,4 @@ export class CreatePersonDto {
   @IsOptional()
   @Min(1)
   id_state: number;
-  @IsString()
-  @IsNotEmpty()
-  password: string;
 }
