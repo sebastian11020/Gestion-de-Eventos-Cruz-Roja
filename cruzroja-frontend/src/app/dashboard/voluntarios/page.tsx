@@ -2,12 +2,13 @@
 import SearchBar from "@/components/layout/searchBar";
 import { Button } from "@/components/ui/button";
 import { useEffect, useMemo, useState } from "react";
-import VolunteerWizard from "@/components/layout/formCreateUser";
+import VolunteerWizard from "@/components/forms/formCreateUser";
 import { Eye, PencilLine } from "lucide-react";
-import { FormState, sectional } from "@/types/usertType";
-import ViewUser from "@/components/layout/viewUser";
+import { formCreatePerson, FormState, sectional } from "@/types/usertType";
+import ViewUser from "@/components/cards/viewUser";
 import { supabase } from "@/lib/supabase-browser";
 import { generatePassword } from "@/utils/generatePassword";
+import { toFormCreatePerson } from "@/utils/adapters";
 
 const PAGE_SIZE = 7;
 
@@ -334,7 +335,8 @@ export default function voluntarios() {
   const [openWizard, setOpenWizard] = useState(false);
   const [openView, setOpenView] = useState(false);
   const [cityFilter, setCityFilter] = useState<string>("");
-  const [editUser, setEditUser] = useState<FormState | null>(null);
+  const [stateFilter, setStateFilter] = useState<string>("");
+  const [editUser, setEditUser] = useState<formCreatePerson | null>(null);
   const [viewUser, setViewUser] = useState<FormState | null>(null);
 
   const handleSearch = (value: string) => {
@@ -346,16 +348,22 @@ export default function voluntarios() {
     return Array.from(set).sort();
   }, []);
 
-  async function register(form: FormState) {
+  const states = useMemo(() => {
+    const set = new Set(dataUser.map((u) => u.state));
+    return Array.from(set).sort();
+  }, []);
+
+  async function register(form: formCreatePerson) {
     const provisional: string = generatePassword(12);
     const sb = supabase();
     const { data, error } = await sb.auth.signUp({
       email: form.email,
       password: provisional,
     });
+    console.log(form);
   }
 
-  const handleCreateOrUpdate = (data: FormState) => {
+  const handleCreateOrUpdate = (data: formCreatePerson) => {
     if (editUser) {
       console.log("Actualizar voluntario:", data);
     } else {
@@ -386,9 +394,11 @@ export default function voluntarios() {
             normalize(u.sectional.city).includes(q),
         );
     return base.filter(
-      (u) => cityFilter === "" || u.sectional.city === cityFilter,
+      (u) =>
+        (cityFilter === "" || u.sectional.city === cityFilter) &&
+        (stateFilter === "" || u.state === stateFilter),
     );
-  }, [filtro, cityFilter]);
+  }, [filtro, cityFilter, stateFilter]);
 
   const total = results.length;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -407,7 +417,8 @@ export default function voluntarios() {
     setOpenView(true);
   };
   const onEdit = (u: FormState) => {
-    setEditUser(u);
+    const mapped = toFormCreatePerson(u);
+    setEditUser(mapped);
     setOpenWizard(true);
   };
   return (
@@ -432,6 +443,20 @@ export default function voluntarios() {
             {cities.map((city) => (
               <option key={city} value={city}>
                 {city}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="w-44">
+          <select
+            value={stateFilter}
+            onChange={(e) => setStateFilter(e.target.value)}
+            className="w-full rounded-lg bg-white px-3 py-2 text-sm text-gray-700 shadow-sm hover: focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40"
+          >
+            <option value="">Todos los estados</option>
+            {states.map((state) => (
+              <option key={state} value={state}>
+                {state}
               </option>
             ))}
           </select>

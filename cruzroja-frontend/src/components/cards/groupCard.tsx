@@ -15,10 +15,10 @@ import {
   X,
 } from "lucide-react";
 import Modal from "@/components/layout/modal";
-import ViewUser from "@/components/layout/viewUser";
-import ChangeLeaderTable from "@/components/layout/changeLeaderTable";
-import ProgramTable from "@/components/layout/programTable";
-import { ConfirmDialog } from "@/components/layout/confitmDialog";
+import ViewUser from "@/components/cards/viewUser";
+import ChangeLeaderTable from "@/components/tables/changeLeaderTable";
+import ProgramTable from "@/components/tables/programTable";
+import { ConfirmDialog } from "@/components/cards/confitmDialog";
 import type {
   sectional as TSectional,
   group as TGroup,
@@ -27,7 +27,7 @@ import type {
   program,
 } from "@/types/usertType";
 import toast from "react-hot-toast";
-import {deleteGroup, updateGroup} from "@/services/serviceCreateGroups";
+import { deleteGroup, updateGroup } from "@/services/serviceCreateGroups";
 
 type SectionalCardProps = {
   sectional?: TSectional;
@@ -65,8 +65,8 @@ export function GroupCard({ group }: SectionalCardProps) {
   const [viewUser, setViewUser] = useState<FormState | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [openView, setOpenView] = useState(false);
-  const [deleteGroupId,setDeleteGroupId] = useState("")
-    const [deleteSectionalId,setDeleteSectionalId] = useState("")
+  const [deleteGroupId, setDeleteGroupId] = useState("");
+  const [deleteSectionalId, setDeleteSectionalId] = useState("");
   // --- Edición de nombre ---
   const [localName, setLocalName] = useState(group?.name ?? "");
   const [editing, setEditing] = useState(false);
@@ -85,12 +85,12 @@ export function GroupCard({ group }: SectionalCardProps) {
     if (!next) return;
     setLocalName(next);
     setEditing(false);
-    toast.loading("Editando agrupacion",{duration:1000})
-    const response = await updateGroup(id,localName)
-    if(response.success){
-        toast.success("Actualizada correctamente",{duration:3000})
-    }else {
-        toast.error(response.message,{duration:3000})
+    toast.loading("Editando agrupacion", { duration: 1000 });
+    const response = await updateGroup(id, localName);
+    if (response.success) {
+      toast.success("Actualizada correctamente", { duration: 3000 });
+    } else {
+      toast.error(response.message, { duration: 3000 });
     }
   }
 
@@ -130,13 +130,9 @@ export function GroupCard({ group }: SectionalCardProps) {
   }
 
   async function handleDelete() {
-    toast.loading("Eliminando Agrupacion",{duration:1000})
-    const response = await deleteGroup(deleteGroupId,deleteSectionalId)
-    if(response.data){
-        toast.success("Agrupacion eliminada correctamente",{duration:3000})
-    }else {
-        toast.error(response.message,{duration:3000})
-    }
+    toast.loading("Eliminando Agrupacion", { duration: 1000 });
+    const response = await deleteGroup(deleteGroupId, deleteSectionalId);
+    toast.success("Agrupacion eliminada correctamente", { duration: 3000 });
     setConfirmOpen(false);
   }
 
@@ -181,7 +177,7 @@ export function GroupCard({ group }: SectionalCardProps) {
                 value={nameDraft}
                 onChange={(e) => setNameDraft(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") handleSaveName(group?.id ?? '');
+                  if (e.key === "Enter") handleSaveName(group?.id ?? "");
                   if (e.key === "Escape") cancelEdit();
                 }}
                 required={true}
@@ -195,7 +191,7 @@ export function GroupCard({ group }: SectionalCardProps) {
               <button
                 type="button"
                 onClick={() => {
-                  handleSaveName(group?.id ?? '');
+                  handleSaveName(group?.id ?? "");
                 }}
                 className="inline-flex items-center justify-center rounded-md bg-green-600 text-white p-1.5 hover:bg-green-700 active:bg-green-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500/30"
                 title="Guardar"
@@ -219,7 +215,11 @@ export function GroupCard({ group }: SectionalCardProps) {
           type="button"
           aria-label="Eliminar"
           title="Eliminar"
-          onClick={() => {setConfirmOpen(true); setDeleteGroupId(group?.id ?? '');setDeleteSectionalId(group?.sectional?.id ?? '')}}
+          onClick={() => {
+            setConfirmOpen(true);
+            setDeleteGroupId(group?.id ?? "");
+            setDeleteSectionalId(group?.sectional?.id ?? "");
+          }}
           className="
             inline-flex items-center justify-center
             rounded-full p-2

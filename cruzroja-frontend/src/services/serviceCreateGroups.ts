@@ -25,20 +25,24 @@ export async function associateGroupService(group: createGroup) {
   }
 }
 
-export async function deleteGroup(idGroup:string,idHeadquarters:string){
-    try {
-        const response = await axios.put(`http://localhost:8080/group-headquarters/deactivate/${idGroup}/${idHeadquarters}`)
-        return response.data;
-    }catch (error) {
-        console.error(error);
-    }
+export async function deleteGroup(idGroup: string, idHeadquarters: string) {
+  try {
+    const response = await axios.put(
+      `http://localhost:8080/group-headquarters/deactivate/${idGroup}/${idHeadquarters}`,
+    );
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
 }
 
-export async function updateGroup(id_group:string,name:string){
-    try {
-        const response = await axios.put(`http://localhost:8080/group/update/${id_group}`)
-        return response.data;
-    }catch (error) {
-        console.error(error);
-    }
+export async function updateGroup(id_group: string, name: string) {
+  try {
+    const response = await axios.put(
+      `http://localhost:8080/group/update/${id_group}`,
+    );
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
 }

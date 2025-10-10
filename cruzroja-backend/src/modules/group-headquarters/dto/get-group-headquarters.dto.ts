@@ -1,7 +1,10 @@
 export class GetGroupHeadquartersDto {
   id: string;
   name: string;
-  sectional: string;
+  sectional: {
+      id: string
+      name:string
+  };
   numberVolunteers: string;
   numberPrograms: string;
   leader?: {

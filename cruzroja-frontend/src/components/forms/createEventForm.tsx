@@ -1,4 +1,3 @@
-// components/event/CreateEventForm.tsx
 "use client";
 
 import { useMemo, useState } from "react";
@@ -16,7 +15,10 @@ import {
   Phone,
   Trash2,
 } from "lucide-react";
-import VolunteerPickerModal from "@/components/layout/volunteerPickerModal";
+import VolunteerPickerModal from "@/components/tables/volunteerPickerModal";
+import Modal from "@/components/layout/modal";
+import ChangeLeaderTable from "@/components/tables/changeLeaderTable";
+import { leaderDataTable } from "@/types/usertType";
 
 type Props = { onCancel: () => void; onSuccess: () => void };
 
@@ -39,8 +41,26 @@ type CreateEventForm = {
   latitud: string;
   longitud: string;
   isPrivate: "true" | "false";
+  isAdult: boolean;
   participants?: string[];
 };
+
+const users: leaderDataTable[] = [
+  {
+    typeDocument: "CC",
+    document: "1007749746",
+    name: "Sebastian Daza Delgadillo",
+    state: "Activo",
+    group: "Juvenil",
+  },
+  {
+    typeDocument: "CC",
+    document: "1006649646",
+    name: "Andres Felipe Melo Avellaneda",
+    state: "Activo",
+    group: "Socorrismo",
+  },
+];
 
 const AMBITS = [
   { value: "INSTITUCIONAL", label: "Institucional" },
@@ -86,7 +106,6 @@ const MUNICIPIOS = [
   { id: "sogamoso", name: "Sogamoso" },
 ];
 
-/** Pequeño wrapper para inputs con icono a la izquierda */
 function Field({
   label,
   icon,
@@ -112,7 +131,6 @@ function Field({
   );
 }
 
-/** Card con borde degradado sutil */
 function FancyCard({
   title,
   icon,
@@ -138,6 +156,7 @@ function FancyCard({
 export default function CreateEventForm({ onCancel, onSuccess }: Props) {
   const [loading, setLoading] = useState(false);
   const [openPicker, setOpenPicker] = useState(false);
+  const [openChangeLeader, setOpenChangeLeader] = useState(false);
   const [selectedVolunteers, setSelectedVolunteers] = useState<
     { id: string; name: string; document?: string }[]
   >([]);
@@ -145,7 +164,7 @@ export default function CreateEventForm({ onCancel, onSuccess }: Props) {
   const [form, setForm] = useState<CreateEventForm>({
     ambit: "",
     classification: "",
-    applyDecreet: false,
+    applyDecreet: true,
     marcActivity: "",
     startDate: "",
     endDate: "",
@@ -161,6 +180,7 @@ export default function CreateEventForm({ onCancel, onSuccess }: Props) {
     latitud: "",
     longitud: "",
     isPrivate: "false",
+    isAdult: false,
   });
 
   const groupsForSectional = useMemo(() => {
@@ -356,7 +376,7 @@ export default function CreateEventForm({ onCancel, onSuccess }: Props) {
             </select>
           </Field>
 
-          <Field label="Seccional">
+          <Field label="Sede">
             <select
               required
               value={form.sectionalId}
@@ -416,7 +436,7 @@ export default function CreateEventForm({ onCancel, onSuccess }: Props) {
 
       {/* Operación */}
       <FancyCard title="Operación" icon={<ListChecks className="w-4 h-4" />}>
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-4">
           <Field label="Capacidad">
             <input
               type="number"
@@ -427,30 +447,53 @@ export default function CreateEventForm({ onCancel, onSuccess }: Props) {
             />
           </Field>
 
-          <label className="flex items-center gap-2 pt-6">
+          {/* Checkbox Virtual */}
+          <label className="flex items-center gap-3 pt-6">
             <input
               type="checkbox"
               checked={form.isVirtual}
-              onChange={(e) =>
-                setForm({ ...form, isVirtual: e.target.checked })
-              }
+              disabled={form.applyDecreet} // deshabilitado si el decreto está activo
+              onChange={(e) => {
+                const checked = e.target.checked;
+                setForm({
+                  ...form,
+                  isVirtual: checked,
+                  applyDecreet: checked ? false : form.applyDecreet, // desmarca decreto si se marca virtual
+                });
+              }}
             />
             <span className="text-sm">Virtual</span>
           </label>
 
+          {/* Checkbox Mayoría de edad */}
+          <label className="flex items-center gap-2 pt-6">
+            <input
+              type="checkbox"
+              checked={form.isAdult}
+              onChange={(e) => setForm({ ...form, isAdult: e.target.checked })}
+            />
+            <span className="text-sm">¿Se requiere mayoría de edad?</span>
+          </label>
+
+          {/* Checkbox Decreto */}
           <label className="flex items-center gap-2 pt-6">
             <input
               type="checkbox"
               checked={form.applyDecreet}
-              onChange={(e) =>
-                setForm({ ...form, applyDecreet: e.target.checked })
-              }
+              disabled={form.isVirtual} // deshabilitado si virtual está activo
+              onChange={(e) => {
+                const checked = e.target.checked;
+                setForm({
+                  ...form,
+                  applyDecreet: checked,
+                  isVirtual: checked ? false : form.isVirtual, // desmarca virtual si se marca decreto
+                });
+              }}
             />
             <span className="text-sm">Aplica decreto 1809</span>
           </label>
         </div>
       </FancyCard>
-
       <FancyCard
         title="Privacidad y participantes"
         icon={<Users className="w-4 h-4" />}
@@ -479,6 +522,14 @@ export default function CreateEventForm({ onCancel, onSuccess }: Props) {
             >
               <Users className="w-4 h-4 mr-2" />
               Gestionar participantes
+            </Button>
+            <Button
+              type="button"
+              className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700"
+              onClick={() => setOpenChangeLeader(true)}
+            >
+              <Users className="w-4 h-4 mr-2" />
+              Seleccionar encargado
             </Button>
           </div>
 
@@ -546,7 +597,6 @@ export default function CreateEventForm({ onCancel, onSuccess }: Props) {
         </Button>
       </div>
 
-      {/* Modal selector */}
       <VolunteerPickerModal
         open={openPicker}
         onClose={() => setOpenPicker(false)}
@@ -556,6 +606,13 @@ export default function CreateEventForm({ onCancel, onSuccess }: Props) {
           setOpenPicker(false);
         }}
       />
+      <Modal
+        open={openChangeLeader}
+        onClose={() => setOpenChangeLeader(false)}
+        title={"Seleccionar encargado"}
+      >
+        <ChangeLeaderTable users={users}></ChangeLeaderTable>
+      </Modal>
     </form>
   );
 }

@@ -1,5 +1,5 @@
 "use client";
-import { Card } from "@/components/layout/InformationCard";
+import { Card } from "@/components/cards/InformationCard";
 import {
   Users,
   CalendarCheck2,

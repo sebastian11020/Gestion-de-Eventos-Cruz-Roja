@@ -1,13 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { EventCard } from "@/components/layout/eventCard";
+import { EventCard } from "@/components/cards/eventCard";
 import Modal from "@/components/layout/modal";
 import Podium from "@/components/layout/podium";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, History, PlusCircle } from "lucide-react";
 import type { event as EventType } from "@/types/usertType";
-import CreateEventForm from "@/components/layout/createEventForm";
+import CreateEventForm from "@/components/forms/createEventForm";
 
 const PAGE_SIZE = 8;
 
