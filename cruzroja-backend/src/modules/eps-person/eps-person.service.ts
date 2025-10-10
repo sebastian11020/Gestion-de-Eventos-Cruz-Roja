@@ -19,4 +19,14 @@ export class EpsPersonService {
     });
     await this.epsPersonRepository.save(affiliation);
   }
+
+  async findByIds(id_person: string, id_eps: number) {
+    return await this.epsPersonRepository.findOne({
+      where: {
+        id_person: id_person,
+        id_eps: id_eps,
+        state: true,
+      },
+    });
+  }
 }

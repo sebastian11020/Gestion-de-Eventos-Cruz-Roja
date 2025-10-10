@@ -3,15 +3,16 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Headquarters } from '../../headquarters/entity/headquarters.entity';
 import { Program } from '../../program/entity/program.entity';
 import { PersonRole } from '../../person-role/entity/person-role.entity';
+import { ProgramStatus } from '../../program-status/entity/program-status.entity';
 
 @Entity()
 export class ProgramHeadquarters {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   id: number;
 
   @ManyToOne(() => Program, (program) => program.programHeadquarters)
@@ -27,4 +28,7 @@ export class ProgramHeadquarters {
 
   @OneToMany(() => PersonRole, (pr) => pr.program)
   personRole: PersonRole[];
+
+  @OneToMany(() => ProgramStatus, (ps) => ps.programHeadquarters)
+  programStatus: ProgramStatus[];
 }

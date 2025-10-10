@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { GroupStatus } from './entity/group-status.entity';
+import { ProgramStatus } from './entity/program-status.entity';
 import { IsNull, Repository } from 'typeorm';
 
 @Injectable()
-export class GroupStatusService {
+export class ProgramStatusService {
   constructor(
-    @InjectRepository(GroupStatus)
-    private groupStatusRepository: Repository<GroupStatus>,
+    @InjectRepository(ProgramStatus)
+    private programStatusRepository: Repository<ProgramStatus>,
   ) {}
 
-  async findOneOpenStateByIdPk(id: number): Promise<GroupStatus | null> {
-    return this.groupStatusRepository.findOne({
+  async findOneOpenStateByIdPk(id: number): Promise<ProgramStatus | null> {
+    return this.programStatusRepository.findOne({
       where: {
         id: id,
         end_date: IsNull(),
@@ -24,13 +24,13 @@ export class GroupStatusService {
 
   async findOneOpenStateByIdsFk(
     id_headquarters: number,
-    id_group: number,
-  ): Promise<GroupStatus | null> {
-    return await this.groupStatusRepository.findOne({
+    id_program: number,
+  ): Promise<ProgramStatus | null> {
+    return await this.programStatusRepository.findOne({
       where: {
-        groupHeadquarters: {
-          group: {
-            id: id_group,
+        programHeadquarters: {
+          program: {
+            id: id_program,
           },
           headquarters: {
             id: id_headquarters,
@@ -40,7 +40,6 @@ export class GroupStatusService {
       },
       relations: {
         state: true,
-        groupHeadquarters: true,
       },
     });
   }

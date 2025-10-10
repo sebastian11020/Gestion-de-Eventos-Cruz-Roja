@@ -15,7 +15,6 @@ import { AssociateProgramHeadquarters } from './dto/associate-program-headquarte
 @Controller('program-headquarters')
 export class ProgramHeadquartersController {
   constructor(private programHeadquartersService: ProgramHeadquartersService) {}
-  /*
   @Get('/all')
   async getAll() {
     return this.programHeadquartersService.getAllProgramHeadquartersDto();
@@ -27,6 +26,7 @@ export class ProgramHeadquartersController {
     return this.programHeadquartersService.createOrActivate(dto);
   }
 
+  /*
   @Put('/deactivate/:idProgram/:idHeadquarters')
   @HttpCode(HttpStatus.OK)
   async deactivate(
@@ -38,6 +38,5 @@ export class ProgramHeadquartersController {
       idHeadquarters,
     );
   }
-
- */
+   */
 }
