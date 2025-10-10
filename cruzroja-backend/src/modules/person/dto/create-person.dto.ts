@@ -94,4 +94,7 @@ export class CreatePersonDto {
   @IsOptional()
   @Min(1)
   id_state: number;
+  @IsString()
+  @IsNotEmpty()
+  password: string;
 }

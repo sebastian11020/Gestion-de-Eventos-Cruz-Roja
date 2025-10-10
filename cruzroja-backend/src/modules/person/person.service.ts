@@ -44,12 +44,13 @@ export class PersonService {
       const dto = new GetPersonTableDto();
       dto.typeDocument = FormatNamesString(row.type_document);
       dto.document = FormatNamesString(row.document);
-      dto.name = FormatNamesString(row.name) + ' ' + FormatNamesString(row.last_name);
+      dto.name =
+        FormatNamesString(row.name) + ' ' + FormatNamesString(row.last_name);
       const openState = row.person_status.find((ps) => ps.end_date == null);
       dto.state = openState
         ? FormatNamesString(openState.state?.name ?? '')
         : '';
-      const activeRole = row.person_roles.find(r => r.end_date == null);
+      const activeRole = row.person_roles.find((r) => r.end_date == null);
       dto.program = FormatNamesString(activeRole?.program?.program?.name ?? '');
       dto.group = FormatNamesString(activeRole?.group?.group?.name ?? '');
       return dto;
