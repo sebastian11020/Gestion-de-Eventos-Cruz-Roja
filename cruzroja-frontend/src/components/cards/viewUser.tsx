@@ -72,7 +72,7 @@ export default function ViewUser({ infUser, onClose }: viewUserProps) {
 
   const age = calcAgeFromDate(data?.bornDate);
   const fullName = `${data?.name} ${data?.lastName}`.trim();
-  const photo =  "/4792929.png";
+  const photo = "/4792929.png";
 
   const viewUI = (
     <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto md:overflow-hidden ">

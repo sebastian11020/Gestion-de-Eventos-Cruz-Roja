@@ -25,8 +25,8 @@ const dataUser: FormState[] = [
     bornDate: "2002-03-23",
     department: "Boyacá",
     city: {
-        id:"10",
-        name:"Tunja"
+      id: "10",
+      name: "Tunja",
     },
     zone: "El topo",
     address: "Cra 15#3-12",
@@ -64,10 +64,10 @@ const dataUser: FormState[] = [
     state: "Activo",
     bornDate: "2001-02-11",
     department: "Boyacá",
-      city: {
-          id:"1",
-          name:"Tunja"
-      },
+    city: {
+      id: "1",
+      name: "Tunja",
+    },
     zone: "San Rafael",
     address: "Cra 14#46-39",
     email: "sebastian@gmail.com",
@@ -104,10 +104,10 @@ const dataUser: FormState[] = [
     state: "Activo",
     bornDate: "2002-03-23",
     department: "Boyacá",
-      city: {
-          id:"6",
-          name:"Tunja"
-      },
+    city: {
+      id: "6",
+      name: "Tunja",
+    },
     zone: "El topo",
     address: "Cra 15#3-12",
     email: "juan@gmail.com",
@@ -144,10 +144,10 @@ const dataUser: FormState[] = [
     state: "Licencia",
     bornDate: "2002-03-23",
     department: "Boyacá",
-      city: {
-          id:"1",
-          name:"Tunja"
-      },
+    city: {
+      id: "1",
+      name: "Tunja",
+    },
     zone: "El topo",
     address: "Cra 15#3-12",
     email: "juan@gmail.com",
@@ -184,10 +184,10 @@ const dataUser: FormState[] = [
     state: "Formacion",
     bornDate: "2002-03-23",
     department: "Boyacá",
-      city: {
-          id:"1",
-          name:"Tunja"
-      },
+    city: {
+      id: "1",
+      name: "Tunja",
+    },
     zone: "El topo",
     address: "Cra 15#3-12",
     email: "juan@gmail.com",
@@ -224,10 +224,10 @@ const dataUser: FormState[] = [
     state: "Inactivo",
     bornDate: "2002-03-23",
     department: "Boyacá",
-      city: {
-          id:"1",
-          name:"Tunja"
-      },
+    city: {
+      id: "1",
+      name: "Tunja",
+    },
     zone: "El topo",
     address: "Cra 15#3-12",
     email: "juan@gmail.com",
@@ -264,10 +264,10 @@ const dataUser: FormState[] = [
     state: "Desvinculado",
     bornDate: "2002-03-23",
     department: "Boyacá",
-      city: {
-          id:"1",
-          name:"Tunja"
-      },
+    city: {
+      id: "1",
+      name: "Tunja",
+    },
     zone: "El topo",
     address: "Cra 15#3-12",
     email: "juan@gmail.com",
@@ -304,10 +304,10 @@ const dataUser: FormState[] = [
     state: "Formacion",
     bornDate: "2002-03-23",
     department: "Boyacá",
-      city: {
-          id:"1",
-          name:"Tunja"
-      },
+    city: {
+      id: "1",
+      name: "Tunja",
+    },
     zone: "El topo",
     address: "Cra 15#3-12",
     email: "juan@gmail.com",
