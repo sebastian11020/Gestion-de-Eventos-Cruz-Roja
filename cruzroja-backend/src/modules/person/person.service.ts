@@ -15,13 +15,23 @@ import { Headquarters } from '../headquarters/entity/headquarters.entity';
 import { assertFound } from '../../common/utils/assert';
 import { PersonStatus } from '../person-status/entity/person-status.entity';
 import { GetPersonTableDto } from './dto/get-person-table.dto';
-import { FormatNamesString } from '../../common/utils/string.utils';
+import {
+  FormatNamesString,
+  NormalizeString,
+} from '../../common/utils/string.utils';
+import { GroupStatusService } from '../group-status/group-status.service';
+import { ProgramStatusService } from '../program-status/program-status.service';
+import { UpdatePersonDto } from './dto/update-person.dto';
+import { EpsPersonService } from '../eps-person/eps-person.service';
 
 @Injectable()
 export class PersonService {
   constructor(
     @InjectRepository(Person)
     private personRepository: Repository<Person>,
+    private groupStatusService: GroupStatusService,
+    private programStatusService: ProgramStatusService,
+    private epsPersonService: EpsPersonService,
   ) {}
 
   async findAllDtoTable() {
@@ -67,22 +77,22 @@ export class PersonService {
         id: dto.id,
         type_document: dto.type_document,
         document: dto.document,
-        name: dto.name,
-        last_name: dto.lastName,
-        email: dto.email,
+        name: NormalizeString(dto.name),
+        last_name: NormalizeString(dto.lastName),
+        email: NormalizeString(dto.email),
         sex: dto.sex,
         gender: dto.gender,
         phone: dto.phone,
         emergency_contact: {
-          name: dto.emergencyContact.name,
-          relationShip: dto.emergencyContact.relationShip,
+          name: NormalizeString(dto.emergencyContact.name),
+          relationShip: NormalizeString(dto.emergencyContact.relationShip),
           phone: dto.emergencyContact.phone,
         },
         type_blood: dto.blood,
         birth_date: dto.birthDate,
         address: {
-          streetAddress: dto.address.streetAddress,
-          zone: dto.address.zone,
+          streetAddress: NormalizeString(dto.address.streetAddress),
+          zone: NormalizeString(dto.address.zone),
         },
         location: {
           id: dto.id_location,
@@ -98,7 +108,7 @@ export class PersonService {
         dto.id_eps,
         dto.type_affiliation,
       );
-      await this.associateRoleInitial(
+      await this.associateRole(
         manager,
         dto.id,
         dto.id_headquarters,
@@ -110,20 +120,78 @@ export class PersonService {
     });
   }
 
+  async update(id: string, dto: UpdatePersonDto) {
+    return this.personRepository.manager.transaction(async (manager) => {
+      await manager.update(Person, id, {
+        type_document: dto.type_document,
+        document: dto.document,
+        name: NormalizeString(dto.name),
+        last_name: NormalizeString(dto.lastName),
+        email: NormalizeString(dto.email),
+        sex: dto.sex,
+        gender: dto.gender,
+        license: dto.carnet,
+        phone: dto.phone,
+        emergency_contact: {
+          name: NormalizeString(dto.emergencyContact.name),
+          relationShip: NormalizeString(dto.emergencyContact.relationShip),
+          phone: dto.emergencyContact.phone,
+        },
+        type_blood: dto.blood,
+        birth_date: dto.birthDate,
+        address: {
+          streetAddress: NormalizeString(dto.address.streetAddress),
+          zone: NormalizeString(dto.address.zone),
+        },
+        location: {
+          id: dto.id_location,
+        },
+      });
+      await this.associateEps(manager, id, dto.id_eps, dto.type_affiliation);
+      return { success: true, message: 'Persona actualizada exitosamente.' };
+    });
+  }
+
   private async associateEps(
     manager: EntityManager,
     id_person: string,
     id_eps: number,
     affiliation: type_affiliation,
   ) {
-    const dto = new CreateEpsPersonDTO();
-    dto.id_person = id_person;
-    dto.id_eps = id_eps;
-    dto.affiliation = affiliation;
-    await manager.save(manager.create(EpsPerson, dto));
+    const currentEps = await this.epsPersonService.findByIds(id_person, id_eps);
+    if (currentEps) {
+      if (affiliation != currentEps.affiliation) {
+        await this.closeEpsPerson(manager, id_eps, id_person);
+        const dto = new CreateEpsPersonDTO();
+        dto.id_person = id_person;
+        dto.id_eps = id_eps;
+        dto.affiliation = affiliation;
+        await manager.save(manager.create(EpsPerson, dto));
+      }
+    } else {
+      const dto = new CreateEpsPersonDTO();
+      dto.id_person = id_person;
+      dto.id_eps = id_eps;
+      dto.affiliation = affiliation;
+      await manager.save(manager.create(EpsPerson, dto));
+    }
   }
 
-  private async associateRoleInitial(
+  private async closeEpsPerson(
+    manager: EntityManager,
+    id_eps: number,
+    id_person: string,
+  ) {
+    await manager.update(
+      EpsPerson,
+      { id_person, id_eps },
+      {
+        state: false,
+      },
+    );
+  }
+
+  private async associateRole(
     manager: EntityManager,
     id_person: string,
     id_headquarters: number,
@@ -135,15 +203,13 @@ export class PersonService {
     dto.id_person = id_person;
     dto.id_headquarters = id_headquarters;
     if (id_group) {
-      dto.id_group_headquarters = await this.verifiedGroupStatus(
-        manager,
+      dto.id_group_headquarters = await this.checkGroupStatus(
         id_headquarters,
         id_group,
       );
     }
     if (id_program) {
-      dto.id_program_headquarters = await this.verifiedProgramStatus(
-        manager,
+      dto.id_program_headquarters = await this.checkProgramStatus(
         id_headquarters,
         id_program,
       );
@@ -176,40 +242,23 @@ export class PersonService {
     });
   }
 
-  private async verifiedGroupStatus(
-    manager: EntityManager,
-    id_headquarters: number,
-    id_group: number,
-  ) {
-    const gh = await manager.findOne(GroupHeadquarters, {
-      where: {
-        group: {
-          id: id_group,
-        },
-        headquarters: {
-          id: id_headquarters,
-        },
-      },
-    });
+  private async checkGroupStatus(id_headquarters: number, id_group: number) {
+    const gh = await this.groupStatusService.findOneOpenStateByIdsFk(
+      id_headquarters,
+      id_group,
+    );
     assertFound(gh, 'No se encontro la agrupacion en la sede especificada');
     return gh.id;
   }
 
-  private async verifiedProgramStatus(
-    manager: EntityManager,
+  private async checkProgramStatus(
     id_headquarters: number,
     id_program: number,
   ) {
-    const ph = await manager.findOne(ProgramHeadquarters, {
-      where: {
-        program: {
-          id: id_program,
-        },
-        headquarters: {
-          id: id_headquarters,
-        },
-      },
-    });
+    const ph = await this.programStatusService.findOneOpenStateByIdsFk(
+      id_headquarters,
+      id_program,
+    );
     assertFound(ph, 'No se encontro el programa en la sede especificada');
     return ph.id;
   }
@@ -227,8 +276,6 @@ export class PersonService {
         id: id_state,
       },
     });
-    console.log('Estado creado');
-    console.log(person_state);
     await manager.save(person_state);
   }
 }
