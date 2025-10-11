@@ -39,6 +39,10 @@ export class HeadquartersService {
       dto.city = FormatNamesString(String(row.city ?? ''));
       dto.numberVolunteers = String(row.number_volunteers ?? 0);
       dto.numberGroups = String(row.number_groups ?? 0);
+      dto.leader = {
+        document: dto.leader.document,
+        name: FormatNamesString(dto.leader.name),
+      };
       return dto;
     });
   }
