@@ -70,11 +70,9 @@ export class CreatePersonDto {
   address: Address;
   @IsOptional()
   @IsNumber()
-  @Min(1)
   id_group?: number;
   @IsOptional()
   @IsNumber()
-  @Min(1)
   id_program?: number;
   @IsNumber()
   @Min(1)
