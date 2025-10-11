@@ -23,6 +23,8 @@ import { GroupStatusService } from '../group-status/group-status.service';
 import { ProgramStatusService } from '../program-status/program-status.service';
 import { UpdatePersonDto } from './dto/update-person.dto';
 import { EpsPersonService } from '../eps-person/eps-person.service';
+import { EmailService } from '../email/email.service';
+import { SendEmail } from '../email/dto/send-email.dto';
 
 @Injectable()
 export class PersonService {
@@ -32,6 +34,7 @@ export class PersonService {
     private groupStatusService: GroupStatusService,
     private programStatusService: ProgramStatusService,
     private epsPersonService: EpsPersonService,
+    private nodeEmailerService: EmailService,
   ) {}
 
   async findAllDtoTable() {
@@ -116,8 +119,16 @@ export class PersonService {
         dto.id_program,
       );
       await this.associateStatusInitial(manager, dto.id, dto.id_state);
+      await this.sendEmail(dto.email, dto.password);
       return { success: true, message: 'Persona creada exitosamente.' };
     });
+  }
+
+  async sendEmail(email: string, password: string): Promise<void> {
+    const send = new SendEmail();
+    send.email = email;
+    send.password = password;
+    await this.nodeEmailerService.sendEmailRegister(send);
   }
 
   async update(id: string, dto: UpdatePersonDto) {
