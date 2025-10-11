@@ -4,4 +4,8 @@ export class GetHeadquartersDto {
   type: string;
   numberVolunteers?: string;
   numberGroups?: string;
+  leader: {
+    document: string;
+    name: string;
+  };
 }
