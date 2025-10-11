@@ -66,18 +66,18 @@ export const register = (userName, password) => `
     }
     .button {
       display: inline-block;
-      background-color: #1e3a8a; /* Azul principal */
-      color: #ffffff;
+      background-color: #dc2626; /* 🔴 Rojo principal */
+      color: #ffffff; /* Letras blancas */
       padding: 12px 28px;
       text-decoration: none;
       border-radius: 6px;
       font-size: 18px;
-      border: 2px solid #dc2626; /* Detalle rojo */
+      border: 2px solid #dc2626;
       transition: all 0.3s ease;
     }
     .button:hover {
-      background-color: #dc2626;
-      border-color: #1e3a8a;
+      background-color: #b91c1c; /* Rojo más oscuro al pasar */
+      border-color: #b91c1c;
     }
     .footer {
       text-align: center;
@@ -109,7 +109,7 @@ export const register = (userName, password) => `
     </div>
 
     <div class="content">
-      <p>¡Bienvenido a la farmacéutica!</p>
+      <p>¡Bienvenido a la Cruz Roja Colombiana!</p>
       <p>Tu cuenta ha sido creada correctamente. A continuación encontrarás tus credenciales de acceso:</p>
 
       <div class="credentials">
@@ -123,7 +123,7 @@ export const register = (userName, password) => `
     </div>
 
     <div class="footer">
-      <p>© 2025 Farmacéutica — Todos los derechos reservados.</p>
+      <p>© 2025 Cruz Roja Colombiana Seccional Boyacá — Todos los derechos reservados.</p>
     </div>
   </div>
 </body>
