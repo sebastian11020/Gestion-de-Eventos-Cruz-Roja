@@ -20,6 +20,7 @@ import { PersonStatusModule } from './modules/person-status/person-status.module
 import { HeadquartersStatusModule } from './modules/headquarters-status/headquarters-status.module';
 import { GroupStatusModule } from './modules/group-status/group-status.module';
 import { ProgramStatusModule } from './modules/program-status/program-status.module';
+import { EmailModule } from './modules/email/email.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { ProgramStatusModule } from './modules/program-status/program-status.mod
     HeadquartersStatusModule,
     GroupStatusModule,
     ProgramStatusModule,
+    EmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],
