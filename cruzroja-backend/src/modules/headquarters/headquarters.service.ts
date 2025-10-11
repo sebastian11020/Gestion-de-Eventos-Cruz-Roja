@@ -28,6 +28,10 @@ export class HeadquartersService {
       type: string;
       number_volunteers: number;
       number_groups: number;
+      leader: {
+        document: string;
+        name: string;
+      };
     }[] = await this.headquartersRepository.query(
       'select * from public.list_headquarters_with_metrics($1, $2)',
       ['ACTIVO', true],
@@ -40,8 +44,8 @@ export class HeadquartersService {
       dto.numberVolunteers = String(row.number_volunteers ?? 0);
       dto.numberGroups = String(row.number_groups ?? 0);
       dto.leader = {
-        document: dto.leader.document,
-        name: FormatNamesString(dto.leader.name),
+        document: row.leader.document,
+        name: FormatNamesString(row.leader.name),
       };
       return dto;
     });
