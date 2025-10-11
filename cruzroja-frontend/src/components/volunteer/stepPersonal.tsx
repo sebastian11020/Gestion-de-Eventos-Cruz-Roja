@@ -1,6 +1,7 @@
 "use client";
 import { fieldBase, labelBase } from "@/components/volunteer/fields";
-import { GEN_OPTIONS, SEX_OPTIONS, STATE_TYPES } from "@/const/consts";
+import { GEN_OPTIONS, SEX_OPTIONS } from "@/const/consts";
+import {useSectionalsNode} from "@/hooks/useSectionalsNode";
 
 export function StepPersonal({
   form,
@@ -11,6 +12,7 @@ export function StepPersonal({
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => void;
 }) {
+    const { state } = useSectionalsNode()
   return (
     <section className="grid grid-cols-1 gap-4 md:grid-cols-2">
       <div>
@@ -95,9 +97,9 @@ export function StepPersonal({
             className={`${fieldBase} appearance-none`}
             required
           >
-            {STATE_TYPES.map((s) => (
-              <option key={s} value={s}>
-                {s}
+            {state.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}
               </option>
             ))}
           </select>

@@ -93,10 +93,16 @@ export function SectionalCard({ sectional }: SectionalCardProps) {
       lastName: "Melo Avellaneda",
       bloodType: "O+",
       sex: "Masculino",
-      state: "Activo",
+      state: {
+          id:"1",
+          name:"Activo"
+      },
       bornDate: "2002-03-23",
       department: "Boyacá",
-      city: "Tunja",
+      city: {
+          id:"1",
+          name:"Tunja"
+      },
       zone: "El topo",
       address: "Cra 15#3-12",
       email: "juan@gmail.com",

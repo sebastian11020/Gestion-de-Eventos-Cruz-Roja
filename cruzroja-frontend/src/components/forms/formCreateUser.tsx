@@ -1,19 +1,17 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { generatePassword } from "@/utils/generatePassword";
-import { formCreatePerson, eps as EpsType } from "@/types/usertType";
-import { getCities, getEPS } from "@/services/serviceSelect";
+import { formCreatePerson } from "@/types/usertType";
 import { Progress } from "@/components/volunteer/progress";
 import { Stepper } from "@/components/volunteer/stepper";
 import { Footer } from "@/components/volunteer/footer";
 import { Header } from "@/components/volunteer/header";
-import { INITIAL_FORM, GRUOP_TYPES } from "@/components/volunteer/constants";
-import type { cities } from "@/components/volunteer/constants";
+import { INITIAL_FORM } from "@/components/volunteer/constants";
 import { StepIdentification } from "@/components/volunteer/stepIdentification";
 import { StepPersonal } from "@/components/volunteer/stepPersonal";
 import { StepLocationContact } from "@/components/volunteer/stepLocationContact";
 import { StepEpsEmergency } from "@/components/volunteer/stepEpsEmergency";
 import { StepReview } from "@/components/volunteer/stepStepsReview";
+import {useSectionalsNode} from "@/hooks/useSectionalsNode";
 
 export default function VolunteerWizard({
                                             open,
@@ -30,13 +28,10 @@ export default function VolunteerWizard({
     const steps = ["Identificación", "Personales", "Ubicación/Contacto", "EPS & Emergencia", "Revisión"];
     const progress = Math.round(((step + 1) / steps.length) * 100);
     const [form, setForm] = useState<formCreatePerson>(INITIAL_FORM);
-    const [cities, setCities] = useState<cities[]>();
-    const [eps, setEps] = useState<EpsType[]>([]);
+    const {cities,eps,sectionals,reload} = useSectionalsNode()
 
     useEffect(() => {
         if (!open) return;
-        getMunicipalities();
-        getEps();
         if (editForm) {
             setForm(editForm);
         } else {
@@ -44,33 +39,10 @@ export default function VolunteerWizard({
         }
     }, [open, editForm]);
 
-    async function getMunicipalities() {
-        try {
-            const citiesForm: cities[] = await getCities();
-            setCities(citiesForm);
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
-    async function getEps() {
-        try {
-            const epsForm: EpsType[] = await getEPS();
-            setEps(epsForm);
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setForm((s) => ({ ...s, [name]: value }));
     };
-
-    const programs = useMemo(() => {
-        const g = GRUOP_TYPES.find((g) => g.id === form.id_group);
-        return g?.program ?? [];
-    }, [form.id_group]);
 
     const handleNested = (
         group: "emergencyContact" | "address",
@@ -156,7 +128,7 @@ export default function VolunteerWizard({
                         <StepLocationContact
                             form={form}
                             cities={cities}
-                            programs={programs}
+                            sectionals={sectionals}
                             handleChange={handleChange}
                             handleNested={handleNested}
                             handleGroupChange={handleGroupChange}

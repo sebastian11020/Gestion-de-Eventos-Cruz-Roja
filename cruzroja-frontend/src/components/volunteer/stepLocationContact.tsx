@@ -1,11 +1,12 @@
 "use client";
 import { fieldBase, labelBase } from "@/components/volunteer/fields";
-import { SECTIONAL_TYPES, GRUOP_TYPES } from "@/components/volunteer/constants";
+import {SectionalNode, GroupNode, type ProgramItem} from "@/types/programType";
+import {useMemo} from "react";
 
 export function StepLocationContact({
                                         form,
                                         cities,
-                                        programs,
+                                        sectionals,
                                         handleChange,
                                         handleNested,
                                         handleGroupChange,
@@ -13,7 +14,7 @@ export function StepLocationContact({
                                     }: {
     form: any;
     cities: { id: string; name: string }[] | undefined;
-    programs: { id?: string; name: string }[];
+    sectionals: SectionalNode[];
     handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
     handleNested: (
         group: "emergencyContact" | "address",
@@ -22,6 +23,20 @@ export function StepLocationContact({
     handleGroupChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
     handleProgramChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }) {
+
+    const sectionalSelected = useMemo(
+        () =>
+            sectionals.find((c) => String(c.id) === String(form.sectional)) || null,
+        [sectionals, form.sectional],
+    );
+    const groupOptions:GroupNode[] = sectionalSelected?.groups ?? [];
+
+    const groupSelected = useMemo(
+        () => groupOptions.find((g) => String(g.id) === String(form.group)) || null,
+        [groupOptions, form.group],
+    );
+    const programOptions: ProgramItem[] = groupSelected?.program ?? [];
+
     return (
         <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div>
@@ -56,11 +71,11 @@ export function StepLocationContact({
 
             <div className="relative">
                 <label className={labelBase}>Seccional</label>
-                <select name="id_headquarter" value={form.id_headquarter} onChange={handleChange} className={`${fieldBase} appearance-none`} required>
+                <select name="id_headquarters" value={form.id_headquarters} onChange={handleChange} className={`${fieldBase} appearance-none`} required>
                     <option value="" disabled>
                         Seleccione…
                     </option>
-                    {SECTIONAL_TYPES.map((s) => (
+                    {sectionals.map((s) => (
                         <option key={s.id} value={s.id}>
                             {s.city}
                         </option>
@@ -74,7 +89,7 @@ export function StepLocationContact({
                     <option value="" disabled>
                         Seleccione…
                     </option>
-                    {GRUOP_TYPES.map((s) => (
+                    {groupOptions.map((s) => (
                         <option key={s.id} value={s.id}>
                             {s.name}
                         </option>
@@ -88,7 +103,7 @@ export function StepLocationContact({
                     <option value="" disabled>
                         Seleccione…
                     </option>
-                    {programs.map((p) => (
+                    {programOptions.map((p) => (
                         <option key={p.id} value={p.id}>
                             {p.name}
                         </option>

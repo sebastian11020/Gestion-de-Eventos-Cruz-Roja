@@ -7,7 +7,10 @@ export type FormState = {
   bloodType?: string;
   sex?: string;
   gender?: string;
-  state: string;
+  state: {
+      id:string;
+      name: string;
+  }
   bornDate?: string;
   department?: string;
   city?: {
@@ -48,6 +51,7 @@ export type formCreatePerson = {
   name: string;
   lastName: string;
   email: string;
+  password?: string;
   sex: string;
   gender: string;
   phone: string;
@@ -65,7 +69,7 @@ export type formCreatePerson = {
   };
   id_group?: string;
   id_program?: string;
-  id_headquarter: string;
+  id_headquarters: string;
   id_location: string;
   id_eps: string;
   type_affiliation: string;
@@ -175,3 +179,9 @@ export type eps = {
   id: string;
   name: string;
 };
+
+export type state = {
+    id: string;
+    name: string;
+    type:string;
+}

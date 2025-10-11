@@ -18,3 +18,12 @@ export async function getEPS() {
     console.error(error);
   }
 }
+
+export async function getState() {
+    try {
+        const response = await axios.get(`http://localhost:8080/state/all`);
+        return response.data;
+    } catch (error) {
+        console.error(error);
+    }
+}

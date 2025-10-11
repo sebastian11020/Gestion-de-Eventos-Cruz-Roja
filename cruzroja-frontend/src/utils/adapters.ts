@@ -3,7 +3,7 @@ type Legacy = FormState;
 
 export function toFormCreatePerson(u: Legacy): formCreatePerson {
   const sectional = u.sectional;
-  const id_headquarter = sectional?.id ? String(sectional.id) : "";
+  const id_headquarters = sectional?.id ? String(sectional.id) : "";
   const id_location = u.city?.id ? String(u.city.id) : "";
   const group = u.group;
   const id_group = group?.id ? String(group.id) : "";
@@ -21,7 +21,7 @@ export function toFormCreatePerson(u: Legacy): formCreatePerson {
     blood: u.bloodType ?? "",
     sex: u.sex ?? "",
     gender: u.gender ?? "",
-    id_state: u.state ?? "Formacion",
+    id_state: u.state.name ?? "Formacion",
     birthDate: u.bornDate ?? "",
     id_location,
     address: {
@@ -35,7 +35,7 @@ export function toFormCreatePerson(u: Legacy): formCreatePerson {
       relationShip: u.emergencyContact?.relationShip ?? "",
       phone: u.emergencyContact?.phone ?? "",
     },
-    id_headquarter,
+    id_headquarters,
     id_group,
     id_program,
     id_eps,

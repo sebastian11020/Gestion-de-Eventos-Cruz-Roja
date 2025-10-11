@@ -127,11 +127,11 @@ export default function ViewUser({ infUser, onClose }: viewUserProps) {
                 <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
                   <span
                     className={`inline-flex items-center rounded-full px-3 py-1 font-medium ${badgeClass(
-                      data?.state,
+                      data?.state.name,
                     )}`}
                   >
                     <ShieldCheck className="mr-1.5 h-4 w-4" />
-                    {data?.state}
+                    {data?.state.name}
                   </span>
                   <span className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 font-medium text-slate-700 ring-1 ring-slate-200">
                     <Droplet className="mr-1.5 h-4 w-4" />
@@ -236,7 +236,7 @@ export default function ViewUser({ infUser, onClose }: viewUserProps) {
             >
               <DL
                 items={[
-                  ["Estado", data?.state],
+                  ["Estado", data?.state.name],
                   ["Tipo de sangre", data?.bloodType],
                 ]}
               />

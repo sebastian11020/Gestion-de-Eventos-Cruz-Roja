@@ -78,8 +78,7 @@ export default function Programas() {
     const response = await associateProgramService(payload);
     if (response.success) {
       toast.success("Programa Asociado Correctamente", { duration: 3000 });
-      // Opcional: refresh
-      // await reload();
+       await reload();
     } else {
       toast.error(response.message, { duration: 3000 });
     }

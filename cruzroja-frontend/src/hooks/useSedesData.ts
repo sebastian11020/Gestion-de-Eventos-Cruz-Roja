@@ -19,6 +19,7 @@ export function useSedesData() {
       ]);
       setCities(citiesData);
       setSectionals(sectionalsData);
+      console.log(sectionalsData);
     } finally {
       setLoading(false);
     }

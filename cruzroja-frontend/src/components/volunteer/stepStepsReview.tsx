@@ -1,5 +1,7 @@
 "use client";
-import { SECTIONAL_TYPES, GRUOP_TYPES } from "@/components/volunteer/constants";
+
+
+import {useSectionalsNode} from "@/hooks/useSectionalsNode";
 
 export function StepReview({
                                form,
@@ -10,14 +12,17 @@ export function StepReview({
     cityMap: Map<string, string>;
     epsMap: Map<string, string> | undefined;
 }) {
+    const {sectionals} = useSectionalsNode()
     const sectionalMap = new Map<string, string>();
-    SECTIONAL_TYPES.forEach((s) => sectionalMap.set(String(s.id), s.city));
+    sectionals.forEach((s) => sectionalMap.set(String(s.id), s.city));
 
     const groupMap = new Map<string, string>();
-    GRUOP_TYPES.forEach((g) => groupMap.set(String(g.id), g.name));
+    sectionals.forEach((s) => s.groups.forEach((g)=>groupMap.set(g.id,g.name)))
 
     const programMap = new Map<string, string>();
-    GRUOP_TYPES.forEach((g) => g.program?.forEach((p) => programMap.set(String(p.id), p.name)));
+    sectionals.forEach((s) =>
+        s.groups?.forEach((g) =>
+            g.program.forEach((p)=> programMap.set(p.id,p.name))));
 
     return (
         <section className="space-y-3">
@@ -81,7 +86,7 @@ export function StepReview({
                     <h5 className="font-medium text-gray-800 mb-2">Asignación</h5>
                     <ul className="text-sm text-gray-700 space-y-1">
                         <li>
-                            <strong>Seccional:</strong> {sectionalMap.get(String(form.id_headquarter)) ?? "—"}
+                            <strong>Seccional:</strong> {sectionalMap.get(String(form.id_headquarters)) ?? "—"}
                         </li>
                         <li>
                             <strong>Agrupación:</strong> {groupMap.get(String(form.id_group)) ?? "—"}
