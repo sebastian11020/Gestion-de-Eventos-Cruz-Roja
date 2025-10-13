@@ -4,7 +4,7 @@ export class Address {
   @IsNotEmpty()
   @IsString()
   @MaxLength(120)
-  @Matches(/^[A-Za-zÁÉÍÓÚÜáéíóúüñÑ0-9\s#\-.]+$/, {
+  @Matches(/^[A-Za-zÁÉÍÓÚÜáéíóúüñÑ0-9\s#\-.-]+$/, {
     message: 'Dirección inválida',
   })
   streetAddress: string;
