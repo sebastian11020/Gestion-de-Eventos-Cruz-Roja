@@ -1,4 +1,4 @@
-import { IsNumber, Min } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
 
 export class CreateGroupHeadquarters {
   @IsNumber()
@@ -7,5 +7,7 @@ export class CreateGroupHeadquarters {
   @IsNumber()
   @Min(1)
   idGroup: number;
+  @IsString()
+  @IsNotEmpty()
   leader: string;
 }

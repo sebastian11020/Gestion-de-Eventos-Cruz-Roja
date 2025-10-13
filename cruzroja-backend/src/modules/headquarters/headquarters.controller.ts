@@ -24,7 +24,7 @@ export class HeadquartersController {
 
   @Get('/allInfo')
   async getAllInfo() {
-    return await this.headquartersService.getAllWithGroupsAndPrograms();
+    return await this.headquartersService.getAllWithGroupsAndMissingPrograms();
   }
 
   @Post('/create')
