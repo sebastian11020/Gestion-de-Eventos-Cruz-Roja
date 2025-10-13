@@ -7,7 +7,7 @@ export class GetGroupHeadquartersDto {
   };
   numberVolunteers: string;
   numberPrograms: string;
-  leader?: {
+  leader: {
     document: string;
     name: string;
   };

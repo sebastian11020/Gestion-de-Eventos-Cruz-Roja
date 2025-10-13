@@ -52,7 +52,10 @@ export class GroupHeadquartersService {
       };
       dto.numberVolunteers = String(row.number_volunteers);
       dto.numberPrograms = String(row.number_programs);
-      dto.leader = row.leader;
+      dto.leader = {
+        document: row.leader.document,
+        name: FormatNamesString(row.leader.name),
+      };
       dto.programs = row.programs;
       return dto;
     });

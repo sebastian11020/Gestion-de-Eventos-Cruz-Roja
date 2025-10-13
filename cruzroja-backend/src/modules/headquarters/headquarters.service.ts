@@ -33,9 +33,9 @@ export class HeadquartersService {
         name: string;
       };
     }[] = await this.headquartersRepository.query(
-      'select * from public.list_headquarters_with_metrics($1, $2)',
-      ['ACTIVO', true],
+      'select * from public.get_active_headquarters()',
     );
+    console.log(rows);
     return rows.map((row) => {
       const dto = new GetHeadquartersDto();
       dto.id = String(row.id);
@@ -105,7 +105,7 @@ export class HeadquartersService {
         await this.changeHeadquartersStatus(manager, headquarter.id);
         await this.assignLeader(
           manager,
-          dto.document_leader,
+          dto.leader,
           headquarter.id,
           headquarter.type === HeadquartersTypeEnum.SEDE_SECCIONAL,
         );
@@ -226,7 +226,7 @@ export class HeadquartersService {
       `No se encontro una sede con el sigueinte id: ${id}`,
     );
     await this.headquartersRepository.query(
-      'select * from public.deactivate_headquarters($1)',
+      'select * from public.deactivate_headquarters_cascade($1)',
       [id],
     );
     return { success: true };
