@@ -68,7 +68,7 @@ export class ProgramHeadquartersService {
         }
         const group_headquarters = await this.checkGroupHeadquarters(
           dto.idHeadquarters,
-          dto.idGroup,
+          dto.id_group,
         );
         if (!(group_headquarters.state.name === 'ACTIVO')) {
           conflict(
@@ -105,7 +105,7 @@ export class ProgramHeadquartersService {
         }
         await this.assignCoordinator(
           manager,
-          dto.document_coordinator,
+          dto.leader,
           dto.idHeadquarters,
           group_headquarters.groupHeadquarters.id,
           program_headquarters.id,
