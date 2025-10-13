@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Person } from './entity/person.entity';
-import { EntityManager, Repository } from 'typeorm';
+import { EntityManager, IsNull, Repository } from 'typeorm';
 import { CreatePersonDto } from './dto/create-person.dto';
 import { type_affiliation } from '../eps-person/enum/eps-person.enum';
 import { CreateEpsPersonDTO } from '../eps-person/dto/create-eps-person.dto';
@@ -44,6 +44,7 @@ export class PersonService {
           role: {
             id: 5,
           },
+          end_date: IsNull(),
         },
       },
       relations: {
