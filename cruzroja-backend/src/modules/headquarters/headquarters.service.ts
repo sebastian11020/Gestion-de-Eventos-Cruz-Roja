@@ -3,7 +3,6 @@ import { Headquarters } from './entity/headquarters.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, IsNull, Repository } from 'typeorm';
 import { CreateHeadquartersDto } from './dto/create-headquarters.dto';
-import { LocationService } from '../location/location.service';
 import { assert, assertFound, conflict } from '../../common/utils/assert';
 import { LocationTypeEnum } from '../location/enum/location-type.enum';
 import { GetHeadquartersDto } from './dto/get-headquarters.dto';
@@ -18,7 +17,6 @@ export class HeadquartersService {
   constructor(
     @InjectRepository(Headquarters)
     private headquartersRepository: Repository<Headquarters>,
-    private locationService: LocationService,
   ) {}
 
   async getAllDto(): Promise<GetHeadquartersDto[]> {
@@ -51,13 +49,13 @@ export class HeadquartersService {
     });
   }
 
-  async getAllWithGroupsAndPrograms() {
+  async getAllWithGroupsAndMissingPrograms() {
     const rows: {
       id: number;
       city: string;
       groups: [id: number, name: string, program: [id: number, name: string]];
     }[] = await this.headquartersRepository.query(
-      'select * from public.list_headquarters_with_groups_and_programs()',
+      'select * from public.list_headquarters_with_missing_programs()',
     );
     return rows;
   }
