@@ -134,6 +134,7 @@ export type createGroup = {
   idGroup?: string;
   name?: string;
   idHeadquarters?: string;
+  leader?: string;
 };
 
 export type event = {

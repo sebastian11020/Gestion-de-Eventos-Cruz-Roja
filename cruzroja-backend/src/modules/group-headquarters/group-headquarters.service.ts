@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { GroupHeadquarters } from './entity/group-headquarters.entity';
 import { EntityManager, IsNull, Repository } from 'typeorm';
 import { CreateGroupHeadquarters } from './dto/create-group-headquarters.dto';
-import { assertFound, conflict } from '../../common/utils/assert';
+import { assert, assertFound, conflict } from '../../common/utils/assert';
 import { GetGroupHeadquartersDto } from './dto/get-group-headquarters.dto';
 import { FormatNamesString } from '../../common/utils/string.utils';
 import { GroupStatus } from '../group-status/entity/group-status.entity';

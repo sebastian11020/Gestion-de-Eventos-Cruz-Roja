@@ -34,7 +34,6 @@ export class GroupService {
   }
 
   async create(dto: CreateGroupDto) {
-    console.log(dto);
     let group: Groups | null = await this.groupRepository.findOne({
       where: {
         name: NormalizeString(dto.name),

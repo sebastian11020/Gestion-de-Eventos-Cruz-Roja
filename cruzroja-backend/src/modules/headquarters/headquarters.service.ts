@@ -33,7 +33,6 @@ export class HeadquartersService {
     }[] = await this.headquartersRepository.query(
       'select * from public.get_active_headquarters()',
     );
-    console.log(rows);
     return rows.map((row) => {
       const dto = new GetHeadquartersDto();
       dto.id = String(row.id);
