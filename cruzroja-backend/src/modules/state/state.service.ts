@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { conflict } from '../../common/utils/assert';
 import { InjectRepository } from '@nestjs/typeorm';
 import { GetStateDto } from './dto/get-state.dto';
+import { type_state } from './enum/state-type.enum';
 
 @Injectable()
 export class StateService {
@@ -39,7 +40,11 @@ export class StateService {
   }
 
   async getAll(): Promise<GetStateDto[]> {
-    return await this.stateRepository.find();
+    return await this.stateRepository.find({
+      where: {
+        type: type_state.PERSONA,
+      },
+    });
   }
 
   async update(id: number, dto: CreateStateDto) {

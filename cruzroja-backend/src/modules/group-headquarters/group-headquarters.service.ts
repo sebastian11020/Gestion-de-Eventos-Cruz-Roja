@@ -157,6 +157,7 @@ export class GroupHeadquartersService {
     id_headquarters: number,
     id_group_headquarters: number,
   ) {
+    assert(document, 'El documento del coordinador es obligatorio');
     const personRol = await manager.findOne(PersonRole, {
       where: {
         person: {
