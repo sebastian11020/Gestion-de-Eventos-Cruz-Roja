@@ -84,9 +84,9 @@ export class UpdatePersonDto {
   id_eps: number;
   @IsEnum(type_affiliation)
   type_affiliation: type_affiliation;
-  @IsNumber()
+  @IsString()
   @IsOptional()
-  carnet: number;
+  carnet: string;
   @IsNumber()
   @IsOptional()
   @Min(1)
