@@ -59,6 +59,17 @@ export class HeadquartersService {
     return rows;
   }
 
+  async getAllWithGroupsAndPrograms() {
+    const rows: {
+      id: number;
+      city: string;
+      groups: [id: number, name: string, program: [id: number, name: string]];
+    }[] = await this.headquartersRepository.query(
+      'select * from public.list_headquarters_with_groups_and_programs()',
+    );
+    return rows;
+  }
+
   async create(dto: CreateHeadquartersDto) {
     return await this.headquartersRepository.manager.transaction(
       async (manager) => {
