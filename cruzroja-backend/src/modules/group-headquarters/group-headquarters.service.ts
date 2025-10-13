@@ -25,17 +25,13 @@ export class GroupHeadquartersService {
       id: number;
       name: string;
       sectional: {
-        id: string;
+        id: number;
         name: string;
       };
       number_volunteers: number;
       number_programs: number;
       leader: {
         document: string;
-        name: string;
-      };
-      programs: {
-        id: string;
         name: string;
       };
     }[] = await this.groupHeadquartersRepository.query(
@@ -47,7 +43,7 @@ export class GroupHeadquartersService {
       dto.id = String(row.id);
       dto.name = FormatNamesString(row.name);
       dto.sectional = {
-        id: row.sectional.id,
+        id: String(row.sectional.id),
         name: FormatNamesString(row.sectional.name),
       };
       dto.numberVolunteers = String(row.number_volunteers);
@@ -56,7 +52,6 @@ export class GroupHeadquartersService {
         document: row.leader.document,
         name: FormatNamesString(row.leader.name),
       };
-      dto.programs = row.programs;
       return dto;
     });
   }
@@ -104,7 +99,7 @@ export class GroupHeadquartersService {
         }
         await this.assignCoordinator(
           manager,
-          dto.document_coordinator,
+          dto.leader,
           dto.idHeadquarters,
           group_headquarters.id,
         );

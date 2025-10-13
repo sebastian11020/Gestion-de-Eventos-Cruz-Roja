@@ -7,5 +7,5 @@ export class CreateGroupHeadquarters {
   @IsNumber()
   @Min(1)
   idGroup: number;
-  document_coordinator: string;
+  leader: string;
 }
