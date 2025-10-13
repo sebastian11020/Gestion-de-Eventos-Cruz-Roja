@@ -72,8 +72,9 @@ export class ProgramService {
         `Ya existe un programa con el nombre ${FormatNamesString(dto.name)}`,
       );
     }
-    program.name = NormalizeString(dto.name);
-    await this.programRepository.save(program);
-    return { success: true };
+    await this.programRepository.update(id, {
+      name: NormalizeString(dto.name),
+    });
+    return { success: true, message: `El programa se actualizo correctamente` };
   }
 }

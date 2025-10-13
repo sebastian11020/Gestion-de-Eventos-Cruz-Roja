@@ -35,8 +35,7 @@ export class GroupHeadquartersService {
         name: string;
       };
     }[] = await this.groupHeadquartersRepository.query(
-      'select * from public.list_groups_with_details($1)',
-      ['ACTIVO'],
+      'select * from public.list_groups_with_details()',
     );
     return rows.map((row) => {
       const dto = new GetGroupHeadquartersDto();
