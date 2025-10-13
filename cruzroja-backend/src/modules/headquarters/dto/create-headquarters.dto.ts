@@ -9,5 +9,5 @@ export class CreateHeadquartersDto {
   idLocation: number;
   @IsString()
   @IsNotEmpty()
-  document_leader: string;
+  leader: string;
 }
