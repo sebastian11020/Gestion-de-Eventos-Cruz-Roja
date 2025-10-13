@@ -55,7 +55,7 @@ export class HeadquartersService {
     const rows: {
       id: number;
       city: string;
-      groups: [id: number, name: string, programs: [id: number, name: string]];
+      groups: [id: number, name: string, program: [id: number, name: string]];
     }[] = await this.headquartersRepository.query(
       'select * from public.list_headquarters_with_groups_and_programs()',
     );

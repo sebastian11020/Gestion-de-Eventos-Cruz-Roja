@@ -30,9 +30,9 @@ export class ProgramHeadquartersService {
       sectional: string;
       group: string;
       number_volunteers: number;
-      leader?: {
-        document?: string;
-        name?: string;
+      leader: {
+        document: string;
+        name: string;
       };
     }[] = await this.programHeadquartersRepository.query(
       'select * from public.list_programs_with_details()',
@@ -44,7 +44,10 @@ export class ProgramHeadquartersService {
       dto.sectional = FormatNamesString(row.sectional);
       dto.group = FormatNamesString(row.group);
       dto.numberVolunteers = String(row.number_volunteers);
-      dto.leader = row.leader;
+      dto.leader = {
+        document: row.leader.document,
+        name: FormatNamesString(row.leader.name),
+      };
       return dto;
     });
   }
