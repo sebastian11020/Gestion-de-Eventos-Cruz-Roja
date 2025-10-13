@@ -69,8 +69,9 @@ export class GroupService {
         `Ya existe una agrupacion con el nombre ${FormatNamesString(dto.name)}`,
       );
     }
-    group.name = NormalizeString(dto.name);
-    await this.groupRepository.update(id, group);
+    await this.groupRepository.update(id, {
+      name: NormalizeString(dto.name),
+    });
     return { success: true };
   }
 }

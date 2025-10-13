@@ -11,8 +11,4 @@ export class GetGroupHeadquartersDto {
     document: string;
     name: string;
   };
-  programs?: {
-    id: string;
-    name: string;
-  };
 }
