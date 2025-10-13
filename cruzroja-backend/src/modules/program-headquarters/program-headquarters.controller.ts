@@ -26,17 +26,9 @@ export class ProgramHeadquartersController {
     return this.programHeadquartersService.createOrActivate(dto);
   }
 
-  /*
-  @Put('/deactivate/:idProgram/:idHeadquarters')
+  @Put('/deactivate/:idProgram')
   @HttpCode(HttpStatus.OK)
-  async deactivate(
-    @Param('idProgram', ParseIntPipe) idProgram: number,
-    @Param('idHeadquarters', ParseIntPipe) idHeadquarters: number,
-  ) {
-    return this.programHeadquartersService.deactivate(
-      idProgram,
-      idHeadquarters,
-    );
+  async deactivate(@Param('idProgram', ParseIntPipe) idProgram: number) {
+    return this.programHeadquartersService.deactivate(idProgram);
   }
-   */
 }

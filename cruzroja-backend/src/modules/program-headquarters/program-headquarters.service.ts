@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { FormatNamesString } from '../../common/utils/string.utils';
-import { assertFound, conflict } from '../../common/utils/assert';
+import { assert, assertFound, conflict } from '../../common/utils/assert';
 import { ProgramHeadquarters } from './entity/program-headquarters.entity';
 import { EntityManager, IsNull, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -204,20 +204,52 @@ export class ProgramHeadquartersService {
     );
   }
 
-  /*
-  async deactivate(idProgram: number, idHeadquarters: number) {
-    const object = await this.programHeadquartersRepository.findOne({
-      where: {
-        idProgram: idProgram,
-        idHeadquarters: idHeadquarters,
+  async deactivate(id: number) {
+    return await this.programHeadquartersRepository.manager.transaction(
+      async (manager) => {
+        await this.changeProgramStatus(manager, id);
+        const p = await manager.findOne(PersonRole, {
+          where: {
+            program: {
+              id: id,
+            },
+            end_date: IsNull(),
+            role: {
+              id: 4,
+            },
+          },
+          relations: {
+            headquarters: true,
+            group: true,
+            person: true,
+          },
+        });
+        assert(p, 'No se pudo desactivar el programa, intente nuevamente');
+        await manager.update(PersonRole, p.id, {
+          end_date: new Date(),
+        });
+        const newRole = manager.create(PersonRole, {
+          person: {
+            id: p.person.id,
+          },
+          headquarters: {
+            id: p.headquarters.id,
+          },
+          role: {
+            id: 5,
+          },
+          group: {
+            id: p.group.id,
+          },
+        });
+        await manager.save(newRole);
+        return {
+          success: true,
+          message: 'Se desactivo el programa correctamente',
+        };
       },
-    });
-    assertFound(object, `No se encontro la agrupacion que deseas desactivar`);
-    object.state = false;
-    await this.programHeadquartersRepository.save(object);
-    return { success: true };
+    );
   }
-   */
 
   async findOneById(id_headquarters: number, id_program: number) {
     return this.programHeadquartersRepository.findOne({
