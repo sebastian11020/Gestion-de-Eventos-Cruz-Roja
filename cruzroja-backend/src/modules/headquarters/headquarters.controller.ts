@@ -22,9 +22,14 @@ export class HeadquartersController {
     return await this.headquartersService.getAllDto();
   }
 
-  @Get('/allInfo')
-  async getAllInfo() {
+  @Get('/MissingProgram')
+  async getMissingPrograms() {
     return await this.headquartersService.getAllWithGroupsAndMissingPrograms();
+  }
+
+  @Get('/WithProgram')
+  async getWithProgramsActive() {
+    return await this.headquartersService.getAllWithGroupsAndPrograms();
   }
 
   @Post('/create')
