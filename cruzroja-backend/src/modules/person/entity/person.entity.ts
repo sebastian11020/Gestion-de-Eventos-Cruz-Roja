@@ -38,7 +38,7 @@ export class Person {
   @Column()
   gender: type_gender;
   @Column()
-  license: number;
+  license: string;
   @Column()
   phone: number;
   @Column('jsonb')
