@@ -25,32 +25,15 @@ import type {
 
 type SectionalCardProps = {
   program?: TProgram;
+  users:leaderDataTable[];
 };
 
-const users: leaderDataTable[] = [
-  {
-    typeDocument: "CC",
-    document: "1007749746",
-    name: "Sebastian Daza Delgadillo",
-    state: "Activo",
-    group: "Juvenil",
-  },
-  {
-    typeDocument: "CC",
-    document: "1006649646",
-    name: "Andres Felipe Melo Avellaneda",
-    state: "Activo",
-    group: "Socorrismo",
-  },
-];
-
-export function ProgramCard({ program }: SectionalCardProps) {
+export function ProgramCard({ program,users }: SectionalCardProps) {
   const [openChangeLeader, setOpenChangeLeader] = useState(false);
   const [viewUser, setViewUser] = useState<FormState | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [openView, setOpenView] = useState(false);
 
-  // --- Edición de nombre ---
   const [localName, setLocalName] = useState(program?.name ?? "");
   const [editing, setEditing] = useState(false);
   const [nameDraft, setNameDraft] = useState(localName);
@@ -73,37 +56,6 @@ export function ProgramCard({ program }: SectionalCardProps) {
 
   function onView(g: string | undefined) {
     setOpenView(true);
-    setViewUser({
-      typeDocument: "CC",
-      document: "1001453276",
-      carnet: "a125",
-      name: "Andres Felipe",
-      lastName: "Melo Avellaneda",
-      bloodType: "O+",
-      sex: "Masculino",
-      state: "Activo",
-      bornDate: "2002-03-23",
-      department: "Boyacá",
-      city: "Tunja",
-      zone: "El topo",
-      address: "Cra 15#3-12",
-      email: "juan@gmail.com",
-      cellphone: "3124567654",
-      emergencyContact: {
-        name: "Andres Castro",
-        relationShip: "Primo",
-        phone: "3126785478",
-      },
-      sectional: { id: "1234", city: "Tunja" },
-      group: {
-        id: "1",
-        name: "Juventud",
-        program: { id: "1", name: "Aire Libre" },
-      },
-      eps: { name: "Nueva EPS", type: "Subsidiado" },
-      totalHours: "500",
-      monthHours: "9",
-    });
   }
 
   function handleDelete() {
@@ -268,7 +220,7 @@ export function ProgramCard({ program }: SectionalCardProps) {
         onClose={() => setOpenChangeLeader(false)}
         title={`Voluntarios - ${localName}`}
       >
-        <ChangeLeaderTable users={users} />
+        <ChangeLeaderTable users={users} sectional={program?.id} onCancel={() => setOpenChangeLeader(false)} isChange={true} isProgram={true} />
       </Modal>
       <ViewUser infUser={viewUser} onClose={() => setViewUser(null)} />
 

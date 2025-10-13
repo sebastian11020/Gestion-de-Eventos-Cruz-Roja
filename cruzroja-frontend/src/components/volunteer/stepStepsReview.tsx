@@ -22,7 +22,7 @@ export function StepReview({
     const programMap = new Map<string, string>();
     sectionals.forEach((s) =>
         s.groups?.forEach((g) =>
-            g.program.forEach((p)=> programMap.set(p.id,p.name))));
+            g.program?.forEach((p)=> programMap.set(p.id,p.name))));
 
     return (
         <section className="space-y-3">

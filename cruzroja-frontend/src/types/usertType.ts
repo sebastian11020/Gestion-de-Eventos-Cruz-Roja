@@ -127,6 +127,7 @@ export type leaderDataTable = {
 export type createSectional = {
   idLocation: string;
   type: string;
+  leader?:string;
 };
 
 export type createGroup = {

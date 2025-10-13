@@ -17,7 +17,6 @@ import { PAGE_SIZE } from "@/const/consts";
 import { normalize } from "@/utils/normalize";
 import { PageBtn } from "@/components/buttons/pageButton";
 import ChangeLeaderTable from "@/components/tables/changeLeaderTable";
-import { users } from "@/mocks/sectionals";
 import type { group } from "@/types/usertType";
 import { CreateGroupForm } from "@/components/forms/createGroupForm";
 import { AssociateGroupForm } from "@/components/forms/associateGroupForm";
@@ -26,7 +25,9 @@ export default function Agrupaciones() {
   const [open, setOpen] = useState(false);
   const [isNewGroup, setIsNewGroup] = useState(false);
   const [openChangeLeader, setOpenChangeLeader] = useState(false);
-  const { sectionals, groups, catalogGroups, loading, reload } =
+    const [documentSelected, setDocumentSelected] = useState<string>("");
+    const [nameLeader, setNameLeader] = useState<string>("");
+  const { sectionals, groups, catalogGroups,users, loading, reload } =
     useGroupsData();
   const [query, setQuery] = useState("");
   const {
@@ -61,11 +62,11 @@ export default function Agrupaciones() {
     setOpen(false);
     setQuery("");
     setPage(1);
-    toast.loading("Creando agrupacion", { duration: 1000 });
+    toast.loading("Creando agrupacion", { duration: 3000 });
 
     const response = await createGroupService({ name });
     if (response.success) {
-      toast.success("Agrupacion creada", { duration: 3000 });
+      toast.success("Agrupacion creada", { duration: 1000 });
       await reload();
     } else {
       toast.error(response.message);
@@ -76,12 +77,13 @@ export default function Agrupaciones() {
     idGroup: string;
     idHeadquarters: string;
   }) {
+    const newPayload = {...payload,leader:documentSelected}
     setOpen(false);
     setQuery("");
     setPage(1);
     toast.loading("Creando agrupacion", { duration: 1000 });
-
-    const response = await associateGroupService(payload);
+    console.log(newPayload);
+    const response = await associateGroupService(newPayload);
     if (response.success) {
       toast.success("Agrupacion creada", { duration: 3000 });
       reload();
@@ -150,7 +152,7 @@ export default function Agrupaciones() {
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {paged.map((sec) => (
-            <GroupCard key={`${sec.id}-${sec.sectional}`} group={sec} />
+            <GroupCard key={`${sec.id}-${sec.sectional}`} group={sec} users={users} />
           ))}
         </div>
       )}
@@ -215,6 +217,7 @@ export default function Agrupaciones() {
           <AssociateGroupForm
             groups={catalogGroups}
             sectionals={sectionals}
+            nameLeader={nameLeader}
             onOpenLeader={() => setOpenChangeLeader(true)}
             onCancel={() => {
               setOpen(false);
@@ -237,7 +240,7 @@ export default function Agrupaciones() {
         onClose={() => setOpenChangeLeader(false)}
         title={"Seleccionar Lider"}
       >
-        <ChangeLeaderTable users={users} />
+        <ChangeLeaderTable users={users} onSelect={(document,name)=>{{setDocumentSelected(document),setNameLeader(name)}}} onCancel={()=>setOpenChangeLeader(false)}/>
       </Modal>
     </div>
   );

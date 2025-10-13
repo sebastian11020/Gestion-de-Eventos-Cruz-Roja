@@ -11,7 +11,6 @@ import {
 } from "@/services/serviceCreateProgram";
 import toast from "react-hot-toast";
 import ChangeLeaderTable from "@/components/tables/changeLeaderTable";
-import { users } from "@/mocks/sectionals";
 import { useProgramsData } from "@/hooks/useProgramsData";
 import { usePaginatedSearch } from "@/hooks/usePaginatedSearch";
 import { usePageNumbers } from "@/hooks/usedPaginatedNumbers";
@@ -26,7 +25,9 @@ export default function Programas() {
   const [openChangeLeader, setOpenChangeLeader] = useState(false);
   const [isNewProgram, setIsNewProgram] = useState(false);
   const [query, setQuery] = useState("");
-  const { items, sectionals, loading, reload } = useProgramsData();
+  const { items, sectionals,users, loading, reload } = useProgramsData();
+    const [documentSelected, setDocumentSelected] = useState<string>("");
+    const [nameLeader, setNameLeader] = useState<string>("");
   const {
     page,
     setPage,
@@ -70,12 +71,13 @@ export default function Programas() {
     }
   }
   async function handleAssociateCatalog(payload: createProgram) {
+    const newPayload = {...payload,leader:documentSelected}
+    console.log(newPayload)
     setOpen(false);
     setQuery("");
     setPage(1);
     toast.loading("Asociando Programa", { duration: 1000 });
-
-    const response = await associateProgramService(payload);
+    const response = await associateProgramService(newPayload);
     if (response.success) {
       toast.success("Programa Asociado Correctamente", { duration: 3000 });
        await reload();
@@ -152,12 +154,10 @@ export default function Programas() {
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {paged.map((sec) => (
-            <ProgramCard key={sec.id} program={sec} />
+            <ProgramCard key={sec.id} program={sec} users={users} />
           ))}
         </div>
       )}
-
-      {/* Paginación */}
       <nav
         className="flex flex-col items-center justify-between gap-3 sm:flex-row"
         aria-label="Paginación"
@@ -220,6 +220,7 @@ export default function Programas() {
         {isNewProgram ? (
           <AssociateProgramForm
             sectionals={sectionals}
+            nameLeader={nameLeader}
             onOpenLeader={() => setOpenChangeLeader(true)}
             onCancel={() => {
               setOpen(false);
@@ -244,7 +245,7 @@ export default function Programas() {
         onClose={() => setOpenChangeLeader(false)}
         title={"Seleccionar Lider"}
       >
-        <ChangeLeaderTable users={users} />
+        <ChangeLeaderTable users={users} onSelect={(document,name)=>{{setDocumentSelected(document),setNameLeader(name)}}} onCancel={()=>setOpenChangeLeader(false)} />
       </Modal>
     </div>
   );

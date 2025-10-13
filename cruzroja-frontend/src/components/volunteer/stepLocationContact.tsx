@@ -26,14 +26,14 @@ export function StepLocationContact({
 
     const sectionalSelected = useMemo(
         () =>
-            sectionals.find((c) => String(c.id) === String(form.sectional)) || null,
-        [sectionals, form.sectional],
+            sectionals.find((c) => String(c.id) === String(form.id_headquarters)) || null,
+        [sectionals, form.id_headquarters],
     );
     const groupOptions:GroupNode[] = sectionalSelected?.groups ?? [];
 
     const groupSelected = useMemo(
-        () => groupOptions.find((g) => String(g.id) === String(form.group)) || null,
-        [groupOptions, form.group],
+        () => groupOptions.find((g) => String(g.id) === String(form.id_group)) || null,
+        [groupOptions, form.id_group],
     );
     const programOptions: ProgramItem[] = groupSelected?.program ?? [];
 
@@ -70,7 +70,7 @@ export function StepLocationContact({
             </div>
 
             <div className="relative">
-                <label className={labelBase}>Seccional</label>
+                <label className={labelBase}>Sede</label>
                 <select name="id_headquarters" value={form.id_headquarters} onChange={handleChange} className={`${fieldBase} appearance-none`} required>
                     <option value="" disabled>
                         Seleccione…

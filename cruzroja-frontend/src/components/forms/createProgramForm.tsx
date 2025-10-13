@@ -76,8 +76,6 @@ export function CreateProgramForm({
           ))}
         </select>
       </div>
-
-      {/* Agrupación */}
       <div className="grid gap-1.5">
         <label htmlFor="group" className="text-sm font-medium text-gray-800">
           Agrupación
@@ -102,8 +100,6 @@ export function CreateProgramForm({
           ))}
         </select>
       </div>
-
-      {/* Nombre del programa */}
       <div className="grid gap-1.5">
         <label
           htmlFor="programName"

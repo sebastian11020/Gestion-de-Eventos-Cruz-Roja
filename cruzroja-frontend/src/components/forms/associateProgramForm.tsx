@@ -16,12 +16,14 @@ type LocalForm = {
 
 export function AssociateProgramForm({
   sectionals,
+  nameLeader,
   onOpenLeader,
   onCancel,
   onSubmit,
 }: {
   sectionals: SectionalNode[];
   onOpenLeader: () => void;
+  nameLeader: string;
   onCancel: () => void;
   onSubmit: (payload: createProgram) => void;
 }) {
@@ -43,8 +45,12 @@ export function AssociateProgramForm({
     [groupOptions, form.group],
   );
   const programOptions: ProgramItem[] = groupSelected?.program ?? [];
+    const programSelected = useMemo(
+        () => programOptions.find((p) => String(p.id) === String(form.programId)) ?? null,
+        [programOptions, form.programId]
+    );
 
-  const canSave = Boolean(form.sectional && form.group && form.programId);
+    const canSave = Boolean(form.sectional && form.group && form.programId);
 
   return (
     <form
@@ -159,6 +165,11 @@ export function AssociateProgramForm({
         <Crown className="h-4 w-4 text-amber-500 transition-transform group-hover:scale-110" />
         Seleccionar Líder
       </Button>
+
+        <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-600">
+            <span className="font-medium text-gray-700">Vista previa:</span>{" "}
+            {groupSelected?.name ?? "—"} {" en "} {sectionalSelected?.city ?? "—"}{programSelected?.name}{" Lider: "}{nameLeader}
+        </div>
 
       <div className="flex items-center justify-end gap-2 pt-1">
         <Button

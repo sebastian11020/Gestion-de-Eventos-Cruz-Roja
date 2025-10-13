@@ -1,11 +1,20 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { Check, ChevronLeft, ChevronRight, Search } from "lucide-react";
-import type { leaderDataTable } from "@/types/usertType";
+import type {leaderDataTable} from "@/types/usertType";
+import {normalize} from "@/utils/normalize";
+import {PageBtn} from "@/components/buttons/pageButton";
 
 type ChangeLeaderTableProps = {
   users: leaderDataTable[];
+  isChange?: boolean;
+  isSectional?:boolean;
+  isGroup?:boolean;
+  isProgram?:boolean;
+  sectional?: string;
   initialPageSize?: number;
+  onSelect?:(document:string,name:string) => void;
+  onCancel?:()=>void;
 };
 
 function badgeClass(state: string) {
@@ -23,19 +32,21 @@ function badgeClass(state: string) {
   return "inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-700 ring-1 ring-inset ring-gray-200";
 }
 
-const normalize = (v: string) =>
-  (v ?? "")
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "");
 
 export default function ChangeLeaderTable({
   users,
   initialPageSize = 10,
+  onSelect,
+  sectional,
+  isSectional,
+  isProgram,
+  isGroup,
+  onCancel,
+  isChange = false
 }: ChangeLeaderTableProps) {
   const [query, setQuery] = useState("");
   const [pageSize, setPageSize] = useState(initialPageSize);
-  const [page, setPage] = useState(1); // 1-based
+  const [page, setPage] = useState(1);
 
   const filtered = useMemo(() => {
     const q = normalize(query);
@@ -71,6 +82,10 @@ export default function ChangeLeaderTable({
     if (to - from + 1 < maxButtons) from = Math.max(1, to - maxButtons + 1);
     return Array.from({ length: to - from + 1 }, (_, i) => from + i);
   }, [page, totalPages]);
+
+  function handleChange(data:{idSectional?:string,leader:string}) {
+      console.log("Cambio",data)
+  }
 
   return (
     <section className="space-y-3">
@@ -119,7 +134,6 @@ export default function ChangeLeaderTable({
         </div>
       </div>
 
-      {/* Meta info */}
       <div className="text-xs text-gray-500">
         Mostrando{" "}
         <span className="font-medium">
@@ -224,6 +238,17 @@ export default function ChangeLeaderTable({
                         "
                         title="Seleccionar"
                         aria-label={`Seleccionar a ${g.name}`}
+                        onClick={()=> {onSelect?.(g.document,g.name)
+                        onCancel?.()
+                        if(isChange){
+                            const payload = {
+                                idSectional:sectional,
+                                leader:g.document
+                            }
+                            handleChange(payload)
+                         }
+                        }
+                      }
                       >
                         <Check className="size-4" />
                       </button>
@@ -236,7 +261,6 @@ export default function ChangeLeaderTable({
         </table>
       </div>
 
-      {/* Paginador */}
       <nav
         className="flex flex-col items-center justify-between gap-3 sm:flex-row"
         aria-label="Paginación"
@@ -261,7 +285,6 @@ export default function ChangeLeaderTable({
             Anterior
           </button>
 
-          {/* Números de página (compacto) */}
           <div className="mx-1 hidden sm:flex">
             {pageNumbers[0] > 1 && (
               <>
@@ -299,28 +322,3 @@ export default function ChangeLeaderTable({
   );
 }
 
-function PageBtn({
-  n,
-  current,
-  onClick,
-}: {
-  n: number;
-  current: number;
-  onClick: (n: number) => void;
-}) {
-  const active = n === current;
-  return (
-    <button
-      type="button"
-      onClick={() => onClick(n)}
-      aria-current={active ? "page" : undefined}
-      className={`mx-0.5 inline-flex min-w-8 items-center justify-center rounded-md px-2 py-1 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/20 ${
-        active
-          ? "bg-blue-600 text-white shadow-sm"
-          : "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
-      }`}
-    >
-      {n}
-    </button>
-  );
-}

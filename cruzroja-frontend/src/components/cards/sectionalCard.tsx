@@ -27,6 +27,7 @@ import toast from "react-hot-toast";
 
 type SectionalCardProps = {
   sectional: sectional;
+  users:leaderDataTable[];
 };
 
 const groups: group[] = [
@@ -52,29 +53,7 @@ const groups: group[] = [
   },
 ];
 
-const users: leaderDataTable[] = [
-  {
-    typeDocument: "CC",
-    document: "1007749746",
-    name: "Sebastian Daza Delgadillo",
-    state: "Activo",
-    group: "Juvenil",
-  },
-  {
-    typeDocument: "CC",
-    document: "1006649646",
-    name: "Andres Felipe Melo Avellaneda",
-    state: "Activo",
-    group: "Socorrismo",
-  },
-];
-
-function getInitialsFromFullName(full?: string) {
-  const [n = "", l = ""] = (full ?? "").split(" ");
-  return `${n.charAt(0)}${l.charAt(0)}`.toUpperCase();
-}
-
-export function SectionalCard({ sectional }: SectionalCardProps) {
+export function SectionalCard({ sectional,users }: SectionalCardProps) {
   const [openGroups, setOpenGroups] = useState(false);
   const [openChangeLeader, setOpenChangeLeader] = useState(false);
   const [viewUser, setViewUser] = useState<FormState | null>(null);
@@ -261,7 +240,7 @@ export function SectionalCard({ sectional }: SectionalCardProps) {
         onClose={() => setOpenChangeLeader(false)}
         title={`Voluntarios - ${sectional.city}`}
       >
-        <ChangeLeaderTable users={users} />
+        <ChangeLeaderTable users={users} onCancel={() => setOpenChangeLeader(false)} sectional={sectional.id} isChange={true} />
       </Modal>
       <ViewUser infUser={viewUser} onClose={handleCloseView}></ViewUser>
       <ConfirmDialog
