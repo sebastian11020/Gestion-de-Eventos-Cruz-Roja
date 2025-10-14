@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { HeadquartersService } from './headquarters.service';
 import { CreateHeadquartersDto } from './dto/create-headquarters.dto';
+import { ChangeLeaderHeadquartersDto } from './dto/change-leader-headquarters.dto';
 
 @Controller('headquarters')
 export class HeadquartersController {
@@ -47,5 +48,11 @@ export class HeadquartersController {
   @HttpCode(HttpStatus.OK)
   async update(@Param('id', ParseIntPipe) id: number) {
     return await this.headquartersService.deactivate(id);
+  }
+
+  @Post('/change-leader')
+  @HttpCode(HttpStatus.OK)
+  async changeLeader(@Body() dto: ChangeLeaderHeadquartersDto) {
+    return await this.headquartersService.changeLeader(dto);
   }
 }

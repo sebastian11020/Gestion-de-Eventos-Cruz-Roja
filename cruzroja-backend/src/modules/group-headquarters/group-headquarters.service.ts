@@ -11,6 +11,7 @@ import { PersonRole } from '../person-role/entity/person-role.entity';
 import { HeadquartersStatusService } from '../headquarters-status/headquarters-status.service';
 import { GroupStatusService } from '../group-status/group-status.service';
 import { GetGroupsProgramsDto } from './dto/get-groups-programs.dto';
+import { ChangeCoordinatorGroupHeadquartersDto } from './dto/change-coordinator-group-headquarters.dto';
 
 @Injectable()
 export class GroupHeadquartersService {
@@ -135,7 +136,7 @@ export class GroupHeadquartersService {
       `No se encontro la agrupacion que deseas desactivar`,
     );
     await this.groupHeadquartersRepository.query(
-      'select * from public.p_cascad($1)',
+      'select * from public.deactivate_group_cascade($1)',
       [group_headquarters.id],
     );
     return {
@@ -214,6 +215,40 @@ export class GroupHeadquartersService {
           id: id_group_headquarters,
         },
       }),
+    );
+  }
+
+  async changeCoordinator(dto: ChangeCoordinatorGroupHeadquartersDto) {
+    return await this.groupHeadquartersRepository.manager.transaction(
+      async (manager) => {
+        const group_headquarters = await manager.findOne(GroupHeadquarters, {
+          where: {
+            id: dto.idSectional,
+          },
+          relations: {
+            headquarters: true,
+          },
+        });
+        assertFound(
+          group_headquarters,
+          'No se encontro la agrupacion a la que le deseas cambiar el coordinador',
+        );
+        await this.closeCoordinatorRoleCurrent(
+          manager,
+          group_headquarters.headquarters.id,
+          dto.idSectional,
+        );
+        await this.assignCoordinator(
+          manager,
+          dto.leader,
+          group_headquarters.headquarters.id,
+          dto.idSectional,
+        );
+        return {
+          success: true,
+          message: 'Se cambio el cordinador de la agrupacion de forma exixtosa',
+        };
+      },
     );
   }
 

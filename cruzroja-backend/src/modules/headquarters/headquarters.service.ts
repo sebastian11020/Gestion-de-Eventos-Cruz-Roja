@@ -12,6 +12,7 @@ import { HeadquartersStatus } from '../headquarters-status/entity/headquarters-s
 import { PersonRole } from '../person-role/entity/person-role.entity';
 import { HeadquartersTypeEnum } from './enum/headquarters-type.enum';
 import { GetHeadquartersGroupsProgramsDto } from './dto/get-headquarters-groups-programs.dto';
+import { ChangeLeaderHeadquartersDto } from './dto/change-leader-headquarters.dto';
 
 @Injectable()
 export class HeadquartersService {
@@ -157,8 +158,6 @@ export class HeadquartersService {
     await manager.update(PersonRole, personRol.id, {
       end_date: new Date(),
     });
-    console.log('Rol persona actual');
-    console.log(personRol);
     let aux: number = 2;
     if (isSectional) {
       aux = 1;
@@ -254,9 +253,48 @@ export class HeadquartersService {
     const headquarter = await this.headquartersRepository.findOne({
       where: {
         id: id,
+        personRole: {
+          role: {
+            id: 1 | 2,
+          },
+        },
+      },
+      relations: {
+        personRole: {
+          person: true,
+        },
       },
     });
     assertFound(headquarter, `No se encontro una sede con el id ${id}`);
     return headquarter;
+  }
+
+  async changeLeader(dto: ChangeLeaderHeadquartersDto) {
+    return await this.headquartersRepository.manager.transaction(
+      async (manager) => {
+        const personRol = await manager.findOne(PersonRole, {
+          where: {
+            headquarters: {
+              id: dto.idSectional,
+            },
+            role: {
+              id: 1 | 2,
+            },
+            end_date: IsNull(),
+          },
+        });
+        assertFound(personRol, 'No se encontro un lider activo en esta sede');
+        await manager.update(PersonRole, personRol.id, {
+          end_date: new Date(),
+        });
+        const headquarters = await this.getById(dto.idSectional);
+        if (headquarters.type === HeadquartersTypeEnum.SEDE_SECCIONAL) {
+          await this.assignLeader(manager, dto.leader, dto.idSectional, true);
+        } else {
+          await this.assignLeader(manager, dto.leader, dto.idSectional, false);
+        }
+        return { success: true, message: 'Se cambio correctamente el lider' };
+      },
+    );
   }
 }
