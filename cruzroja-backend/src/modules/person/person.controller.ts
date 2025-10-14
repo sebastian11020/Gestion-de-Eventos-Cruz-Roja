@@ -13,6 +13,11 @@ export class PersonController {
     return this.personService.findAllDto();
   }
 
+  @Get('/leaderinfo/:document')
+  async getLeaderInfo(@Param('document') document: string) {
+    return this.personService.findByIdDto(document);
+  }
+
   @Get('/table/all')
   async getTableAll(): Promise<GetPersonTableDto[]> {
     return this.personService.findAllDtoTable();

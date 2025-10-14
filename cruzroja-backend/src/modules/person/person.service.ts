@@ -86,6 +86,14 @@ export class PersonService {
     return rows;
   }
 
+  async findByIdDto(document: string) {
+    const rows: GetPersons = await this.personRepository.query(
+      'select * from public.get_person_flat_by_document($1)',
+      [document],
+    );
+    return rows;
+  }
+
   async create(dto: CreatePersonDto) {
     return this.personRepository.manager.transaction(async (manager) => {
       const person: Person = manager.create(Person, {
