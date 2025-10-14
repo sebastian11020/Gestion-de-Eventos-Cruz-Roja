@@ -148,21 +148,19 @@ export class ProgramHeadquartersService {
     const activeStatus = program.programStatus?.find(
       (ps) => ps.end_date == null,
     );
-    assertFound(
-      activeStatus,
-      'No se encontro un estado activo para el programa seleccionado',
-    );
-    const currentStatus =
-      await this.programHeadquartersStatusService.findOneOpenStateByIdPk(
-        activeStatus.id,
-      );
     let aux_id_state: number = 1;
-    if (currentStatus) {
-      await manager.update(ProgramStatus, activeStatus.id, {
-        end_date: new Date(),
-      });
-      if (currentStatus.state.name === 'ACTIVO') {
-        aux_id_state = 2;
+    if (activeStatus) {
+      const currentStatus =
+        await this.programHeadquartersStatusService.findOneOpenStateByIdPk(
+          activeStatus.id,
+        );
+      if (currentStatus) {
+        await manager.update(ProgramStatus, activeStatus.id, {
+          end_date: new Date(),
+        });
+        if (currentStatus.state.name === 'ACTIVO') {
+          aux_id_state = 2;
+        }
       }
     }
     const newState: ProgramStatus = manager.create(ProgramStatus, {
