@@ -91,7 +91,11 @@ export class PersonService {
       'select * from public.get_person_flat_by_document($1)',
       [document],
     );
-    return rows;
+    return {
+      success: true,
+      message: 'Informacion cargada con exito',
+      leader: rows,
+    };
   }
 
   async create(dto: CreatePersonDto) {
