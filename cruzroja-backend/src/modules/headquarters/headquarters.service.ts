@@ -11,6 +11,7 @@ import { Location } from '../location/entity/location.entity';
 import { HeadquartersStatus } from '../headquarters-status/entity/headquarters-status.entity';
 import { PersonRole } from '../person-role/entity/person-role.entity';
 import { HeadquartersTypeEnum } from './enum/headquarters-type.enum';
+import { GetHeadquartersGroupsProgramsDto } from './dto/get-headquarters-groups-programs.dto';
 
 @Injectable()
 export class HeadquartersService {
@@ -70,7 +71,14 @@ export class HeadquartersService {
     return rows;
   }
 
-  async getInfoTable() {}
+  async getInfoTable(id: number) {
+    const rows: GetHeadquartersGroupsProgramsDto =
+      await this.headquartersRepository.query(
+        'select * from public.list_groups_with_leader_and_programs_by_hq($1)',
+        [id],
+      );
+    return rows;
+  }
 
   async create(dto: CreateHeadquartersDto) {
     return await this.headquartersRepository.manager.transaction(

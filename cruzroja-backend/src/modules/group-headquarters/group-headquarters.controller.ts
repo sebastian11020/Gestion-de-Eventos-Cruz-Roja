@@ -22,6 +22,11 @@ export class GroupHeadquartersController {
     return this.groupHeadquartersService.getAllGroupHeadquartersDto();
   }
 
+  @Get('/table/:programId')
+  async getTable(@Param('programId', ParseIntPipe) programId: number) {
+    return await this.groupHeadquartersService.getInfoTable(programId);
+  }
+
   @Post('/associate')
   @HttpCode(HttpStatus.CREATED)
   async associate(@Body() dto: CreateGroupHeadquarters) {
