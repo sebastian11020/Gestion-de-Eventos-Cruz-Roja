@@ -255,7 +255,7 @@ export class HeadquartersService {
         id: id,
         personRole: {
           role: {
-            id: 1 | 2,
+            id: In(['LIDER SEDE', 'LIDER VOLUNTARIADO']),
           },
         },
       },
