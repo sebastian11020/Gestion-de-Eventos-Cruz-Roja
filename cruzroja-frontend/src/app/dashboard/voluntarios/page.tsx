@@ -9,8 +9,10 @@ import ViewUser from "@/components/cards/viewUser";
 import { supabase } from "@/lib/supabase-browser";
 import { generatePassword } from "@/utils/generatePassword";
 import { toFormCreatePerson } from "@/utils/adapters";
-
-const PAGE_SIZE = 7;
+import { PAGE_SIZE } from "@/const/consts";
+import {createPersonService, updatePersonService} from "@/services/serviceCreatePerson";
+import toast from "react-hot-toast";
+import {getSupabaseUserId} from "@/utils/getSupabaseId";
 
 const dataUser: FormState[] = [
   {
@@ -20,11 +22,19 @@ const dataUser: FormState[] = [
     name: "Juan Sebastian",
     lastName: "Rodriguez Mateus",
     bloodType: "O+",
-    sex: "Masculino",
-    state: "Activo",
+    sex: "Hombre",
+    gender: "Masculino",
+    state:{
+        id:"6",
+        name:"Formacion",
+
+    },
     bornDate: "2002-03-23",
     department: "Boyacá",
-    city: "Tunja",
+    city: {
+      id: "10",
+      name: "Tunja",
+    },
     zone: "El topo",
     address: "Cra 15#3-12",
     email: "juan@gmail.com",
@@ -35,7 +45,7 @@ const dataUser: FormState[] = [
       phone: "3126785478",
     },
     sectional: {
-      id: "1234",
+      id: "1",
       city: "Tunja",
     },
     group: {
@@ -58,10 +68,17 @@ const dataUser: FormState[] = [
     lastName: "Daza Delgadillo",
     bloodType: "O+",
     sex: "Masculino",
-    state: "Activo",
+      state:{
+          id:"6",
+          name:"Formacion",
+
+      },
     bornDate: "2001-02-11",
     department: "Boyacá",
-    city: "Tunja",
+    city: {
+      id: "1",
+      name: "Tunja",
+    },
     zone: "San Rafael",
     address: "Cra 14#46-39",
     email: "sebastian@gmail.com",
@@ -95,10 +112,17 @@ const dataUser: FormState[] = [
     lastName: "Melo Avellaneda",
     bloodType: "O+",
     sex: "Masculino",
-    state: "Activo",
+      state:{
+          id:"6",
+          name:"Formacion",
+
+      },
     bornDate: "2002-03-23",
     department: "Boyacá",
-    city: "Tunja",
+    city: {
+      id: "6",
+      name: "Tunja",
+    },
     zone: "El topo",
     address: "Cra 15#3-12",
     email: "juan@gmail.com",
@@ -109,7 +133,7 @@ const dataUser: FormState[] = [
       phone: "3126785478",
     },
     sectional: {
-      id: "1234",
+      id: "18",
       city: "Tunja",
     },
     group: {
@@ -132,10 +156,17 @@ const dataUser: FormState[] = [
     lastName: "Lotero Rodriguez",
     bloodType: "O+",
     sex: "Masculino",
-    state: "Licencia",
+      state:{
+          id:"6",
+          name:"Formacion",
+
+      },
     bornDate: "2002-03-23",
     department: "Boyacá",
-    city: "Tunja",
+    city: {
+      id: "1",
+      name: "Tunja",
+    },
     zone: "El topo",
     address: "Cra 15#3-12",
     email: "juan@gmail.com",
@@ -169,10 +200,17 @@ const dataUser: FormState[] = [
     lastName: "Vargas Millan",
     bloodType: "O+",
     sex: "Masculino",
-    state: "Formacion",
+      state:{
+          id:"6",
+          name:"Formacion",
+
+      },
     bornDate: "2002-03-23",
     department: "Boyacá",
-    city: "Tunja",
+    city: {
+      id: "1",
+      name: "Tunja",
+    },
     zone: "El topo",
     address: "Cra 15#3-12",
     email: "juan@gmail.com",
@@ -206,10 +244,17 @@ const dataUser: FormState[] = [
     lastName: "Alvarado Leandro",
     bloodType: "O+",
     sex: "Masculino",
-    state: "Inactivo",
+      state:{
+          id:"6",
+          name:"Formacion",
+
+      },
     bornDate: "2002-03-23",
     department: "Boyacá",
-    city: "Tunja",
+    city: {
+      id: "1",
+      name: "Tunja",
+    },
     zone: "El topo",
     address: "Cra 15#3-12",
     email: "juan@gmail.com",
@@ -243,10 +288,17 @@ const dataUser: FormState[] = [
     lastName: "Martinez Gomez",
     bloodType: "O+",
     sex: "Masculino",
-    state: "Desvinculado",
+      state:{
+          id:"6",
+          name:"Formacion",
+
+      },
     bornDate: "2002-03-23",
     department: "Boyacá",
-    city: "Tunja",
+    city: {
+      id: "1",
+      name: "Tunja",
+    },
     zone: "El topo",
     address: "Cra 15#3-12",
     email: "juan@gmail.com",
@@ -280,10 +332,17 @@ const dataUser: FormState[] = [
     lastName: "Perez Garcia",
     bloodType: "O+",
     sex: "Masculino",
-    state: "Formacion",
+      state:{
+          id:"6",
+          name:"Formacion",
+
+      },
     bornDate: "2002-03-23",
     department: "Boyacá",
-    city: "Tunja",
+    city: {
+      id: "1",
+      name: "Tunja",
+    },
     zone: "El topo",
     address: "Cra 15#3-12",
     email: "juan@gmail.com",
@@ -333,7 +392,7 @@ export default function voluntarios() {
   const [filtro, setFiltro] = useState("");
   const [page, setPage] = useState(1);
   const [openWizard, setOpenWizard] = useState(false);
-  const [openView, setOpenView] = useState(false);
+  const [openView, setOpenView] = useState(false)
   const [cityFilter, setCityFilter] = useState<string>("");
   const [stateFilter, setStateFilter] = useState<string>("");
   const [editUser, setEditUser] = useState<formCreatePerson | null>(null);
@@ -348,31 +407,62 @@ export default function voluntarios() {
     return Array.from(set).sort();
   }, []);
 
-  const states = useMemo(() => {
-    const set = new Set(dataUser.map((u) => u.state));
-    return Array.from(set).sort();
-  }, []);
+    const states = useMemo(() => {
+        const map = new Map<string, string>(); // id -> name
+        for (const u of dataUser) {
+            if (u.state?.id && u.state?.name) {
+                map.set(u.state.id, u.state.name);
+            }
+        }
+        return Array.from(map, ([id, name]) => ({ id, name }))
+            .sort((a, b) => a.name.localeCompare(b.name));
+    }, []);
 
   async function register(form: formCreatePerson) {
-    const provisional: string = generatePassword(12);
+    const password = generatePassword(12)
     const sb = supabase();
     const { data, error } = await sb.auth.signUp({
       email: form.email,
-      password: provisional,
+      password: password,
     });
-    console.log(form);
+    if (error){
+        console.error(error);
+        return null
+    }
+     return {id: data.user?.id ?? null, password}
   }
 
-  const handleCreateOrUpdate = (data: formCreatePerson) => {
-    if (editUser) {
-      console.log("Actualizar voluntario:", data);
-    } else {
-      register(data);
-    }
-    setOpenWizard(false);
-    setEditUser(null);
-  };
-
+  async function handleCreateOrUpdate (data: formCreatePerson)  {
+      try {
+          if (editUser) {
+              const id = getSupabaseUserId();
+              const newData = {...data,id:id ?? ''}
+              console.log(newData);
+              toast.loading("Actualizando voluntario", {duration: 3000})
+              const response = await updatePersonService(newData)
+              if (response.success) {
+                  setOpenWizard(false);
+                  toast.success(response.message, {duration: 1000});
+              } else {
+                  toast.error(response.message);
+              }
+          } else {
+              const reg = await register(data)
+              const newData = {...data, id: reg?.id ?? '', password: reg?.password ?? ''};
+              toast.loading("Creando voluntario", {duration: 3000})
+              const response = await createPersonService(newData);
+              if (response.success) {
+                  setOpenWizard(false);
+                  toast.success(response.message, {duration: 1000});
+              } else {
+                  toast.error(response.message);
+              }
+          }
+          setEditUser(null);
+      }catch (error){
+              console.log(error);
+      }
+  }
   useEffect(() => {
     setPage(1);
   }, [filtro, cityFilter]);
@@ -391,12 +481,13 @@ export default function voluntarios() {
             normalize(u.typeDocument).includes(q) ||
             normalize(u.document).includes(q) ||
             normalize(u.cellphone).includes(q) ||
-            normalize(u.sectional.city).includes(q),
+            normalize(u.sectional.city).includes(q) ||
+              normalize(u.state.name).includes(q)
         );
     return base.filter(
       (u) =>
         (cityFilter === "" || u.sectional.city === cityFilter) &&
-        (stateFilter === "" || u.state === stateFilter),
+        (stateFilter === "" || u.state.id === stateFilter),
     );
   }, [filtro, cityFilter, stateFilter]);
 
@@ -455,8 +546,8 @@ export default function voluntarios() {
           >
             <option value="">Todos los estados</option>
             {states.map((state) => (
-              <option key={state} value={state}>
-                {state}
+              <option key={state.id} value={state.id}>
+                {state.name}
               </option>
             ))}
           </select>
@@ -521,7 +612,7 @@ export default function voluntarios() {
                   </td>
 
                   <td className="px-4 py-3">
-                    <span className={badgeClass(u.state)}>{u.state}</span>
+                    <span className={badgeClass(u.state.name)}>{u.state.name}</span>
                   </td>
                   {/* Acciones */}
                   <td className="px-3 py-2">

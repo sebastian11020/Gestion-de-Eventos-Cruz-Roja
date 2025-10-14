@@ -22,37 +22,24 @@ import type {
   leaderDataTable,
   program as TProgram,
 } from "@/types/usertType";
+import {deleteProgram, updateProgram} from "@/services/serviceCreateProgram";
+import toast from "react-hot-toast";
 
 type SectionalCardProps = {
   program?: TProgram;
+  users:leaderDataTable[];
+    onDeleted?: () => Promise<void> | void;
 };
 
-const users: leaderDataTable[] = [
-  {
-    typeDocument: "CC",
-    document: "1007749746",
-    name: "Sebastian Daza Delgadillo",
-    state: "Activo",
-    group: "Juvenil",
-  },
-  {
-    typeDocument: "CC",
-    document: "1006649646",
-    name: "Andres Felipe Melo Avellaneda",
-    state: "Activo",
-    group: "Socorrismo",
-  },
-];
-
-export function ProgramCard({ program }: SectionalCardProps) {
+export function ProgramCard({ program,users,onDeleted }: SectionalCardProps) {
   const [openChangeLeader, setOpenChangeLeader] = useState(false);
   const [viewUser, setViewUser] = useState<FormState | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [openView, setOpenView] = useState(false);
 
-  // --- Edición de nombre ---
   const [localName, setLocalName] = useState(program?.name ?? "");
   const [editing, setEditing] = useState(false);
+  const [deleteProgramId,setDeleteProgramId] = useState<string>("");
   const [nameDraft, setNameDraft] = useState(localName);
 
   function startEdit() {
@@ -63,51 +50,45 @@ export function ProgramCard({ program }: SectionalCardProps) {
     setEditing(false);
     setNameDraft(localName);
   }
-  function handleSaveName(id: string | undefined) {
-    const next = nameDraft.trim();
-    if (!next) return;
-    setLocalName(next);
-    setEditing(false);
-    console.log(id);
+  async function handleSaveName(id: string) {
+      try {
+          const next = nameDraft.trim();
+          if (!next) return;
+          setLocalName(next);
+          setEditing(false);
+          toast.loading("Actualizando nombre de programas",{duration:3000})
+          const response = await updateProgram(id, nameDraft)
+          if (response.success) {
+              toast.success(response.message);
+              await onDeleted?.()
+          }else {
+              toast.error(response.message);
+          }
+      }catch (error) {
+          console.error(error);
+      }
   }
 
   function onView(g: string | undefined) {
     setOpenView(true);
-    setViewUser({
-      typeDocument: "CC",
-      document: "1001453276",
-      carnet: "a125",
-      name: "Andres Felipe",
-      lastName: "Melo Avellaneda",
-      bloodType: "O+",
-      sex: "Masculino",
-      state: "Activo",
-      bornDate: "2002-03-23",
-      department: "Boyacá",
-      city: "Tunja",
-      zone: "El topo",
-      address: "Cra 15#3-12",
-      email: "juan@gmail.com",
-      cellphone: "3124567654",
-      emergencyContact: {
-        name: "Andres Castro",
-        relationShip: "Primo",
-        phone: "3126785478",
-      },
-      sectional: { id: "1234", city: "Tunja" },
-      group: {
-        id: "1",
-        name: "Juventud",
-        program: { id: "1", name: "Aire Libre" },
-      },
-      eps: { name: "Nueva EPS", type: "Subsidiado" },
-      totalHours: "500",
-      monthHours: "9",
-    });
   }
 
-  function handleDelete() {
-    setConfirmOpen(false);
+ async function handleDelete() {
+    try {
+    toast.loading("Eliminando el programa",{duration:3000})
+    const response = await deleteProgram(deleteProgramId)
+    if (response.success) {
+        toast.success(response.message);
+        setConfirmOpen(false)
+        await onDeleted?.()
+    }else {
+        toast.error(response.message);
+        setConfirmOpen(false)
+    }
+    }catch (error) {
+        console.error(error);
+    }
+      setConfirmOpen(false);
   }
 
   return (
@@ -151,7 +132,7 @@ export function ProgramCard({ program }: SectionalCardProps) {
                 value={nameDraft}
                 onChange={(e) => setNameDraft(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") handleSaveName(program?.id);
+                  if (e.key === "Enter") handleSaveName(program?.id ?? '');
                   if (e.key === "Escape") cancelEdit();
                 }}
                 required={true}
@@ -165,7 +146,7 @@ export function ProgramCard({ program }: SectionalCardProps) {
               <button
                 type="button"
                 onClick={() => {
-                  handleSaveName(program?.id);
+                  handleSaveName(program?.id ?? '');
                 }}
                 className="inline-flex items-center justify-center rounded-md bg-green-600 text-white p-1.5 hover:bg-green-700 active:bg-green-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500/30"
                 title="Guardar"
@@ -189,7 +170,7 @@ export function ProgramCard({ program }: SectionalCardProps) {
           type="button"
           aria-label="Eliminar"
           title="Eliminar"
-          onClick={() => setConfirmOpen(true)}
+          onClick={() => {setConfirmOpen(true),setDeleteProgramId(program?.id ?? "")}}
           className="
             inline-flex items-center justify-center
             rounded-full p-2
@@ -268,7 +249,7 @@ export function ProgramCard({ program }: SectionalCardProps) {
         onClose={() => setOpenChangeLeader(false)}
         title={`Voluntarios - ${localName}`}
       >
-        <ChangeLeaderTable users={users} />
+        <ChangeLeaderTable users={users} sectional={program?.id} onCancel={() => setOpenChangeLeader(false)} isChange={true} isProgram={true} />
       </Modal>
       <ViewUser infUser={viewUser} onClose={() => setViewUser(null)} />
 

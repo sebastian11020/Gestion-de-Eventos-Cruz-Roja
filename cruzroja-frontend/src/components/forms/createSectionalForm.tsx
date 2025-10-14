@@ -7,11 +7,13 @@ import { SECTIONAL_TYPES } from "@/const/consts";
 
 export function CreateSectionalForm({
   cities,
+  nameLeader,
   onOpenLeader,
   onCancel,
   onSubmit,
 }: {
   cities: City[];
+  nameLeader: string;
   onOpenLeader: () => void;
   onCancel: () => void;
   onSubmit: (payload: createSectional) => void;
@@ -21,7 +23,6 @@ export function CreateSectionalForm({
     () => cities.find((c) => c.id === form.cityId) ?? null,
     [cities, form.cityId],
   );
-
   const canSave = Boolean(form.cityId && form.type);
 
   return (
@@ -100,7 +101,7 @@ export function CreateSectionalForm({
         <span className="font-medium text-gray-700">Vista previa:</span>{" "}
         {form.type || "—"} en{" "}
         {citySelected
-          ? `${citySelected.name} (${citySelected.department})`
+          ? `${citySelected.name} (${nameLeader})`
           : "—"}
       </div>
 

@@ -1,9 +1,8 @@
-import { createGroup, createProgram } from "@/types/usertType";
+import { createProgram } from "@/types/usertType";
 import axios from "axios";
 
 export async function createProgramService(program: createProgram) {
   try {
-    console.log("Creating program service...");
     const response = await axios.post(
       `http://localhost:8080/program/create`,
       program,
@@ -35,4 +34,27 @@ export async function getProgramService() {
   } catch (error) {
     console.error(error);
   }
+}
+
+export async function updateProgram(id_program: string, name: string) {
+    try {
+        const response = await axios.put(
+            `http://localhost:8080/program/update/${id_program}`,{name:name}
+        );
+        return response.data;
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+
+export async function deleteProgram(idProgram: string) {
+    try {
+        const response = await axios.put(
+            `http://localhost:8080/program-headquarters/deactivate/${idProgram}`,
+        );
+        return response.data;
+    } catch (error) {
+        console.error(error);
+    }
 }

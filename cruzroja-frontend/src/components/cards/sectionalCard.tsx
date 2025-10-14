@@ -24,9 +24,13 @@ import ChangeLeaderTable from "@/components/tables/changeLeaderTable";
 import { ConfirmDialog } from "@/components/cards/confitmDialog";
 import { deleteSectional } from "@/services/serviceCreateSectional";
 import toast from "react-hot-toast";
+import {useSedesData} from "@/hooks/useSedesData";
+import {useRouter} from "next/navigation";
 
 type SectionalCardProps = {
   sectional: sectional;
+  users:leaderDataTable[];
+    onDeleted?: () => Promise<void> | void;
 };
 
 const groups: group[] = [
@@ -52,29 +56,7 @@ const groups: group[] = [
   },
 ];
 
-const users: leaderDataTable[] = [
-  {
-    typeDocument: "CC",
-    document: "1007749746",
-    name: "Sebastian Daza Delgadillo",
-    state: "Activo",
-    group: "Juvenil",
-  },
-  {
-    typeDocument: "CC",
-    document: "1006649646",
-    name: "Andres Felipe Melo Avellaneda",
-    state: "Activo",
-    group: "Socorrismo",
-  },
-];
-
-function getInitialsFromFullName(full?: string) {
-  const [n = "", l = ""] = (full ?? "").split(" ");
-  return `${n.charAt(0)}${l.charAt(0)}`.toUpperCase();
-}
-
-export function SectionalCard({ sectional }: SectionalCardProps) {
+export function SectionalCard({ sectional,users,onDeleted }: SectionalCardProps) {
   const [openGroups, setOpenGroups] = useState(false);
   const [openChangeLeader, setOpenChangeLeader] = useState(false);
   const [viewUser, setViewUser] = useState<FormState | null>(null);
@@ -93,10 +75,16 @@ export function SectionalCard({ sectional }: SectionalCardProps) {
       lastName: "Melo Avellaneda",
       bloodType: "O+",
       sex: "Masculino",
-      state: "Activo",
+      state: {
+          id:"1",
+          name:"Activo"
+      },
       bornDate: "2002-03-23",
       department: "Boyacá",
-      city: "Tunja",
+      city: {
+          id:"1",
+          name:"Tunja"
+      },
       zone: "El topo",
       address: "Cra 15#3-12",
       email: "juan@gmail.com",
@@ -129,6 +117,7 @@ export function SectionalCard({ sectional }: SectionalCardProps) {
     const response = await deleteSectional(idDelete);
     if (response.success) {
       toast.success("Sede eliminada correctamente", { duration: 3000 });
+      await onDeleted?.();
     } else {
       toast.error("No se ha podido eliminar la sede", { duration: 3000 });
     }
@@ -255,7 +244,7 @@ export function SectionalCard({ sectional }: SectionalCardProps) {
         onClose={() => setOpenChangeLeader(false)}
         title={`Voluntarios - ${sectional.city}`}
       >
-        <ChangeLeaderTable users={users} />
+        <ChangeLeaderTable users={users} onCancel={() => setOpenChangeLeader(false)} sectional={sectional.id} isChange={true} />
       </Modal>
       <ViewUser infUser={viewUser} onClose={handleCloseView}></ViewUser>
       <ConfirmDialog

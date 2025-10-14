@@ -4,15 +4,12 @@ import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Users,
-  X,
   CalendarClock,
   MapPin,
   Building2,
   ListChecks,
   Layers3,
   Landmark,
-  UserRound,
-  Phone,
   Trash2,
 } from "lucide-react";
 import VolunteerPickerModal from "@/components/tables/volunteerPickerModal";

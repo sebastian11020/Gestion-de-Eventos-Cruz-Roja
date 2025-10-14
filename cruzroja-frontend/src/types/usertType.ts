@@ -7,10 +7,16 @@ export type FormState = {
   bloodType?: string;
   sex?: string;
   gender?: string;
-  state: string;
+  state: {
+      id:string;
+      name: string;
+  }
   bornDate?: string;
   department?: string;
-  city?: string;
+  city?: {
+    id: string;
+    name: string;
+  };
   zone?: string;
   address?: string;
   email: string;
@@ -32,7 +38,7 @@ export type FormState = {
       name: string;
     };
   };
-  eps: { name?: string; type?: string };
+  eps: { id?: string; name?: string; type?: string };
   totalHours?: string;
   monthHours?: string;
 };
@@ -45,6 +51,7 @@ export type formCreatePerson = {
   name: string;
   lastName: string;
   email: string;
+  password?: string;
   sex: string;
   gender: string;
   phone: string;
@@ -62,7 +69,7 @@ export type formCreatePerson = {
   };
   id_group?: string;
   id_program?: string;
-  id_headquarter: string;
+  id_headquarters: string;
   id_location: string;
   id_eps: string;
   type_affiliation: string;
@@ -120,12 +127,14 @@ export type leaderDataTable = {
 export type createSectional = {
   idLocation: string;
   type: string;
+  leader?:string;
 };
 
 export type createGroup = {
   idGroup?: string;
   name?: string;
   idHeadquarters?: string;
+  leader?: string;
 };
 
 export type event = {
@@ -141,6 +150,7 @@ export type event = {
 
 export type createProgram = {
   name?: string;
+  leader?:string;
   id_group?: string;
   idProgram?: string;
   idHeadquarters?: string;
@@ -172,3 +182,9 @@ export type eps = {
   id: string;
   name: string;
 };
+
+export type state = {
+    id: string;
+    name: string;
+    type:string;
+}

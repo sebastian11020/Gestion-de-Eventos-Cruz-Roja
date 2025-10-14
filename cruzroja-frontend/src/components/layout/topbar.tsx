@@ -59,7 +59,7 @@ export function Topbar({ onOpenSidebar }: Props) {
 
         {/* Desktop: marca */}
         <div className="hidden md:flex items-center gap-3">
-          <span className="grid size-9 place-items-center rounded-lg bg-white shadow ring-1 ring-red-200">
+          <span className="grid size-9 place-items-center  bg-white shadow ring-1 ring-red-200">
             <svg
               viewBox="0 0 24 24"
               className="size-6 text-red-600"

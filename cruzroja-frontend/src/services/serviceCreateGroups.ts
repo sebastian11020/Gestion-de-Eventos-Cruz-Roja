@@ -39,7 +39,7 @@ export async function deleteGroup(idGroup: string, idHeadquarters: string) {
 export async function updateGroup(id_group: string, name: string) {
   try {
     const response = await axios.put(
-      `http://localhost:8080/group/update/${id_group}`,
+      `http://localhost:8080/group/update/${id_group}`,{name:name}
     );
     return response.data;
   } catch (error) {

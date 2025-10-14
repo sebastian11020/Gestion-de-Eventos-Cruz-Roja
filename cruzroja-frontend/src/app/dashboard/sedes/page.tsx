@@ -4,12 +4,11 @@ import { SectionalCard } from "@/components/cards/sectionalCard";
 import { createSectional, sectional } from "@/types/usertType";
 import { Button } from "@/components/ui/button";
 import Modal from "@/components/layout/modal";
-import { ChevronLeft, ChevronRight,Search } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { createSectionalService } from "@/services/serviceCreateSectional";
 import toast from "react-hot-toast";
 import ChangeLeaderTable from "@/components/tables/changeLeaderTable";
 import { PAGE_SIZE } from "@/const/consts";
-import { users } from "@/mocks/sectionals";
 import { normalize } from "@/utils/normalize";
 import { useSedesData } from "@/hooks/useSedesData";
 import { usePageNumbers } from "@/hooks/usedPaginatedNumbers";
@@ -19,9 +18,11 @@ import { CreateSectionalForm } from "@/components/forms/createSectionalForm";
 
 export default function Sedes() {
   const [open, setOpen] = useState(false);
-  const { cities, sectionals, loading, reload } = useSedesData();
+  const { cities, sectionals,users, loading, reload } = useSedesData();
   const [query, setQuery] = useState("");
   const [openChangeLeader, setOpenChangeLeader] = useState(false);
+  const [documentSelected, setDocumentSelected] = useState<string>("");
+  const [nameLeader, setNameLeader] = useState<string>("");
   const {
     page,
     setPage,
@@ -45,9 +46,9 @@ export default function Sedes() {
     setOpen(false);
     setQuery("");
     setPage(1);
-
+    const newPayload = {...payload,leader:documentSelected}
     toast.loading("Creando sede", { duration: 1000 });
-    const response = await createSectionalService(payload);
+    const response = await createSectionalService(newPayload);
     if (response.success) {
       toast.success("Sede creada correctamente");
       await reload();
@@ -112,7 +113,7 @@ export default function Sedes() {
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {paged.map((sec) => (
-            <SectionalCard key={sec.id} sectional={sec} />
+            <SectionalCard key={sec.id} sectional={sec} users={users} onDeleted={reload} />
           ))}
         </div>
       )}
@@ -168,6 +169,7 @@ export default function Sedes() {
       <Modal open={open} onClose={() => setOpen(false)} title="Nueva Sede">
         <CreateSectionalForm
           cities={cities}
+          nameLeader={nameLeader}
           onOpenLeader={() => setOpenChangeLeader(true)}
           onCancel={() => setOpen(false)}
           onSubmit={handleCreate}
@@ -178,7 +180,7 @@ export default function Sedes() {
         onClose={() => setOpenChangeLeader(false)}
         title={"Seleccionar Lider"}
       >
-        <ChangeLeaderTable users={users} />
+        <ChangeLeaderTable users={users} onSelect={(document,name)=>{setDocumentSelected(document),setNameLeader(name)}} onCancel={()=>setOpenChangeLeader(false)} />
       </Modal>
     </div>
   );

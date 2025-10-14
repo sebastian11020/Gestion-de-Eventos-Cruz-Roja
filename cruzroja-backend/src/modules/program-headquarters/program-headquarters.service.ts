@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { FormatNamesString } from '../../common/utils/string.utils';
-import { assert, assertFound, conflict } from '../../common/utils/assert';
+import { assertFound, conflict } from '../../common/utils/assert';
 import { ProgramHeadquarters } from './entity/program-headquarters.entity';
 import { EntityManager, IsNull, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -35,7 +35,7 @@ export class ProgramHeadquartersService {
         name: string;
       };
     }[] = await this.programHeadquartersRepository.query(
-      'select * from public.list_programs_with_details()',
+      'select * from public.list_active_programs_with_details()',
     );
     return rows.map((row) => {
       const dto = new GetProgramHeadquartersDto();
@@ -135,11 +135,30 @@ export class ProgramHeadquartersService {
   }
 
   private async changeProgramStatus(manager: EntityManager, id: number) {
+    const program = await manager.findOne(ProgramHeadquarters, {
+      where: {
+        id: id,
+      },
+      relations: {
+        programStatus: true,
+      },
+    });
+    assertFound(program, 'No se encontro el programa que deseas desactivar');
+
+    const activeStatus = program.programStatus?.find(
+      (ps) => ps.end_date == null,
+    );
+    assertFound(
+      activeStatus,
+      'No se encontro un estado activo para el programa seleccionado',
+    );
     const currentStatus =
-      await this.programHeadquartersStatusService.findOneOpenStateByIdPk(id);
+      await this.programHeadquartersStatusService.findOneOpenStateByIdPk(
+        activeStatus.id,
+      );
     let aux_id_state: number = 1;
     if (currentStatus) {
-      await manager.update(ProgramStatus, id, {
+      await manager.update(ProgramStatus, activeStatus.id, {
         end_date: new Date(),
       });
       if (currentStatus.state.name === 'ACTIVO') {
@@ -189,7 +208,7 @@ export class ProgramHeadquartersService {
           id: personRol.person.id,
         },
         role: {
-          id: 3,
+          id: 4,
         },
         headquarters: {
           id: id_headquarters,
@@ -224,7 +243,7 @@ export class ProgramHeadquartersService {
             person: true,
           },
         });
-        assert(p, 'No se pudo desactivar el programa, intente nuevamente');
+        assertFound(p, 'No se pudo desactivar el programa, intente nuevamente');
         await manager.update(PersonRole, p.id, {
           end_date: new Date(),
         });

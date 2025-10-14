@@ -1,9 +1,8 @@
-// utils/generatePassword.ts
 export function generatePassword(length = 12): string {
   const sets = {
-    upper: "ABCDEFGHJKLMNPQRSTUVWXYZ", // sin I/O para evitar confusión
-    lower: "abcdefghijkmnopqrstuvwxyz", // sin l
-    number: "23456789", // sin 0/1
+    upper: "ABCDEFGHJKLMNPQRSTUVWXYZ",
+    lower: "abcdefghijkmnopqrstuvwxyz",
+    number: "23456789",
     symbol: "!@#$%^&*()-_=+[]{};:,.?",
   };
 
@@ -22,10 +21,9 @@ export function generatePassword(length = 12): string {
   shuffle(result);
   return result.join("");
 
-  // helpers
   function pick(chars: string) {
     const arr = new Uint32Array(1);
-    crypto.getRandomValues(arr); // seguro en front y back
+    crypto.getRandomValues(arr);
     return chars[arr[0] % chars.length];
   }
 
