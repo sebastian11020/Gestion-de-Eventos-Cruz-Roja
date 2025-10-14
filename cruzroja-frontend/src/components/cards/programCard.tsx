@@ -22,13 +22,16 @@ import type {
   leaderDataTable,
   program as TProgram,
 } from "@/types/usertType";
+import {deleteProgram, updateProgram} from "@/services/serviceCreateProgram";
+import toast from "react-hot-toast";
 
 type SectionalCardProps = {
   program?: TProgram;
   users:leaderDataTable[];
+    onDeleted?: () => Promise<void> | void;
 };
 
-export function ProgramCard({ program,users }: SectionalCardProps) {
+export function ProgramCard({ program,users,onDeleted }: SectionalCardProps) {
   const [openChangeLeader, setOpenChangeLeader] = useState(false);
   const [viewUser, setViewUser] = useState<FormState | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -36,6 +39,7 @@ export function ProgramCard({ program,users }: SectionalCardProps) {
 
   const [localName, setLocalName] = useState(program?.name ?? "");
   const [editing, setEditing] = useState(false);
+  const [deleteProgramId,setDeleteProgramId] = useState<string>("");
   const [nameDraft, setNameDraft] = useState(localName);
 
   function startEdit() {
@@ -46,20 +50,45 @@ export function ProgramCard({ program,users }: SectionalCardProps) {
     setEditing(false);
     setNameDraft(localName);
   }
-  function handleSaveName(id: string | undefined) {
-    const next = nameDraft.trim();
-    if (!next) return;
-    setLocalName(next);
-    setEditing(false);
-    console.log(id);
+  async function handleSaveName(id: string) {
+      try {
+          const next = nameDraft.trim();
+          if (!next) return;
+          setLocalName(next);
+          setEditing(false);
+          toast.loading("Actualizando nombre de programas",{duration:3000})
+          const response = await updateProgram(id, nameDraft)
+          if (response.success) {
+              toast.success(response.message);
+              await onDeleted?.()
+          }else {
+              toast.error(response.message);
+          }
+      }catch (error) {
+          console.error(error);
+      }
   }
 
   function onView(g: string | undefined) {
     setOpenView(true);
   }
 
-  function handleDelete() {
-    setConfirmOpen(false);
+ async function handleDelete() {
+    try {
+    toast.loading("Eliminando el programa",{duration:3000})
+    const response = await deleteProgram(deleteProgramId)
+    if (response.success) {
+        toast.success(response.message);
+        setConfirmOpen(false)
+        await onDeleted?.()
+    }else {
+        toast.error(response.message);
+        setConfirmOpen(false)
+    }
+    }catch (error) {
+        console.error(error);
+    }
+      setConfirmOpen(false);
   }
 
   return (
@@ -103,7 +132,7 @@ export function ProgramCard({ program,users }: SectionalCardProps) {
                 value={nameDraft}
                 onChange={(e) => setNameDraft(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") handleSaveName(program?.id);
+                  if (e.key === "Enter") handleSaveName(program?.id ?? '');
                   if (e.key === "Escape") cancelEdit();
                 }}
                 required={true}
@@ -117,7 +146,7 @@ export function ProgramCard({ program,users }: SectionalCardProps) {
               <button
                 type="button"
                 onClick={() => {
-                  handleSaveName(program?.id);
+                  handleSaveName(program?.id ?? '');
                 }}
                 className="inline-flex items-center justify-center rounded-md bg-green-600 text-white p-1.5 hover:bg-green-700 active:bg-green-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500/30"
                 title="Guardar"
@@ -141,7 +170,7 @@ export function ProgramCard({ program,users }: SectionalCardProps) {
           type="button"
           aria-label="Eliminar"
           title="Eliminar"
-          onClick={() => setConfirmOpen(true)}
+          onClick={() => {setConfirmOpen(true),setDeleteProgramId(program?.id ?? "")}}
           className="
             inline-flex items-center justify-center
             rounded-full p-2

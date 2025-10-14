@@ -33,6 +33,7 @@ type SectionalCardProps = {
   sectional?: TSectional;
   group?: TGroup;
   users:leaderDataTable[];
+    onDeleted?: () => Promise<void> | void;
 };
 
 const programData: program[] = [
@@ -42,7 +43,7 @@ const programData: program[] = [
     leader: { name: "Juan Pablo Martinez Gomez" },
   },
 ];
-export function GroupCard({ group,users }: SectionalCardProps) {
+export function GroupCard({ group,users,onDeleted }: SectionalCardProps) {
   const [openGroups, setOpenGroups] = useState(false);
   const [openChangeLeader, setOpenChangeLeader] = useState(false);
   const [viewUser, setViewUser] = useState<FormState | null>(null);
@@ -68,9 +69,10 @@ export function GroupCard({ group,users }: SectionalCardProps) {
     setLocalName(next);
     setEditing(false);
     toast.loading("Editando agrupacion", { duration: 1000 });
-    const response = await updateGroup(id, localName);
+    const response = await updateGroup(id, nameDraft);
     if (response.success) {
       toast.success("Actualizada correctamente", { duration: 3000 });
+      await onDeleted?.()
     } else {
       toast.error(response.message, { duration: 3000 });
     }
@@ -81,10 +83,20 @@ export function GroupCard({ group,users }: SectionalCardProps) {
   }
 
   async function handleDelete() {
-    toast.loading("Eliminando Agrupacion", { duration: 1000 });
-    const response = await deleteGroup(deleteGroupId, deleteSectionalId);
-    toast.success("Agrupacion eliminada correctamente", { duration: 3000 });
-    setConfirmOpen(false);
+    try {
+        toast.loading("Eliminando Agrupacion", { duration: 3000 });
+        const response = await deleteGroup(deleteGroupId, deleteSectionalId);
+        if (response.success) {
+            toast.success("Agrupacion eliminada correctamente", { duration: 2000 });
+            setConfirmOpen(false);
+            onDeleted?.()
+        }else {
+            toast.error(response.message, { duration: 2000 });
+            setConfirmOpen(false);
+        }
+    }catch (error) {
+        console.error(error);
+    }
   }
 
   return (
@@ -99,9 +111,7 @@ export function GroupCard({ group,users }: SectionalCardProps) {
       role="article"
       aria-label={localName}
     >
-      {/* Header */}
       <div className="mb-3 flex items-start justify-between gap-3">
-        {/* Título + editor inline */}
         <div className="min-w-0 flex-1">
           {!editing ? (
             <div className="flex items-center gap-2">
@@ -186,7 +196,6 @@ export function GroupCard({ group,users }: SectionalCardProps) {
         </button>
       </div>
 
-      {/* Info principal */}
       <div className="space-y-2 text-sm text-gray-600 flex-1">
         <div className="flex items-center gap-2">
           <MapPin className="h-4 w-4 text-gray-400" />
@@ -228,11 +237,7 @@ export function GroupCard({ group,users }: SectionalCardProps) {
           </span>
         </div>
       </div>
-
-      {/* Divider */}
       <div className="mt-4 h-px w-full bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
-
-      {/* Acciones */}
       <div className="pt-4 grid grid-cols-2 gap-2">
         <button
           onClick={() => setOpenChangeLeader(true)}

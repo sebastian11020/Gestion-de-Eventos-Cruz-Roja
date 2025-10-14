@@ -59,12 +59,12 @@ export function AssociateProgramForm({
         const payload: createProgram = {
           idHeadquarters: form.sectional ?? "",
           idProgram: form.programId ?? "",
+          id_group:form.group ?? "",
         };
         onSubmit(payload);
       }}
       className="space-y-5"
     >
-      {/* Seccional */}
       <div className="grid gap-1.5">
         <label
           htmlFor="sectionalCat"

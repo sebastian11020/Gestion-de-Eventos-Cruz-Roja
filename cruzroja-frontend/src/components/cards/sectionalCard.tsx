@@ -24,10 +24,13 @@ import ChangeLeaderTable from "@/components/tables/changeLeaderTable";
 import { ConfirmDialog } from "@/components/cards/confitmDialog";
 import { deleteSectional } from "@/services/serviceCreateSectional";
 import toast from "react-hot-toast";
+import {useSedesData} from "@/hooks/useSedesData";
+import {useRouter} from "next/navigation";
 
 type SectionalCardProps = {
   sectional: sectional;
   users:leaderDataTable[];
+    onDeleted?: () => Promise<void> | void;
 };
 
 const groups: group[] = [
@@ -53,7 +56,7 @@ const groups: group[] = [
   },
 ];
 
-export function SectionalCard({ sectional,users }: SectionalCardProps) {
+export function SectionalCard({ sectional,users,onDeleted }: SectionalCardProps) {
   const [openGroups, setOpenGroups] = useState(false);
   const [openChangeLeader, setOpenChangeLeader] = useState(false);
   const [viewUser, setViewUser] = useState<FormState | null>(null);
@@ -114,6 +117,7 @@ export function SectionalCard({ sectional,users }: SectionalCardProps) {
     const response = await deleteSectional(idDelete);
     if (response.success) {
       toast.success("Sede eliminada correctamente", { duration: 3000 });
+      await onDeleted?.();
     } else {
       toast.error("No se ha podido eliminar la sede", { duration: 3000 });
     }

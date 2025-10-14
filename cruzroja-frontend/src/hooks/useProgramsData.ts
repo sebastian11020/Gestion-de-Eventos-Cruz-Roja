@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { getSectionalInfo } from "@/services/serviceCreateSectional";
+import {getSectionalCreate, getSectionalInfo} from "@/services/serviceCreateSectional";
 import { getProgramService } from "@/services/serviceCreateProgram";
 import type {leaderDataTable, program} from "@/types/usertType";
 import type { SectionalNode } from "@/types/programType";
 import {getPersonTable} from "@/services/serviceGetPerson";
+import {log} from "node:util";
 
 export function useProgramsData() {
   const [items, setItems] = useState<program[]>([]);
@@ -16,13 +17,13 @@ export function useProgramsData() {
     try {
       const [programsData, sectionalsData,usersData] = await Promise.all([
         getProgramService(),
-        getSectionalInfo(),
+        getSectionalCreate(),
         getPersonTable()
       ]);
       setItems(programsData);
       setSectionals(sectionalsData);
       setUsers(usersData);
-      console.log(sectionalsData);
+      console.log(programsData);
     } finally {
       setLoading(false);
     }

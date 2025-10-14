@@ -97,6 +97,9 @@ export function StepPersonal({
             className={`${fieldBase} appearance-none`}
             required
           >
+              <option value="">
+                  Seleccione…
+              </option>
             {state.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.name}

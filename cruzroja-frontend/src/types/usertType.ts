@@ -150,6 +150,7 @@ export type event = {
 
 export type createProgram = {
   name?: string;
+  leader?:string;
   id_group?: string;
   idProgram?: string;
   idHeadquarters?: string;

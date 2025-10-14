@@ -154,7 +154,7 @@ export default function Programas() {
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {paged.map((sec) => (
-            <ProgramCard key={sec.id} program={sec} users={users} />
+            <ProgramCard key={sec.id} program={sec} users={users} onDeleted={reload} />
           ))}
         </div>
       )}

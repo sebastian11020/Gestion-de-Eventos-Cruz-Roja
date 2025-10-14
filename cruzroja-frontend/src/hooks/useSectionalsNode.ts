@@ -25,7 +25,6 @@ export function useSectionalsNode() {
             setCities(citiesData);
             setEps(epsData);
             setState(stateData);
-            console.log(sectionalsData);
         }finally {
             setLoading(false);
         }
