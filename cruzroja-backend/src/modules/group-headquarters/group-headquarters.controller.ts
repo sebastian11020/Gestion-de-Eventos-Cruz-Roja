@@ -28,7 +28,6 @@ export class GroupHeadquartersController {
     return this.groupHeadquartersService.createOrActivate(dto);
   }
 
-  /*
   @Put('/deactivate/:idGroup/:idHeadquarters')
   @HttpCode(HttpStatus.OK)
   async deactivate(
@@ -37,5 +36,4 @@ export class GroupHeadquartersController {
   ) {
     return this.groupHeadquartersService.deactivate(idGroup, idHeadquarters);
   }
-   */
 }
