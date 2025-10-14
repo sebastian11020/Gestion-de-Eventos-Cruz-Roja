@@ -25,6 +25,7 @@ import { UpdatePersonDto } from './dto/update-person.dto';
 import { EpsPersonService } from '../eps-person/eps-person.service';
 import { EmailService } from '../email/email.service';
 import { SendEmail } from '../email/dto/send-email.dto';
+import { GetPersons } from './dto/get-person.dto';
 
 @Injectable()
 export class PersonService {
@@ -78,8 +79,11 @@ export class PersonService {
     });
   }
 
-  async findAllDto(): Promise<Person[]> {
-    return this.personRepository.find();
+  async findAllDto() {
+    const rows: GetPersons = await this.personRepository.query(
+      'select * from public.list_people_form_state()',
+    );
+    return rows;
   }
 
   async create(dto: CreatePersonDto) {
