@@ -1,5 +1,6 @@
 export class GetGroupHeadquartersDto {
   id: string;
+  id_group: string;
   name: string;
   sectional: {
     id: string;
