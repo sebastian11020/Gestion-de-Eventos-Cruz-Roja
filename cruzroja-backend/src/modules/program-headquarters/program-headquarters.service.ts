@@ -135,11 +135,32 @@ export class ProgramHeadquartersService {
   }
 
   private async changeProgramStatus(manager: EntityManager, id: number) {
+    const program = await manager.findOne(ProgramHeadquarters, {
+      where: {
+        id: id,
+      },
+      relations: {
+        programStatus: true,
+      },
+    });
+    console.log('Programa:  ', program);
+    assertFound(program, 'No se encontro el programa que deseas desactivar');
+
+    const activeStatus = program.programStatus?.find(
+      (ps) => ps.end_date == null,
+    );
+    console.log('activeStatus:  ', activeStatus);
+    assertFound(
+      activeStatus,
+      'No se encontro un estado activo para el programa seleccionado',
+    );
     const currentStatus =
-      await this.programHeadquartersStatusService.findOneOpenStateByIdPk(id);
+      await this.programHeadquartersStatusService.findOneOpenStateByIdPk(
+        activeStatus.id,
+      );
     let aux_id_state: number = 1;
     if (currentStatus) {
-      await manager.update(ProgramStatus, id, {
+      await manager.update(ProgramStatus, activeStatus.id, {
         end_date: new Date(),
       });
       if (currentStatus.state.name === 'ACTIVO') {
@@ -207,25 +228,7 @@ export class ProgramHeadquartersService {
   async deactivate(id: number) {
     return await this.programHeadquartersRepository.manager.transaction(
       async (manager) => {
-        const program = await manager.findOne(ProgramHeadquarters, {
-          where: {
-            id: id,
-          },
-          relations: {
-            programStatus: true,
-          },
-        });
-        assertFound(
-          program,
-          'No se encontro el programa que deseas desactivar',
-        );
-
-        const activeStatus = program.programStatus?.find(
-          (ps) => ps.end_date == null,
-        );
-
-        assertFound(activeStatus, 'El programa no cuenta con un estado actual');
-        await this.changeProgramStatus(manager, activeStatus.id);
+        await this.changeProgramStatus(manager, id);
         const p = await manager.findOne(PersonRole, {
           where: {
             program: {

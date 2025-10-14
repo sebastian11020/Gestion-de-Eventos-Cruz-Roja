@@ -39,7 +39,7 @@ export async function getProgramService() {
 export async function updateProgram(id_program: string, name: string) {
     try {
         const response = await axios.put(
-            `http://localhost:8080/group/update/${id_program}`,{name:name}
+            `http://localhost:8080/program/update/${id_program}`,{name:name}
         );
         return response.data;
     } catch (error) {
