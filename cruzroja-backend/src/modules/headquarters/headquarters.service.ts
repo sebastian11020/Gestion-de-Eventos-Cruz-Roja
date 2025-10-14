@@ -70,6 +70,8 @@ export class HeadquartersService {
     return rows;
   }
 
+  async getInfoTable() {}
+
   async create(dto: CreateHeadquartersDto) {
     return await this.headquartersRepository.manager.transaction(
       async (manager) => {
