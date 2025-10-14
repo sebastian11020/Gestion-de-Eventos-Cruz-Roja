@@ -24,6 +24,7 @@ export class GroupHeadquartersService {
   async getAllGroupHeadquartersDto() {
     const rows: {
       id: number;
+      id_group: number;
       name: string;
       sectional: {
         id: number;
@@ -41,6 +42,7 @@ export class GroupHeadquartersService {
     return rows.map((row) => {
       const dto = new GetGroupHeadquartersDto();
       dto.id = String(row.id);
+      dto.id_group = String(row.id_group);
       dto.name = FormatNamesString(row.name);
       dto.sectional = {
         id: String(row.sectional.id),
