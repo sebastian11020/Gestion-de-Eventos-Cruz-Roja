@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { GroupHeadquartersService } from './group-headquarters.service';
 import { CreateGroupHeadquarters } from './dto/create-group-headquarters.dto';
+import { ChangeCoordinatorGroupHeadquartersDto } from './dto/change-coordinator-group-headquarters.dto';
 
 @Controller('group-headquarters')
 export class GroupHeadquartersController {
@@ -40,5 +41,11 @@ export class GroupHeadquartersController {
     @Param('idHeadquarters', ParseIntPipe) idHeadquarters: number,
   ) {
     return this.groupHeadquartersService.deactivate(idGroup, idHeadquarters);
+  }
+
+  @Post('/change-leader')
+  @HttpCode(HttpStatus.OK)
+  async changeLeader(@Body() dto: ChangeCoordinatorGroupHeadquartersDto) {
+    return await this.groupHeadquartersService.changeCoordinator(dto);
   }
 }
