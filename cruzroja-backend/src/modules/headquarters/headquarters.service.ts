@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Headquarters } from './entity/headquarters.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, IsNull, Repository } from 'typeorm';
+import { EntityManager, In, IsNull, Repository } from 'typeorm';
 import { CreateHeadquartersDto } from './dto/create-headquarters.dto';
 import { assert, assertFound, conflict } from '../../common/utils/assert';
 import { LocationTypeEnum } from '../location/enum/location-type.enum';
@@ -278,7 +278,7 @@ export class HeadquartersService {
               id: dto.idSectional,
             },
             role: {
-              id: 1 | 2,
+              name: In(['LIDER SEDE', 'LIDER VOLUNTARIADO']),
             },
             end_date: IsNull(),
           },
