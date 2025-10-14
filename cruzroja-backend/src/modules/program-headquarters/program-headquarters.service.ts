@@ -26,6 +26,7 @@ export class ProgramHeadquartersService {
   async getAllProgramHeadquartersDto() {
     const rows: {
       id: number;
+      id_program: number;
       name: string;
       sectional: string;
       group: string;
@@ -40,6 +41,7 @@ export class ProgramHeadquartersService {
     return rows.map((row) => {
       const dto = new GetProgramHeadquartersDto();
       dto.id = String(row.id);
+      dto.id_program = String(row.id_program);
       dto.name = FormatNamesString(row.name);
       dto.sectional = FormatNamesString(row.sectional);
       dto.group = FormatNamesString(row.group);
