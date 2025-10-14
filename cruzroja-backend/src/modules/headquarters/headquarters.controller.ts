@@ -32,6 +32,11 @@ export class HeadquartersController {
     return await this.headquartersService.getAllWithGroupsAndPrograms();
   }
 
+  @Get('/table/:programId')
+  async getTable(@Param('programId', ParseIntPipe) programId: number) {
+    return await this.headquartersService.getInfoTable(programId);
+  }
+
   @Post('/create')
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() dto: CreateHeadquartersDto) {

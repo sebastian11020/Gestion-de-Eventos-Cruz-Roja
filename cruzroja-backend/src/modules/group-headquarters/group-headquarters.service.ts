@@ -10,6 +10,7 @@ import { GroupStatus } from '../group-status/entity/group-status.entity';
 import { PersonRole } from '../person-role/entity/person-role.entity';
 import { HeadquartersStatusService } from '../headquarters-status/headquarters-status.service';
 import { GroupStatusService } from '../group-status/group-status.service';
+import { GetGroupsProgramsDto } from './dto/get-groups-programs.dto';
 
 @Injectable()
 export class GroupHeadquartersService {
@@ -53,6 +54,15 @@ export class GroupHeadquartersService {
       };
       return dto;
     });
+  }
+
+  async getInfoTable(id: number) {
+    const rows: GetGroupsProgramsDto =
+      await this.groupHeadquartersRepository.query(
+        'select * from public.list_programs_by_group_headquarters($1)',
+        [id],
+      );
+    return rows;
   }
 
   private async checkStatusHeadquarters(id_headquarters: number) {
