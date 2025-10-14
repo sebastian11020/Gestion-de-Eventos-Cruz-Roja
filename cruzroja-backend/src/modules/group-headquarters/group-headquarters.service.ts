@@ -107,20 +107,30 @@ export class GroupHeadquartersService {
     );
   }
 
-  /*
   async deactivate(idGroup: number, idHeadquarters: number) {
-    const object = await this.groupHeadquartersRepository.findOne({
+    const group_headquarters = await this.groupHeadquartersRepository.findOne({
       where: {
-        idGroup: idGroup,
-        idHeadquarters: idHeadquarters,
+        group: {
+          id: idGroup,
+        },
+        headquarters: {
+          id: idHeadquarters,
+        },
       },
     });
-    assertFound(object, `No se encontro la agrupacion que deseas desactivar`);
-    object.state = false;
-    await this.groupHeadquartersRepository.save(object);
-    return { success: true };
+    assertFound(
+      group_headquarters,
+      `No se encontro la agrupacion que deseas desactivar`,
+    );
+    await this.groupHeadquartersRepository.query(
+      'select * from public.p_cascad($1)',
+      [group_headquarters.id],
+    );
+    return {
+      success: true,
+      message: 'La agrupacion se desactivo correctamente',
+    };
   }
-   */
 
   private async checkGroupHeadquarters(id: number) {
     const row: GroupStatus | null =

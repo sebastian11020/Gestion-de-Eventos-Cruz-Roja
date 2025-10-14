@@ -143,13 +143,11 @@ export class ProgramHeadquartersService {
         programStatus: true,
       },
     });
-    console.log('Programa:  ', program);
     assertFound(program, 'No se encontro el programa que deseas desactivar');
 
     const activeStatus = program.programStatus?.find(
       (ps) => ps.end_date == null,
     );
-    console.log('activeStatus:  ', activeStatus);
     assertFound(
       activeStatus,
       'No se encontro un estado activo para el programa seleccionado',
