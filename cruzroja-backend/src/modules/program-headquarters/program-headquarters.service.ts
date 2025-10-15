@@ -29,7 +29,10 @@ export class ProgramHeadquartersService {
       id: number;
       id_program: number;
       name: string;
-      sectional: string;
+      sectional: {
+        id: number;
+        name: string;
+      };
       group: string;
       number_volunteers: number;
       leader: {
@@ -44,7 +47,10 @@ export class ProgramHeadquartersService {
       dto.id = String(row.id);
       dto.id_program = String(row.id_program);
       dto.name = FormatNamesString(row.name);
-      dto.sectional = FormatNamesString(row.sectional);
+      dto.sectional = {
+        id: String(row.sectional.id),
+        name: FormatNamesString(row.sectional.name),
+      };
       dto.group = FormatNamesString(row.group);
       dto.numberVolunteers = String(row.number_volunteers);
       dto.leader = {
@@ -281,18 +287,24 @@ export class ProgramHeadquartersService {
             program: {
               id: dto.idProgramsHeadquarters,
             },
+            role: {
+              id: 4,
+            },
             end_date: IsNull(),
           },
           relations: {
             group: true,
+            person: true,
           },
         });
         assertFound(
           pr,
           'No se encontro un rol activo para la persona seleccionada',
         );
+        console.log(pr.person);
         await this.closeCoordinatorRoleCurrent(
           manager,
+          pr,
           dto.idSectional,
           dto.idProgramsHeadquarters,
         );
@@ -313,27 +325,10 @@ export class ProgramHeadquartersService {
 
   private async closeCoordinatorRoleCurrent(
     manager: EntityManager,
+    coordCurrent: PersonRole,
     id_headquarters: number,
     id_program_headquarters: number,
   ) {
-    const coordCurrent = await manager.findOne(PersonRole, {
-      where: {
-        end_date: IsNull(),
-        role: {
-          id: 3,
-        },
-        headquarters: {
-          id: id_headquarters,
-        },
-        program: {
-          id: id_program_headquarters,
-        },
-      },
-      relations: {
-        person: true,
-        group: true,
-      },
-    });
     if (coordCurrent) {
       await manager.update(PersonRole, coordCurrent.id, {
         end_date: new Date(),
