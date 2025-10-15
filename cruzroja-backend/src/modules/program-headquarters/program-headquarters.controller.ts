@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { ProgramHeadquartersService } from './program-headquarters.service';
 import { AssociateProgramHeadquarters } from './dto/associate-program-headquarters';
+import { ChangeCoordinatorProgramsDto } from './dto/change-coordinator-program-headquarters.dto';
 
 @Controller('program-headquarters')
 export class ProgramHeadquartersController {
@@ -30,5 +31,11 @@ export class ProgramHeadquartersController {
   @HttpCode(HttpStatus.OK)
   async deactivate(@Param('idProgram', ParseIntPipe) idProgram: number) {
     return this.programHeadquartersService.deactivate(idProgram);
+  }
+
+  @Post('/change-leader')
+  @HttpCode(HttpStatus.OK)
+  async changeLeader(@Body() dto: ChangeCoordinatorProgramsDto) {
+    return await this.programHeadquartersService.changeCoordinator(dto);
   }
 }

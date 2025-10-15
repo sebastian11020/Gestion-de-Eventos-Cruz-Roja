@@ -12,6 +12,7 @@ import { GroupStatus } from '../group-status/entity/group-status.entity';
 import { ProgramStatus } from '../program-status/entity/program-status.entity';
 import { ProgramStatusService } from '../program-status/program-status.service';
 import { PersonRole } from '../person-role/entity/person-role.entity';
+import { ChangeCoordinatorProgramsDto } from './dto/change-coordinator-program-headquarters.dto';
 
 @Injectable()
 export class ProgramHeadquartersService {
@@ -198,7 +199,6 @@ export class ProgramHeadquartersService {
       personRol,
       `No se encontro una persona asociada al siguiente documento: ${document}`,
     );
-    personRol.end_date = new Date();
     await manager.update(PersonRole, personRol.id, {
       end_date: new Date(),
     });
@@ -268,6 +268,94 @@ export class ProgramHeadquartersService {
         };
       },
     );
+  }
+
+  async changeCoordinator(dto: ChangeCoordinatorProgramsDto) {
+    return await this.programHeadquartersRepository.manager.transaction(
+      async (manager) => {
+        const pr = await manager.findOne(PersonRole, {
+          where: {
+            headquarters: {
+              id: dto.idSectional,
+            },
+            program: {
+              id: dto.idProgramsHeadquarters,
+            },
+            end_date: IsNull(),
+          },
+          relations: {
+            group: true,
+          },
+        });
+        assertFound(
+          pr,
+          'No se encontro un rol activo para la persona seleccionada',
+        );
+        await this.closeCoordinatorRoleCurrent(
+          manager,
+          dto.idSectional,
+          dto.idProgramsHeadquarters,
+        );
+        await this.assignCoordinator(
+          manager,
+          dto.leader,
+          dto.idSectional,
+          pr.group.id,
+          dto.idProgramsHeadquarters,
+        );
+        return {
+          success: true,
+          message: 'Se cambio el cordinador de la agrupacion de forma exixtosa',
+        };
+      },
+    );
+  }
+
+  private async closeCoordinatorRoleCurrent(
+    manager: EntityManager,
+    id_headquarters: number,
+    id_program_headquarters: number,
+  ) {
+    const coordCurrent = await manager.findOne(PersonRole, {
+      where: {
+        end_date: IsNull(),
+        role: {
+          id: 3,
+        },
+        headquarters: {
+          id: id_headquarters,
+        },
+        program: {
+          id: id_program_headquarters,
+        },
+      },
+      relations: {
+        person: true,
+        group: true,
+      },
+    });
+    if (coordCurrent) {
+      await manager.update(PersonRole, coordCurrent.id, {
+        end_date: new Date(),
+      });
+      await manager.insert(PersonRole, {
+        person: {
+          id: coordCurrent.person.id,
+        },
+        role: {
+          id: 5,
+        },
+        headquarters: {
+          id: id_headquarters,
+        },
+        group: {
+          id: coordCurrent.group.id,
+        },
+        program: {
+          id: id_program_headquarters,
+        },
+      });
+    }
   }
 
   async findOneById(id_headquarters: number, id_program: number) {
