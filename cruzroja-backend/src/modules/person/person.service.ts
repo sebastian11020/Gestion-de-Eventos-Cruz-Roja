@@ -87,14 +87,14 @@ export class PersonService {
   }
 
   async findByIdDto(document: string) {
-    const rows: GetPersons = await this.personRepository.query(
+    const rows: GetPersons[] = await this.personRepository.query(
       'select * from public.get_person_flat_by_document($1)',
       [document],
     );
     return {
       success: true,
       message: 'Informacion cargada con exito',
-      leader: rows,
+      leader: rows.at(0),
     };
   }
 
