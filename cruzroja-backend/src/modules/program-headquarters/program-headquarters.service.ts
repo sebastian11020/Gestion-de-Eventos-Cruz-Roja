@@ -29,7 +29,10 @@ export class ProgramHeadquartersService {
       id: number;
       id_program: number;
       name: string;
-      sectional: string;
+      sectional: {
+        id: number;
+        name: string;
+      };
       group: string;
       number_volunteers: number;
       leader: {
@@ -44,7 +47,10 @@ export class ProgramHeadquartersService {
       dto.id = String(row.id);
       dto.id_program = String(row.id_program);
       dto.name = FormatNamesString(row.name);
-      dto.sectional = FormatNamesString(row.sectional);
+      dto.sectional = {
+        id: String(row.sectional.id),
+        name: FormatNamesString(row.sectional.name),
+      };
       dto.group = FormatNamesString(row.group);
       dto.numberVolunteers = String(row.number_volunteers);
       dto.leader = {
