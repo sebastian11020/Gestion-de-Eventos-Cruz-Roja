@@ -286,7 +286,7 @@ export class HeadquartersService {
             person: true,
           },
         });
-        console.log(dto)
+        console.log(dto);
         assertFound(personRol, 'No se encontro un lider activo en esta sede');
         await manager.update(PersonRole, personRol.id, {
           end_date: new Date(),
