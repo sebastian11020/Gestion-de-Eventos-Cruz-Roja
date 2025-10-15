@@ -105,7 +105,7 @@ export class PersonService {
   }
 
   async findAllDto() {
-    const rows: GetPersons = await this.personRepository.query(
+    const rows: GetPersons[] = await this.personRepository.query(
       'select * from public.list_people_form_state()',
     );
     return rows;
@@ -336,20 +336,35 @@ export class PersonService {
         },
         end_date: IsNull(),
       },
+      relations: {
+        state: true,
+      },
     });
-    if (person_state) {
-      await manager.update(PersonStatus, person_state.id, {
-        end_date: new Date(),
+    if (!person_state) {
+      person_state = manager.create(PersonStatus, {
+        person: {
+          id: id_person,
+        },
+        state: {
+          id: id_state,
+        },
       });
+      await manager.save(person_state);
+    } else {
+      if (person_state.state.id != id_state) {
+        await manager.update(PersonStatus, person_state.id, {
+          end_date: new Date(),
+        });
+        person_state = manager.create(PersonStatus, {
+          person: {
+            id: id_person,
+          },
+          state: {
+            id: id_state,
+          },
+        });
+        await manager.save(person_state);
+      }
     }
-    person_state = manager.create(PersonStatus, {
-      person: {
-        id: id_person,
-      },
-      state: {
-        id: id_state,
-      },
-    });
-    await manager.save(person_state);
   }
 }

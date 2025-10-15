@@ -1,4 +1,5 @@
 export class GetPersons {
+  id: string;
   typeDocument?: string;
   document?: string;
   carnet?: string;
