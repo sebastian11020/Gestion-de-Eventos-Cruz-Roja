@@ -7,6 +7,7 @@ import {PageBtn} from "@/components/buttons/pageButton";
 import {changeLeaderSectionalService} from "@/services/serviceCreateSectional";
 import toast from "react-hot-toast";
 import {changeLeaderGroup} from "@/services/serviceCreateGroups";
+import {changeLeaderProgram} from "@/services/serviceCreateProgram";
 
 type ChangeLeaderTableProps = {
   users: leaderDataTable[];
@@ -117,7 +118,7 @@ export default function ChangeLeaderTable({
               toast.loading("Cambiando lider",{duration:1000})
               const newData = {...data,idProgramsHeadquarters:group}
               console.log(newData)
-              const response = await changeLeaderGroup(newData)
+              const response = await changeLeaderProgram(newData)
               if (response.success) {
                   toast.success(response.message);
                   await onDeleted?.();
