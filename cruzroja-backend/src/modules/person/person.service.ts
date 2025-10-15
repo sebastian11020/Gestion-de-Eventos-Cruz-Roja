@@ -26,6 +26,7 @@ import { EpsPersonService } from '../eps-person/eps-person.service';
 import { EmailService } from '../email/email.service';
 import { SendEmail } from '../email/dto/send-email.dto';
 import { GetPersons } from './dto/get-person.dto';
+import { GetLoginPersonDto } from './dto/get-login-person.dto';
 
 @Injectable()
 export class PersonService {
@@ -37,6 +38,30 @@ export class PersonService {
     private epsPersonService: EpsPersonService,
     private nodeEmailerService: EmailService,
   ) {}
+
+  async getLoginPerson(id: string): Promise<GetLoginPersonDto> {
+    const person = await this.personRepository.findOne({
+      where: {
+        id: id,
+        person_roles: {
+          end_date: IsNull(),
+        },
+      },
+      relations: {
+        person_roles: {
+          role: true,
+        },
+      },
+    });
+    assertFound(person, 'No se encontro ninguna persona con ese id');
+    const pr = person.person_roles.at(0);
+    assertFound(pr, 'No se encontro un rol activo para la persona con ese id');
+    return {
+      name: FormatNamesString(person.name),
+      lastName: FormatNamesString(person.last_name),
+      role: pr.role.name,
+    };
+  }
 
   async findAllDtoTable() {
     const rows = await this.personRepository.find({
@@ -142,7 +167,7 @@ export class PersonService {
         dto.id_group,
         dto.id_program,
       );
-      await this.associateStatusInitial(manager, dto.id, dto.id_state);
+      await this.associateStatus(manager, dto.id, dto.id_state);
       await this.sendEmail(dto.email, dto.password);
       return { success: true, message: 'Persona creada exitosamente.' };
     });
@@ -183,6 +208,7 @@ export class PersonService {
         },
       });
       await this.associateEps(manager, id, dto.id_eps, dto.type_affiliation);
+      await this.associateStatus(manager, id, dto.id_state);
       return { success: true, message: 'Persona actualizada exitosamente.' };
     });
   }
@@ -298,12 +324,25 @@ export class PersonService {
     return ph.id;
   }
 
-  private async associateStatusInitial(
+  private async associateStatus(
     manager: EntityManager,
     id_person: string,
     id_state: number,
   ) {
-    const person_state = manager.create(PersonStatus, {
+    let person_state = await manager.findOne(PersonStatus, {
+      where: {
+        person: {
+          id: id_person,
+        },
+        end_date: IsNull(),
+      },
+    });
+    if (person_state) {
+      await manager.update(PersonStatus, person_state.id, {
+        end_date: new Date(),
+      });
+    }
+    person_state = manager.create(PersonStatus, {
       person: {
         id: id_person,
       },

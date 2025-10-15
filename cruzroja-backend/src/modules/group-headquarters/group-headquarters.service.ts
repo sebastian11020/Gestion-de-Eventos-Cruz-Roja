@@ -221,28 +221,16 @@ export class GroupHeadquartersService {
   async changeCoordinator(dto: ChangeCoordinatorGroupHeadquartersDto) {
     return await this.groupHeadquartersRepository.manager.transaction(
       async (manager) => {
-        const group_headquarters = await manager.findOne(GroupHeadquarters, {
-          where: {
-            id: dto.idSectional,
-          },
-          relations: {
-            headquarters: true,
-          },
-        });
-        assertFound(
-          group_headquarters,
-          'No se encontro la agrupacion a la que le deseas cambiar el coordinador',
-        );
         await this.closeCoordinatorRoleCurrent(
           manager,
-          group_headquarters.headquarters.id,
           dto.idSectional,
+          dto.idGroupHeadquarters,
         );
         await this.assignCoordinator(
           manager,
           dto.leader,
-          group_headquarters.headquarters.id,
           dto.idSectional,
+          dto.idGroupHeadquarters,
         );
         return {
           success: true,
@@ -275,7 +263,7 @@ export class GroupHeadquartersService {
       },
     });
     if (coordCurrent) {
-      await manager.update(PersonRole, id_group_headquarters, {
+      await manager.update(PersonRole, coordCurrent.id, {
         end_date: new Date(),
       });
       await manager.insert(PersonRole, {

@@ -8,6 +8,11 @@ import { UpdatePersonDto } from './dto/update-person.dto';
 export class PersonController {
   constructor(private readonly personService: PersonService) {}
 
+  @Get('/login/:id')
+  async getLogin(@Param('id') id: string) {
+    return this.personService.getLoginPerson(id);
+  }
+
   @Get('/all')
   async getAll() {
     return this.personService.findAllDto();
