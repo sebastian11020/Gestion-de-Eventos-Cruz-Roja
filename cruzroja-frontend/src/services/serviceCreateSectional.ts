@@ -13,6 +13,18 @@ export async function createSectionalService(sectional: createSectional) {
   }
 }
 
+export async function changeLeaderSectionalService(newLeader:any) {
+    try {
+        const response = await axios.post(
+            `http://localhost:8080/headquarters/change-leader`,
+            newLeader,
+        );
+        return response.data;
+    } catch (error) {
+        console.error(error);
+    }
+}
+
 export async function getSectionalInfo() {
   try {
     const response = await axios.get(

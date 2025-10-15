@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
-import {getSectionalCreate, getSectionalInfo} from "@/services/serviceCreateSectional";
+import {getSectionalCreate} from "@/services/serviceCreateSectional";
 import { getProgramService } from "@/services/serviceCreateProgram";
 import type {leaderDataTable, program} from "@/types/usertType";
 import type { SectionalNode } from "@/types/programType";
 import {getPersonTable} from "@/services/serviceGetPerson";
-import {log} from "node:util";
 
 export function useProgramsData() {
   const [items, setItems] = useState<program[]>([]);

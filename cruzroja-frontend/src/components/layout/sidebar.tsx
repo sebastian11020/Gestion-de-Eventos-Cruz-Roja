@@ -13,6 +13,7 @@ import {
   ChartColumnBig,
   Warehouse,
 } from "lucide-react";
+import {supabase} from "@/lib/supabase-browser";
 
 type Item = {
   title: string;
@@ -39,12 +40,20 @@ const user = {
 export function AppSidebar({
   open,
   setOpen,
-  onLogout,
 }: {
   open: boolean;
   setOpen: (v: boolean) => void;
-  onLogout?: () => void;
 }) {
+
+   async function handleLogout() {
+       const sb = supabase();
+       const { error } = await sb.auth.signOut();
+       if (error) {
+           console.error("Error al cerrar sesión:", error.message);
+           return false;
+       }
+       window.location.href = "/login";
+   }
   return (
     <>
       {/* Overlay móvil */}
@@ -145,7 +154,7 @@ export function AppSidebar({
             <button
               onClick={() => {
                 setOpen(false);
-                onLogout?.();
+                handleLogout();
               }}
               className="group relative flex w-full items-center gap-3 rounded-xl px-3 py-2 transition-all hover:translate-x-[2px] hover:bg-white/10 active:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/70 focus-visible:ring-offset-2 focus-visible:ring-offset-blue-950 overflow-hidden"
             >

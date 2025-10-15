@@ -28,6 +28,8 @@ import type {
 } from "@/types/usertType";
 import toast from "react-hot-toast";
 import { deleteGroup, updateGroup } from "@/services/serviceCreateGroups";
+import {getProgramTable} from "@/services/serviceCreateProgram";
+import {getPersonId} from "@/services/serviceGetPerson";
 
 type SectionalCardProps = {
   sectional?: TSectional;
@@ -36,13 +38,6 @@ type SectionalCardProps = {
     onDeleted?: () => Promise<void> | void;
 };
 
-const programData: program[] = [
-  {
-    name: "Aire Libre",
-    numberVolunteers: "30",
-    leader: { name: "Juan Pablo Martinez Gomez" },
-  },
-];
 export function GroupCard({ group,users,onDeleted }: SectionalCardProps) {
   const [openGroups, setOpenGroups] = useState(false);
   const [openChangeLeader, setOpenChangeLeader] = useState(false);
@@ -54,6 +49,7 @@ export function GroupCard({ group,users,onDeleted }: SectionalCardProps) {
   const [localName, setLocalName] = useState(group?.name ?? "");
   const [editing, setEditing] = useState(false);
   const [nameDraft, setNameDraft] = useState(localName);
+  const [programData,setProgramData] = useState<program[]>([]);
 
   function startEdit() {
     setNameDraft(localName);
@@ -78,8 +74,19 @@ export function GroupCard({ group,users,onDeleted }: SectionalCardProps) {
     }
   }
 
-  function onView(g: string | undefined) {
-    setOpenView(true);
+  async function onView(id: string) {
+      try {
+          const response = await getPersonId(id);
+          console.log(response.leader);
+          if (response.success) {
+              setOpenView(true);
+              setViewUser(response.leader);
+          }else {
+              toast.error(response.message);
+          }
+      }catch (error) {
+          console.error(error);
+      }
   }
 
   async function handleDelete() {
@@ -98,6 +105,17 @@ export function GroupCard({ group,users,onDeleted }: SectionalCardProps) {
         console.error(error);
     }
   }
+
+  async function handleGetProgramData(id:string) {
+      try {
+          const response = await getProgramTable(id)
+          console.log(response)
+          setProgramData(response)
+      }catch (error) {
+          console.error(error);
+      }
+  }
+
 
   return (
     <div
@@ -138,7 +156,7 @@ export function GroupCard({ group,users,onDeleted }: SectionalCardProps) {
                 value={nameDraft}
                 onChange={(e) => setNameDraft(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") handleSaveName(group?.id ?? "");
+                  if (e.key === "Enter") handleSaveName(group?.id_group ?? "");
                   if (e.key === "Escape") cancelEdit();
                 }}
                 required={true}
@@ -152,7 +170,7 @@ export function GroupCard({ group,users,onDeleted }: SectionalCardProps) {
               <button
                 type="button"
                 onClick={() => {
-                  handleSaveName(group?.id ?? "");
+                  handleSaveName(group?.id_group ?? "");
                 }}
                 className="inline-flex items-center justify-center rounded-md bg-green-600 text-white p-1.5 hover:bg-green-700 active:bg-green-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500/30"
                 title="Guardar"
@@ -178,7 +196,7 @@ export function GroupCard({ group,users,onDeleted }: SectionalCardProps) {
           title="Eliminar"
           onClick={() => {
             setConfirmOpen(true);
-            setDeleteGroupId(group?.id ?? "");
+            setDeleteGroupId(group?.id_group ?? "");
             setDeleteSectionalId(group?.sectional?.id ?? "");
           }}
           className="
@@ -213,7 +231,7 @@ export function GroupCard({ group,users,onDeleted }: SectionalCardProps) {
             </span>
           </div>
           <button
-            onClick={() => setOpenGroups(true)}
+            onClick={() => {setOpenGroups(true),handleGetProgramData(group?.id ?? '' )}}
             className="flex items-center justify-center rounded-full bg-green-100 p-1.5 text-green-600 hover:bg-green-200 transition-colors"
             aria-label="Ver programas"
             title="Ver programas"
@@ -249,7 +267,7 @@ export function GroupCard({ group,users,onDeleted }: SectionalCardProps) {
         </button>
         {group?.leader?.document && (
           <button
-            onClick={() => onView(group?.leader!.document)}
+            onClick={() => onView(group?.leader?.document ?? '')}
             className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-white text-sm font-medium hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 transition-colors"
             aria-label="Ver líder"
           >
@@ -270,7 +288,7 @@ export function GroupCard({ group,users,onDeleted }: SectionalCardProps) {
         onClose={() => setOpenChangeLeader(false)}
         title={`Voluntarios - ${localName}`}
       >
-        <ChangeLeaderTable users={users} sectional={group?.id} onCancel={() => setOpenChangeLeader(false)} isChange={true} isGroup={true}/>
+        <ChangeLeaderTable users={users} sectional={group?.sectional?.id} group={group?.id} onCancel={() => setOpenChangeLeader(false)} isChange={true} isGroup={true} onDeleted={onDeleted}/>
       </Modal>
       <ViewUser infUser={viewUser} onClose={() => setViewUser(null)} />
 

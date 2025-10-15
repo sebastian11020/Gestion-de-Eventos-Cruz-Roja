@@ -4,6 +4,9 @@ import { Check, ChevronLeft, ChevronRight, Search } from "lucide-react";
 import type {leaderDataTable} from "@/types/usertType";
 import {normalize} from "@/utils/normalize";
 import {PageBtn} from "@/components/buttons/pageButton";
+import {changeLeaderSectionalService} from "@/services/serviceCreateSectional";
+import toast from "react-hot-toast";
+import {changeLeaderGroup} from "@/services/serviceCreateGroups";
 
 type ChangeLeaderTableProps = {
   users: leaderDataTable[];
@@ -12,9 +15,11 @@ type ChangeLeaderTableProps = {
   isGroup?:boolean;
   isProgram?:boolean;
   sectional?: string;
+  group?:string;
   initialPageSize?: number;
   onSelect?:(document:string,name:string) => void;
   onCancel?:()=>void;
+  onDeleted?: () => Promise<void> | void;
 };
 
 function badgeClass(state: string) {
@@ -27,7 +32,7 @@ function badgeClass(state: string) {
     return "inline-flex items-center gap-1 rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-700 ring-1 ring-inset ring-red-200";
   if (s === "inactivo")
     return "inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-700 ring-1 ring-inset ring-gray-200";
-  if (s === "formacion")
+  if (s === "formación")
     return "inline-flex items-center gap-1 rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-700 ring-1 ring-inset ring-blue-200";
   return "inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-700 ring-1 ring-inset ring-gray-200";
 }
@@ -38,10 +43,12 @@ export default function ChangeLeaderTable({
   initialPageSize = 10,
   onSelect,
   sectional,
+  group,
   isSectional,
   isProgram,
   isGroup,
   onCancel,
+  onDeleted,
   isChange = false
 }: ChangeLeaderTableProps) {
   const [query, setQuery] = useState("");
@@ -83,8 +90,44 @@ export default function ChangeLeaderTable({
     return Array.from({ length: to - from + 1 }, (_, i) => from + i);
   }, [page, totalPages]);
 
-  function handleChange(data:{idSectional?:string,leader:string}) {
-      console.log("Cambio",data)
+  async function handleChange(data:{idSectional?:string,leader:string, idGroupHeadquarters?:string}) {
+      try {
+         if (isSectional){
+             toast.loading("Cambiando lider",{duration:1000})
+             console.log(data)
+             const response = await changeLeaderSectionalService(data)
+             if (response.success) {
+                 toast.success(response.message);
+                 await onDeleted?.();
+             }else {
+                 toast.error(response.message);
+             }
+         }if (isGroup){
+              toast.loading("Cambiando lider",{duration:1000})
+              const newData = {...data,idGroupHeadquarters:group}
+              console.log(newData)
+              const response = await changeLeaderGroup(newData)
+              if (response.success) {
+                  toast.success(response.message);
+                  await onDeleted?.();
+              }else {
+                  toast.error(response.message);
+              }
+          }if (isProgram){
+              toast.loading("Cambiando lider",{duration:1000})
+              const newData = {...data,idProgramsHeadquarters:group}
+              console.log(newData)
+              const response = await changeLeaderGroup(newData)
+              if (response.success) {
+                  toast.success(response.message);
+                  await onDeleted?.();
+              }else {
+                  toast.error(response.message);
+              }
+          }
+      }catch (error){
+          console.error(error)
+      }
   }
 
   return (

@@ -1,29 +1,14 @@
 "use client";
-
 import { useState } from "react";
-import {
-  Users,
-  MapPin,
-  Eye,
-  ArrowLeftRight,
-  User,
-  Trash2,
-  Pencil,
-  Check,
-  X,
-  Hospital,
-} from "lucide-react";
+import { Users, MapPin, Eye, ArrowLeftRight, User, Trash2, Pencil, Check, X, Hospital,} from "lucide-react";
 import Modal from "@/components/layout/modal";
 import ViewUser from "@/components/cards/viewUser";
 import ChangeLeaderTable from "@/components/tables/changeLeaderTable";
 import { ConfirmDialog } from "@/components/cards/confitmDialog";
-import type {
-  FormState,
-  leaderDataTable,
-  program as TProgram,
-} from "@/types/usertType";
+import type {FormState, leaderDataTable, program as TProgram} from "@/types/usertType";
 import {deleteProgram, updateProgram} from "@/services/serviceCreateProgram";
 import toast from "react-hot-toast";
+import {getPersonId} from "@/services/serviceGetPerson";
 
 type SectionalCardProps = {
   program?: TProgram;
@@ -55,12 +40,12 @@ export function ProgramCard({ program,users,onDeleted }: SectionalCardProps) {
           const next = nameDraft.trim();
           if (!next) return;
           setLocalName(next);
-          setEditing(false);
-          toast.loading("Actualizando nombre de programas",{duration:3000})
+          toast.loading("Actualizando nombre de programas",{duration:1000})
           const response = await updateProgram(id, nameDraft)
           if (response.success) {
               toast.success(response.message);
               await onDeleted?.()
+              setEditing(false);
           }else {
               toast.error(response.message);
           }
@@ -69,13 +54,24 @@ export function ProgramCard({ program,users,onDeleted }: SectionalCardProps) {
       }
   }
 
-  function onView(g: string | undefined) {
-    setOpenView(true);
-  }
+    async function onView(id: string) {
+        try {
+            const response = await getPersonId(id);
+            console.log(response.leader);
+            if (response.success) {
+                setOpenView(true);
+                setViewUser(response.leader);
+            }else {
+                toast.error(response.message);
+            }
+        }catch (error) {
+            console.error(error);
+        }
+    }
 
  async function handleDelete() {
     try {
-    toast.loading("Eliminando el programa",{duration:3000})
+    toast.loading("Eliminando el programa",{duration:1000})
     const response = await deleteProgram(deleteProgramId)
     if (response.success) {
         toast.success(response.message);
@@ -103,9 +99,7 @@ export function ProgramCard({ program,users,onDeleted }: SectionalCardProps) {
       role="article"
       aria-label={localName}
     >
-      {/* Header */}
       <div className="mb-3 flex items-start justify-between gap-3">
-        {/* Título + editor inline */}
         <div className="min-w-0 flex-1">
           {!editing ? (
             <div className="flex items-center gap-2">
@@ -132,7 +126,7 @@ export function ProgramCard({ program,users,onDeleted }: SectionalCardProps) {
                 value={nameDraft}
                 onChange={(e) => setNameDraft(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") handleSaveName(program?.id ?? '');
+                  if (e.key === "Enter") handleSaveName(program?.id_program ?? '');
                   if (e.key === "Escape") cancelEdit();
                 }}
                 required={true}
@@ -146,7 +140,7 @@ export function ProgramCard({ program,users,onDeleted }: SectionalCardProps) {
               <button
                 type="button"
                 onClick={() => {
-                  handleSaveName(program?.id ?? '');
+                  handleSaveName(program?.id_program ?? '');
                 }}
                 className="inline-flex items-center justify-center rounded-md bg-green-600 text-white p-1.5 hover:bg-green-700 active:bg-green-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500/30"
                 title="Guardar"
@@ -185,14 +179,12 @@ export function ProgramCard({ program,users,onDeleted }: SectionalCardProps) {
           <Trash2 className="size-4" />
         </button>
       </div>
-
-      {/* Info principal */}
       <div className="space-y-2 text-sm text-gray-600 flex-1">
         <div className="flex items-center gap-2">
           <MapPin className="h-4 w-4 text-gray-400" />
           <span className="truncate">
             <span className="font-medium text-gray-700">Seccional:</span>{" "}
-            {program?.sectional}
+            {program?.sectional?.name}
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -218,11 +210,7 @@ export function ProgramCard({ program,users,onDeleted }: SectionalCardProps) {
           </span>
         </div>
       </div>
-
-      {/* Divider */}
       <div className="mt-4 h-px w-full bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
-
-      {/* Acciones */}
       <div className="pt-4 grid grid-cols-2 gap-2">
         <button
           onClick={() => setOpenChangeLeader(true)}
@@ -234,7 +222,7 @@ export function ProgramCard({ program,users,onDeleted }: SectionalCardProps) {
         </button>
         {program?.leader?.document && (
           <button
-            onClick={() => onView(program?.leader!.document)}
+            onClick={() => onView(program?.leader?.document ?? '')}
             className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-white text-sm font-medium hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 transition-colors"
             aria-label="Ver líder"
           >
@@ -243,13 +231,12 @@ export function ProgramCard({ program,users,onDeleted }: SectionalCardProps) {
           </button>
         )}
       </div>
-
       <Modal
         open={openChangeLeader}
         onClose={() => setOpenChangeLeader(false)}
         title={`Voluntarios - ${localName}`}
       >
-        <ChangeLeaderTable users={users} sectional={program?.id} onCancel={() => setOpenChangeLeader(false)} isChange={true} isProgram={true} />
+        <ChangeLeaderTable users={users} sectional={program?.sectional?.id} group={program?.id} onCancel={() => setOpenChangeLeader(false)} isChange={true} isProgram={true} />
       </Modal>
       <ViewUser infUser={viewUser} onClose={() => setViewUser(null)} />
 

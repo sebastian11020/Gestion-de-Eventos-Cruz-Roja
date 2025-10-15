@@ -5,6 +5,7 @@ export function toFormCreatePerson(u: Legacy): formCreatePerson {
   const sectional = u.sectional;
   const id_headquarters = sectional?.id ? String(sectional.id) : "";
   const id_location = u.city?.id ? String(u.city.id) : "";
+  const id_state = u.state.id ? String(u.state.id) : "";
   const group = u.group;
   const id_group = group?.id ? String(group.id) : "";
   const id_eps = u.eps.id ? String(u.eps.id) : "";
@@ -21,7 +22,7 @@ export function toFormCreatePerson(u: Legacy): formCreatePerson {
     blood: u.bloodType ?? "",
     sex: u.sex ?? "",
     gender: u.gender ?? "",
-    id_state: u.state.name ?? "Formacion",
+    id_state,
     birthDate: u.bornDate ?? "",
     id_location,
     address: {

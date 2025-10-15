@@ -89,6 +89,7 @@ export type sectional = {
 
 export type group = {
   id?: string;
+  id_group?: string;
   name: string;
   sectional?: {
     id: string;
@@ -97,7 +98,7 @@ export type group = {
   numberVolunteers?: string;
   numberPrograms?: string;
   leader?: {
-    document: string;
+    document?: string;
     name: string;
   };
   program?: program[];
@@ -105,8 +106,12 @@ export type group = {
 
 export type program = {
   id?: string;
+  id_program?: string;
   name: string;
-  sectional?: string;
+  sectional?: {
+      id: string;
+      name: string;
+  }
   group?: string;
   numberVolunteers?: string;
   leader?: {

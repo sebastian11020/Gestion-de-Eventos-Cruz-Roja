@@ -13,362 +13,7 @@ import { PAGE_SIZE } from "@/const/consts";
 import {createPersonService, updatePersonService} from "@/services/serviceCreatePerson";
 import toast from "react-hot-toast";
 import {getSupabaseUserId} from "@/utils/getSupabaseId";
-
-const dataUser: FormState[] = [
-  {
-    typeDocument: "CC",
-    document: "1006453276",
-    carnet: "a123",
-    name: "Juan Sebastian",
-    lastName: "Rodriguez Mateus",
-    bloodType: "O+",
-    sex: "Hombre",
-    gender: "Masculino",
-    state:{
-        id:"6",
-        name:"Formacion",
-
-    },
-    bornDate: "2002-03-23",
-    department: "Boyacá",
-    city: {
-      id: "10",
-      name: "Tunja",
-    },
-    zone: "El topo",
-    address: "Cra 15#3-12",
-    email: "juan@gmail.com",
-    cellphone: "3124567654",
-    emergencyContact: {
-      name: "Andres Castro",
-      relationShip: "Primo",
-      phone: "3126785478",
-    },
-    sectional: {
-      id: "1",
-      city: "Tunja",
-    },
-    group: {
-      id: "1",
-      name: "Juventud",
-      program: {
-        id: "1",
-        name: "Aire Libre",
-      },
-    },
-    eps: { name: "Nueva EPS", type: "Subsidiado" },
-    totalHours: "500",
-    monthHours: "20",
-  },
-  {
-    typeDocument: "CC",
-    document: "1006453278",
-    carnet: "a124",
-    name: "Sebastian",
-    lastName: "Daza Delgadillo",
-    bloodType: "O+",
-    sex: "Masculino",
-      state:{
-          id:"6",
-          name:"Formacion",
-
-      },
-    bornDate: "2001-02-11",
-    department: "Boyacá",
-    city: {
-      id: "1",
-      name: "Tunja",
-    },
-    zone: "San Rafael",
-    address: "Cra 14#46-39",
-    email: "sebastian@gmail.com",
-    cellphone: "3114567654",
-    emergencyContact: {
-      name: "Andres Castro",
-      relationShip: "Primo",
-      phone: "3126785478",
-    },
-    sectional: {
-      id: "1234",
-      city: "Tunja",
-    },
-    group: {
-      id: "1",
-      name: "Juventud",
-      program: {
-        id: "1",
-        name: "Aire Libre",
-      },
-    },
-    eps: { name: "Nueva EPS", type: "Subsidiado" },
-    totalHours: "500",
-    monthHours: "5",
-  },
-  {
-    typeDocument: "CC",
-    document: "1001453276",
-    carnet: "a125",
-    name: "Andres Felipe",
-    lastName: "Melo Avellaneda",
-    bloodType: "O+",
-    sex: "Masculino",
-      state:{
-          id:"6",
-          name:"Formacion",
-
-      },
-    bornDate: "2002-03-23",
-    department: "Boyacá",
-    city: {
-      id: "6",
-      name: "Tunja",
-    },
-    zone: "El topo",
-    address: "Cra 15#3-12",
-    email: "juan@gmail.com",
-    cellphone: "3124567654",
-    emergencyContact: {
-      name: "Andres Castro",
-      relationShip: "Primo",
-      phone: "3126785478",
-    },
-    sectional: {
-      id: "18",
-      city: "Tunja",
-    },
-    group: {
-      id: "1",
-      name: "Juventud",
-      program: {
-        id: "1",
-        name: "Aire Libre",
-      },
-    },
-    eps: { name: "Nueva EPS", type: "Subsidiado" },
-    totalHours: "500",
-    monthHours: "9",
-  },
-  {
-    typeDocument: "CC",
-    document: "1002453276",
-    carnet: "a126",
-    name: "David Santiago",
-    lastName: "Lotero Rodriguez",
-    bloodType: "O+",
-    sex: "Masculino",
-      state:{
-          id:"6",
-          name:"Formacion",
-
-      },
-    bornDate: "2002-03-23",
-    department: "Boyacá",
-    city: {
-      id: "1",
-      name: "Tunja",
-    },
-    zone: "El topo",
-    address: "Cra 15#3-12",
-    email: "juan@gmail.com",
-    cellphone: "3124567654",
-    emergencyContact: {
-      name: "Andres Castro",
-      relationShip: "Primo",
-      phone: "3126785478",
-    },
-    sectional: {
-      id: "1234",
-      city: "Tunja",
-    },
-    group: {
-      id: "1",
-      name: "Juventud",
-      program: {
-        id: "1",
-        name: "Aire Libre",
-      },
-    },
-    eps: { name: "Nueva EPS", type: "Subsidiado" },
-    totalHours: "500",
-    monthHours: "20",
-  },
-  {
-    typeDocument: "CC",
-    document: "1003453276",
-    carnet: "a127",
-    name: "Samuel David",
-    lastName: "Vargas Millan",
-    bloodType: "O+",
-    sex: "Masculino",
-      state:{
-          id:"6",
-          name:"Formacion",
-
-      },
-    bornDate: "2002-03-23",
-    department: "Boyacá",
-    city: {
-      id: "1",
-      name: "Tunja",
-    },
-    zone: "El topo",
-    address: "Cra 15#3-12",
-    email: "juan@gmail.com",
-    cellphone: "3124567654",
-    emergencyContact: {
-      name: "Andres Castro",
-      relationShip: "Primo",
-      phone: "3126785478",
-    },
-    sectional: {
-      id: "1234",
-      city: "Duitama",
-    },
-    group: {
-      id: "1",
-      name: "Juventud",
-      program: {
-        id: "1",
-        name: "Aire Libre",
-      },
-    },
-    eps: { name: "Nueva EPS", type: "Subsidiado" },
-    totalHours: "500",
-    monthHours: "20",
-  },
-  {
-    typeDocument: "CC",
-    document: "1004453276",
-    carnet: "a128",
-    name: "Harold Ricardo",
-    lastName: "Alvarado Leandro",
-    bloodType: "O+",
-    sex: "Masculino",
-      state:{
-          id:"6",
-          name:"Formacion",
-
-      },
-    bornDate: "2002-03-23",
-    department: "Boyacá",
-    city: {
-      id: "1",
-      name: "Tunja",
-    },
-    zone: "El topo",
-    address: "Cra 15#3-12",
-    email: "juan@gmail.com",
-    cellphone: "3124567654",
-    emergencyContact: {
-      name: "Andres Castro",
-      relationShip: "Primo",
-      phone: "3126785478",
-    },
-    sectional: {
-      id: "1234",
-      city: "Tunja",
-    },
-    group: {
-      id: "1",
-      name: "Juventud",
-      program: {
-        id: "1",
-        name: "Aire Libre",
-      },
-    },
-    eps: { name: "Nueva EPS", type: "Subsidiado" },
-    totalHours: "500",
-    monthHours: "20",
-  },
-  {
-    typeDocument: "CC",
-    document: "1005453276",
-    carnet: "a12310",
-    name: "Juan Pablo",
-    lastName: "Martinez Gomez",
-    bloodType: "O+",
-    sex: "Masculino",
-      state:{
-          id:"6",
-          name:"Formacion",
-
-      },
-    bornDate: "2002-03-23",
-    department: "Boyacá",
-    city: {
-      id: "1",
-      name: "Tunja",
-    },
-    zone: "El topo",
-    address: "Cra 15#3-12",
-    email: "juan@gmail.com",
-    cellphone: "3124567654",
-    emergencyContact: {
-      name: "Andres Castro",
-      relationShip: "Primo",
-      phone: "3126785478",
-    },
-    sectional: {
-      id: "1234",
-      city: "Tunja",
-    },
-    group: {
-      id: "1",
-      name: "Juventud",
-      program: {
-        id: "1",
-        name: "Aire Libre",
-      },
-    },
-    eps: { name: "Nueva EPS", type: "Subsidiado" },
-    totalHours: "500",
-    monthHours: "20",
-  },
-  {
-    typeDocument: "CC",
-    document: "1009453276",
-    carnet: "b123",
-    name: "Juan Esteban",
-    lastName: "Perez Garcia",
-    bloodType: "O+",
-    sex: "Masculino",
-      state:{
-          id:"6",
-          name:"Formacion",
-
-      },
-    bornDate: "2002-03-23",
-    department: "Boyacá",
-    city: {
-      id: "1",
-      name: "Tunja",
-    },
-    zone: "El topo",
-    address: "Cra 15#3-12",
-    email: "juan@gmail.com",
-    cellphone: "3124567654",
-    emergencyContact: {
-      name: "Andres Castro",
-      relationShip: "Primo",
-      phone: "3126785478",
-    },
-    sectional: {
-      id: "1234",
-      city: "Tunja",
-    },
-    group: {
-      id: "1",
-      name: "Juventud",
-      program: {
-        id: "1",
-        name: "Aire Libre",
-      },
-    },
-    eps: { name: "Nueva EPS", type: "Subsidiado" },
-    totalHours: "500",
-    monthHours: "20",
-  },
-];
+import {usePersonData} from "@/hooks/usePersonData";
 
 function normalize(v: unknown) {
   return String(v ?? "").toLowerCase();
@@ -383,7 +28,7 @@ function badgeClass(state: string) {
     return "inline-flex rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-700";
   if (s === "inactivo")
     return "inline-flex rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-700";
-  if (s === "formacion")
+  if (s === "formación")
     return "inline-flex rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-700";
   return "inline-flex rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-700";
 }
@@ -397,40 +42,56 @@ export default function voluntarios() {
   const [stateFilter, setStateFilter] = useState<string>("");
   const [editUser, setEditUser] = useState<formCreatePerson | null>(null);
   const [viewUser, setViewUser] = useState<FormState | null>(null);
-
+  const {users,loading,reload} = usePersonData()
   const handleSearch = (value: string) => {
     setFiltro(value);
   };
 
   const cities = useMemo(() => {
-    const set = new Set(dataUser.map((u) => u.sectional.city));
+    const set = new Set(users.map((u) => u.sectional.city));
     return Array.from(set).sort();
-  }, []);
+  }, [users]);
 
     const states = useMemo(() => {
         const map = new Map<string, string>(); // id -> name
-        for (const u of dataUser) {
+        for (const u of users) {
             if (u.state?.id && u.state?.name) {
                 map.set(u.state.id, u.state.name);
             }
         }
         return Array.from(map, ([id, name]) => ({ id, name }))
             .sort((a, b) => a.name.localeCompare(b.name));
-    }, []);
+    }, [users]);
 
-  async function register(form: formCreatePerson) {
-    const password = generatePassword(12)
-    const sb = supabase();
-    const { data, error } = await sb.auth.signUp({
-      email: form.email,
-      password: password,
-    });
-    if (error){
-        console.error(error);
-        return null
+    async function register(form: formCreatePerson) {
+        const password = generatePassword(12);
+        const sb = supabase();
+        const { data: before } = await sb.auth.getSession();
+        const prev = before.session;
+        (window as any).__MUTE_AUTH_EVENTS = true;
+        const { data, error } = await sb.auth.signUp({
+            email: form.email,
+            password,
+        });
+
+        if (error) {
+            (window as any).__MUTE_AUTH_EVENTS = false;
+            console.error(error);
+            return null;
+        }
+
+        const newUserId = data.user?.id ?? null;
+        if (prev) {
+            await sb.auth.setSession({
+                access_token: prev.access_token,
+                refresh_token: prev.refresh_token,
+            });
+        } else {
+            await sb.auth.signOut();
+        }
+        (window as any).__MUTE_AUTH_EVENTS = false;
+        return { id: newUserId, password };
     }
-     return {id: data.user?.id ?? null, password}
-  }
 
   async function handleCreateOrUpdate (data: formCreatePerson)  {
       try {
@@ -438,11 +99,12 @@ export default function voluntarios() {
               const id = getSupabaseUserId();
               const newData = {...data,id:id ?? ''}
               console.log(newData);
-              toast.loading("Actualizando voluntario", {duration: 3000})
+              toast.loading("Actualizando voluntario", {duration: 1000})
               const response = await updatePersonService(newData)
               if (response.success) {
                   setOpenWizard(false);
                   toast.success(response.message, {duration: 1000});
+                  await reload();
               } else {
                   toast.error(response.message);
               }
@@ -454,6 +116,7 @@ export default function voluntarios() {
               if (response.success) {
                   setOpenWizard(false);
                   toast.success(response.message, {duration: 1000});
+                  await reload();
               } else {
                   toast.error(response.message);
               }
@@ -465,13 +128,13 @@ export default function voluntarios() {
   }
   useEffect(() => {
     setPage(1);
-  }, [filtro, cityFilter]);
+  }, [filtro, cityFilter,users]);
 
   const results = useMemo(() => {
     const q = normalize(filtro);
     const base = !q
-      ? dataUser
-      : dataUser.filter(
+      ? users
+      : users.filter(
           (u) =>
             normalize(u.carnet).includes(q) ||
             normalize(u.name).includes(q) ||
@@ -489,7 +152,7 @@ export default function voluntarios() {
         (cityFilter === "" || u.sectional.city === cityFilter) &&
         (stateFilter === "" || u.state.id === stateFilter),
     );
-  }, [filtro, cityFilter, stateFilter]);
+  }, [filtro, cityFilter, stateFilter,users]);
 
   const total = results.length;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));

@@ -18,7 +18,7 @@ import { CreateSectionalForm } from "@/components/forms/createSectionalForm";
 
 export default function Sedes() {
   const [open, setOpen] = useState(false);
-  const { cities, sectionals,users, loading, reload } = useSedesData();
+  const { cities, sectionals,users,loading, reload } = useSedesData();
   const [query, setQuery] = useState("");
   const [openChangeLeader, setOpenChangeLeader] = useState(false);
   const [documentSelected, setDocumentSelected] = useState<string>("");
@@ -113,7 +113,7 @@ export default function Sedes() {
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {paged.map((sec) => (
-            <SectionalCard key={sec.id} sectional={sec} users={users} onDeleted={reload} />
+            <SectionalCard key={sec.id} sectional={sec} users={users} onDeleted={reload}/>
           ))}
         </div>
       )}

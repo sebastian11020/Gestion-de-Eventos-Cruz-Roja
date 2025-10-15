@@ -23,7 +23,6 @@ export default function ProgramTable({
       .normalize("NFD")
       .replace(/\p{Diacritic}/gu, "");
 
-  // filtro por nombre de programa
   const filtered = useMemo(() => {
     const q = normalize(query);
     if (!q) return programs;

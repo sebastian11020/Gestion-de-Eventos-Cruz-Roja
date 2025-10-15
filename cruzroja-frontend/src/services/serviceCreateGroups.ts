@@ -25,6 +25,18 @@ export async function associateGroupService(group: createGroup) {
   }
 }
 
+export async function changeLeaderGroup(newLeaderGroup:any) {
+    try {
+        const response = await axios.post(
+            `http://localhost:8080/group-headquarters/change-leader`,
+            newLeaderGroup,
+        );
+        return response.data;
+    } catch (error) {
+        console.error(error);
+    }
+}
+
 export async function deleteGroup(idGroup: string, idHeadquarters: string) {
   try {
     const response = await axios.put(
