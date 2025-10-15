@@ -287,18 +287,24 @@ export class ProgramHeadquartersService {
             program: {
               id: dto.idProgramsHeadquarters,
             },
+            role: {
+              id: 4,
+            },
             end_date: IsNull(),
           },
           relations: {
             group: true,
+            person: true,
           },
         });
         assertFound(
           pr,
           'No se encontro un rol activo para la persona seleccionada',
         );
+        console.log(pr.person);
         await this.closeCoordinatorRoleCurrent(
           manager,
+          pr,
           dto.idSectional,
           dto.idProgramsHeadquarters,
         );
@@ -319,27 +325,10 @@ export class ProgramHeadquartersService {
 
   private async closeCoordinatorRoleCurrent(
     manager: EntityManager,
+    coordCurrent: PersonRole,
     id_headquarters: number,
     id_program_headquarters: number,
   ) {
-    const coordCurrent = await manager.findOne(PersonRole, {
-      where: {
-        end_date: IsNull(),
-        role: {
-          id: 3,
-        },
-        headquarters: {
-          id: id_headquarters,
-        },
-        program: {
-          id: id_program_headquarters,
-        },
-      },
-      relations: {
-        person: true,
-        group: true,
-      },
-    });
     if (coordCurrent) {
       await manager.update(PersonRole, coordCurrent.id, {
         end_date: new Date(),
