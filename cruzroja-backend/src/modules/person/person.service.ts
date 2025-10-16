@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Person } from './entity/person.entity';
-import { EntityManager, IsNull, Repository } from 'typeorm';
+import { EntityManager, In, IsNull, Repository } from 'typeorm';
 import { CreatePersonDto } from './dto/create-person.dto';
 import { type_affiliation } from '../eps-person/enum/eps-person.enum';
 import { CreateEpsPersonDTO } from '../eps-person/dto/create-eps-person.dto';
@@ -383,5 +383,26 @@ export class PersonService {
         await manager.save(person_state);
       }
     }
+  }
+
+  async thereAreActiveVolunteersActive(idHeadquarters: number) {
+    const volunteers = await this.personRepository.count({
+      where: {
+        person_roles: {
+          headquarters: {
+            id: idHeadquarters,
+          },
+          end_date: IsNull(),
+        },
+        person_status: {
+          end_date: IsNull(),
+          state: {
+            name: In(['ACTIVO', 'FORMACION', 'LICENCIA']),
+          },
+        },
+      },
+    });
+    console.log(volunteers);
+    return volunteers > 0;
   }
 }

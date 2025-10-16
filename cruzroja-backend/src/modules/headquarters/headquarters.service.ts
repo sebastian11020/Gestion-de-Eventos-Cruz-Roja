@@ -13,12 +13,14 @@ import { PersonRole } from '../person-role/entity/person-role.entity';
 import { HeadquartersTypeEnum } from './enum/headquarters-type.enum';
 import { GetHeadquartersGroupsProgramsDto } from './dto/get-headquarters-groups-programs.dto';
 import { ChangeLeaderHeadquartersDto } from './dto/change-leader-headquarters.dto';
+import { PersonService } from '../person/person.service';
 
 @Injectable()
 export class HeadquartersService {
   constructor(
     @InjectRepository(Headquarters)
     private headquartersRepository: Repository<Headquarters>,
+    private personService: PersonService,
   ) {}
 
   async getAllDto(): Promise<GetHeadquartersDto[]> {
@@ -112,6 +114,10 @@ export class HeadquartersService {
             conflict(`No se puede crear otra sede en ${location.name}`);
           } else {
             message = 'La sede se reactivo correctamente';
+            if (headquarter.type != dto.type) {
+              headquarter.type = dto.type;
+              await manager.update(Headquarters, headquarter.id, headquarter);
+            }
           }
         } else {
           message = 'La sede se creo correctamente';
@@ -242,11 +248,19 @@ export class HeadquartersService {
       headquarter,
       `No se encontro una sede con el sigueinte id: ${id}`,
     );
-    await this.headquartersRepository.query(
-      'select * from public.deactivate_headquarters_cascade($1)',
-      [id],
-    );
-    return { success: true };
+    if (await this.personService.thereAreActiveVolunteersActive(id)) {
+      return {
+        success: false,
+        message:
+          'No se puede eliminar una sede que tenga voluntarios activos, en formacion o en licencia',
+      };
+    } else {
+      await this.headquartersRepository.query(
+        'select * from public.deactivate_headquarters_cascade($1)',
+        [id],
+      );
+      return { success: true, message: 'Se elimino la sede correctamente' };
+    }
   }
 
   async getById(id: number) {
