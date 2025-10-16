@@ -301,7 +301,6 @@ export class ProgramHeadquartersService {
           pr,
           'No se encontro un rol activo para la persona seleccionada',
         );
-        console.log(pr.person);
         await this.closeCoordinatorRoleCurrent(
           manager,
           pr,

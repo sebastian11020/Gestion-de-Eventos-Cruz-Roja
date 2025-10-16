@@ -13,7 +13,7 @@ export function toFormCreatePerson(u: Legacy): formCreatePerson {
   const id_program = program?.id ? String(program.id) : "";
 
   return {
-    id: "",
+    id: u.id ?? "",
     type_document: u.typeDocument ?? "",
     document: u.document ?? "",
     carnet: u.carnet ?? "",

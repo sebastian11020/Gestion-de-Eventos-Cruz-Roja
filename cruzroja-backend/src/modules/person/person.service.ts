@@ -46,20 +46,32 @@ export class PersonService {
         person_roles: {
           end_date: IsNull(),
         },
+        person_status: {
+          end_date: IsNull(),
+        },
       },
       relations: {
         person_roles: {
           role: true,
         },
+        person_status: {
+          state: true,
+        },
       },
     });
     assertFound(person, 'No se encontro ninguna persona con ese id');
-    const pr = person.person_roles.at(0);
-    assertFound(pr, 'No se encontro un rol activo para la persona con ese id');
+    const current_state = person.person_status.at(0)?.state.name;
+    const current_role = person.person_roles.at(0)?.role.name ?? '';
+    const role =
+      !current_role ||
+      current_state === 'INACTIVO' ||
+      current_state === 'DESVINCULADO'
+        ? ''
+        : current_role;
     return {
       name: FormatNamesString(person.name),
       lastName: FormatNamesString(person.last_name),
-      role: pr.role.name,
+      role: role,
     };
   }
 
@@ -71,6 +83,11 @@ export class PersonService {
             id: 5,
           },
           end_date: IsNull(),
+        },
+        person_status: {
+          state: {
+            id: 3,
+          },
         },
       },
       relations: {

@@ -96,11 +96,9 @@ export default function voluntarios() {
   async function handleCreateOrUpdate (data: formCreatePerson)  {
       try {
           if (editUser) {
-              const id = getSupabaseUserId();
-              const newData = {...data,id:id ?? ''}
-              console.log(newData);
+              console.log(data);
               toast.loading("Actualizando voluntario", {duration: 1000})
-              const response = await updatePersonService(newData)
+              const response = await updatePersonService(data)
               if (response.success) {
                   setOpenWizard(false);
                   toast.success(response.message, {duration: 1000});

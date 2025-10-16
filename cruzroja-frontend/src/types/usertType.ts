@@ -1,4 +1,5 @@
 export type FormState = {
+  id?: string,
   typeDocument?: string;
   document?: string;
   carnet?: string;
