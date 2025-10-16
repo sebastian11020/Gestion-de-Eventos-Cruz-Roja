@@ -21,6 +21,7 @@ import { HeadquartersStatusModule } from './modules/headquarters-status/headquar
 import { GroupStatusModule } from './modules/group-status/group-status.module';
 import { ProgramStatusModule } from './modules/program-status/program-status.module';
 import { EmailModule } from './modules/email/email.module';
+import { SkillModule } from './modules/skill/skill.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { EmailModule } from './modules/email/email.module';
     GroupStatusModule,
     ProgramStatusModule,
     EmailModule,
+    SkillModule,
   ],
   controllers: [AppController],
   providers: [AppService],
