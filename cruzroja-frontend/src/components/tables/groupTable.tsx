@@ -35,7 +35,6 @@ export default function GroupTable({
     if (page > totalPages) setPage(1);
   }, [page, totalPages]);
 
-
   const start = (page - 1) * pageSize;
   const end = Math.min(start + pageSize, total);
   const paged = useMemo(

@@ -9,6 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Eye, EyeOff, Loader2 } from "lucide-react"; // 👈 1) importar spinner
 import { supabase } from "@/lib/supabase-browser";
 import { useRouter } from "next/navigation";
+import {getPersonData} from "@/services/serviceGetPerson";
+import {user} from "@/types/usertType";
 
 export default function LoginCR() {
   const router = useRouter();
@@ -28,6 +30,14 @@ export default function LoginCR() {
         password: loginData.password,
       });
       if (error) throw error;
+      const id = localStorage.getItem("supabase_uid");
+      const userData:user = await getPersonData(id ?? '')
+        await fetch('/api/session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ role: userData.role }),
+        });
+        localStorage.setItem("role",userData.role)
       router.replace("/dashboard");
     } catch (e: any) {
       setErr(e.message ?? "Error al iniciar sesión");
@@ -132,7 +142,7 @@ export default function LoginCR() {
                 </div>
                 <div className="flex justify-end">
                   <Link
-                    href="/recuperar"
+                    href="/auth/forgot"
                     className="text-sm font-medium text-red-600 hover:text-red-700 hover:underline transition-colors"
                   >
                     ¿Olvidaste tu contraseña?
@@ -140,10 +150,8 @@ export default function LoginCR() {
                 </div>
               </div>
 
-              {/* mensaje de error */}
               {err && <p className="text-sm text-red-600">{err}</p>}
 
-              {/* 3) botón con spinner */}
               <Button
                 type="submit"
                 disabled={loading}
@@ -175,17 +183,6 @@ export default function LoginCR() {
               <span className="text-xs text-blue-900/70">o</span>
               <div className="h-px flex-1 bg-gradient-to-r from-transparent via-blue-200 to-transparent" />
             </div>
-
-            {/* Acción secundaria */}
-            <div className="text-center">
-              <Link
-                href="/recuperar"
-                className="inline-flex items-center justify-center text-sm font-medium text-blue-800 hover:text-blue-900 hover:underline transition-colors"
-              >
-                Recuperar acceso
-              </Link>
-            </div>
-
             <p className="text-[11px] text-center text-blue-900/70">
               Uso interno institucional. Si necesitas ayuda, contacta al
               administrador.

@@ -19,15 +19,16 @@ import { PAGE_SIZE } from "@/const/consts";
 import { PageBtn } from "@/components/buttons/pageButton";
 import { CreateProgramForm } from "@/components/forms/createProgramForm";
 import { AssociateProgramForm } from "@/components/forms/associateProgramForm";
+import {Loading} from "@/components/ui/loading";
 
 export default function Programas() {
   const [open, setOpen] = useState(false);
   const [openChangeLeader, setOpenChangeLeader] = useState(false);
   const [isNewProgram, setIsNewProgram] = useState(false);
   const [query, setQuery] = useState("");
-  const { items, sectionals,users, loading, reload } = useProgramsData();
-    const [documentSelected, setDocumentSelected] = useState<string>("");
-    const [nameLeader, setNameLeader] = useState<string>("");
+  const { items, sectionals, users, loading, reload } = useProgramsData();
+  const [documentSelected, setDocumentSelected] = useState<string>("");
+  const [nameLeader, setNameLeader] = useState<string>("");
   const {
     page,
     setPage,
@@ -71,8 +72,8 @@ export default function Programas() {
     }
   }
   async function handleAssociateCatalog(payload: createProgram) {
-    const newPayload = {...payload,leader:documentSelected}
-    console.log(newPayload)
+    const newPayload = { ...payload, leader: documentSelected };
+    console.log(newPayload);
     setOpen(false);
     setQuery("");
     setPage(1);
@@ -80,7 +81,7 @@ export default function Programas() {
     const response = await associateProgramService(newPayload);
     if (response.success) {
       toast.success("Programa Asociado Correctamente", { duration: 3000 });
-       await reload();
+      await reload();
     } else {
       toast.error(response.message, { duration: 3000 });
     }
@@ -142,9 +143,7 @@ export default function Programas() {
 
       {/* Grid */}
       {loading ? (
-        <div className="rounded-xl border border-dashed border-gray-300 bg-white p-8 text-center text-sm text-gray-600">
-          Cargando…
-        </div>
+          <Loading size="lg" label="Cargando Programas"/>
       ) : paged.length === 0 ? (
         <div className="rounded-xl border border-dashed border-gray-300 bg-white p-8 text-center text-sm text-gray-600">
           {total === 0
@@ -154,7 +153,12 @@ export default function Programas() {
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {paged.map((sec) => (
-            <ProgramCard key={sec.id} program={sec} users={users} onDeleted={reload} />
+            <ProgramCard
+              key={sec.id}
+              program={sec}
+              users={users}
+              onDeleted={reload}
+            />
           ))}
         </div>
       )}
@@ -208,7 +212,6 @@ export default function Programas() {
         </div>
       </nav>
 
-      {/* Modal único con contenido variable */}
       <Modal
         open={open}
         onClose={() => {
@@ -245,7 +248,15 @@ export default function Programas() {
         onClose={() => setOpenChangeLeader(false)}
         title={"Seleccionar Lider"}
       >
-        <ChangeLeaderTable users={users} onSelect={(document,name)=>{{setDocumentSelected(document),setNameLeader(name)}}} onCancel={()=>setOpenChangeLeader(false)} />
+        <ChangeLeaderTable
+          users={users}
+          onSelect={(document, name) => {
+            {
+              (setDocumentSelected(document), setNameLeader(name));
+            }
+          }}
+          onCancel={() => setOpenChangeLeader(false)}
+        />
       </Modal>
     </div>
   );

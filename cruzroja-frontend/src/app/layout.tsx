@@ -31,7 +31,7 @@ export default function RootLayout({
       >
         {children}
         <Toaster position="top-right" reverseOrder={false} />
-      <SupabaseSessionWatcher />
+        <SupabaseSessionWatcher />
       </body>
     </html>
   );

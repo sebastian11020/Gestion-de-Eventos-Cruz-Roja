@@ -10,10 +10,14 @@ import { supabase } from "@/lib/supabase-browser";
 import { generatePassword } from "@/utils/generatePassword";
 import { toFormCreatePerson } from "@/utils/adapters";
 import { PAGE_SIZE } from "@/const/consts";
-import {createPersonService, updatePersonService} from "@/services/serviceCreatePerson";
+import {
+  createPersonService,
+  updatePersonService,
+} from "@/services/serviceCreatePerson";
 import toast from "react-hot-toast";
-import {getSupabaseUserId} from "@/utils/getSupabaseId";
-import {usePersonData} from "@/hooks/usePersonData";
+import { getSupabaseUserId } from "@/utils/getSupabaseId";
+import { usePersonData } from "@/hooks/usePersonData";
+import {Loading} from "@/components/ui/loading";
 
 function normalize(v: unknown) {
   return String(v ?? "").toLowerCase();
@@ -37,12 +41,12 @@ export default function voluntarios() {
   const [filtro, setFiltro] = useState("");
   const [page, setPage] = useState(1);
   const [openWizard, setOpenWizard] = useState(false);
-  const [openView, setOpenView] = useState(false)
+  const [openView, setOpenView] = useState(false);
   const [cityFilter, setCityFilter] = useState<string>("");
   const [stateFilter, setStateFilter] = useState<string>("");
   const [editUser, setEditUser] = useState<formCreatePerson | null>(null);
   const [viewUser, setViewUser] = useState<FormState | null>(null);
-  const {users,loading,reload} = usePersonData()
+  const { users, loading, reload } = usePersonData();
   const handleSearch = (value: string) => {
     setFiltro(value);
   };
@@ -52,81 +56,86 @@ export default function voluntarios() {
     return Array.from(set).sort();
   }, [users]);
 
-    const states = useMemo(() => {
-        const map = new Map<string, string>(); // id -> name
-        for (const u of users) {
-            if (u.state?.id && u.state?.name) {
-                map.set(u.state.id, u.state.name);
-            }
-        }
-        return Array.from(map, ([id, name]) => ({ id, name }))
-            .sort((a, b) => a.name.localeCompare(b.name));
-    }, [users]);
+  const states = useMemo(() => {
+    const map = new Map<string, string>(); // id -> name
+    for (const u of users) {
+      if (u.state?.id && u.state?.name) {
+        map.set(u.state.id, u.state.name);
+      }
+    }
+    return Array.from(map, ([id, name]) => ({ id, name })).sort((a, b) =>
+      a.name.localeCompare(b.name),
+    );
+  }, [users]);
 
-    async function register(form: formCreatePerson) {
-        const password = generatePassword(12);
-        const sb = supabase();
-        const { data: before } = await sb.auth.getSession();
-        const prev = before.session;
-        (window as any).__MUTE_AUTH_EVENTS = true;
-        const { data, error } = await sb.auth.signUp({
-            email: form.email,
-            password,
-        });
+  async function register(form: formCreatePerson) {
+    const password = generatePassword(12);
+    const sb = supabase();
+    const { data: before } = await sb.auth.getSession();
+    const prev = before.session;
+    (window as any).__MUTE_AUTH_EVENTS = true;
+    const { data, error } = await sb.auth.signUp({
+      email: form.email,
+      password,
+    });
 
-        if (error) {
-            (window as any).__MUTE_AUTH_EVENTS = false;
-            console.error(error);
-            return null;
-        }
-
-        const newUserId = data.user?.id ?? null;
-        if (prev) {
-            await sb.auth.setSession({
-                access_token: prev.access_token,
-                refresh_token: prev.refresh_token,
-            });
-        } else {
-            await sb.auth.signOut();
-        }
-        (window as any).__MUTE_AUTH_EVENTS = false;
-        return { id: newUserId, password };
+    if (error) {
+      (window as any).__MUTE_AUTH_EVENTS = false;
+      console.error(error);
+      return null;
     }
 
-  async function handleCreateOrUpdate (data: formCreatePerson)  {
-      try {
-          if (editUser) {
-              console.log(data);
-              toast.loading("Actualizando voluntario", {duration: 1000})
-              const response = await updatePersonService(data)
-              if (response.success) {
-                  setOpenWizard(false);
-                  toast.success(response.message, {duration: 1000});
-                  await reload();
-              } else {
-                  toast.error(response.message);
-              }
-          } else {
-              const reg = await register(data)
-              const newData = {...data, id: reg?.id ?? '', password: reg?.password ?? ''};
-              toast.loading("Creando voluntario", {duration: 3000})
-              const response = await createPersonService(newData);
-              if (response.success) {
-                  setOpenWizard(false);
-                  toast.success(response.message, {duration: 1000});
-                  await reload();
-              } else {
-                  toast.error(response.message);
-              }
-          }
-          setEditUser(null);
-      }catch (error){
-              console.log(error);
+    const newUserId = data.user?.id ?? null;
+    if (prev) {
+      await sb.auth.setSession({
+        access_token: prev.access_token,
+        refresh_token: prev.refresh_token,
+      });
+    } else {
+      await sb.auth.signOut();
+    }
+    (window as any).__MUTE_AUTH_EVENTS = false;
+    return { id: newUserId, password };
+  }
+
+  async function handleCreateOrUpdate(data: formCreatePerson) {
+    try {
+      if (editUser) {
+        console.log(data);
+        toast.loading("Actualizando voluntario", { duration: 1000 });
+        const response = await updatePersonService(data);
+        if (response.success) {
+          setOpenWizard(false);
+          toast.success(response.message, { duration: 1000 });
+          await reload();
+        } else {
+          toast.error(response.message);
+        }
+      } else {
+        const reg = await register(data);
+        const newData = {
+          ...data,
+          id: reg?.id ?? "",
+          password: reg?.password ?? "",
+        };
+        toast.loading("Creando voluntario", { duration: 3000 });
+        const response = await createPersonService(newData);
+        if (response.success) {
+          setOpenWizard(false);
+          toast.success(response.message, { duration: 1000 });
+          await reload();
+        } else {
+          toast.error(response.message);
+        }
       }
+      setEditUser(null);
+    } catch (error) {
+      console.log(error);
+    }
   }
   useEffect(() => {
     setPage(1);
-  }, [filtro, cityFilter,users]);
+  }, [filtro, cityFilter, users]);
 
   const results = useMemo(() => {
     const q = normalize(filtro);
@@ -143,14 +152,14 @@ export default function voluntarios() {
             normalize(u.document).includes(q) ||
             normalize(u.cellphone).includes(q) ||
             normalize(u.sectional.city).includes(q) ||
-              normalize(u.state.name).includes(q)
+            normalize(u.state.name).includes(q),
         );
     return base.filter(
       (u) =>
         (cityFilter === "" || u.sectional.city === cityFilter) &&
         (stateFilter === "" || u.state.id === stateFilter),
     );
-  }, [filtro, cityFilter, stateFilter,users]);
+  }, [filtro, cityFilter, stateFilter, users]);
 
   const total = results.length;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -221,9 +230,14 @@ export default function voluntarios() {
           + Agregar Voluntario
         </Button>
       </div>
-      <div className="mt-6 overflow-hidden rounded-xl border border-gray-200 shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+        {loading ? (
+            <div className="mt-6 overflow-hidden rounded-xl border border-gray-200 shadow-sm">
+                <Loading size="lg" label="Cargando voluntarios…" minHeight="min-h-[260px]" />
+            </div>
+        ) : (
+        <div className="mt-6 overflow-hidden rounded-xl border border-gray-200 shadow-sm">
+            <div className="overflow-x-auto">
+                <table className="w-full text-sm">
             <thead className="sticky top-0 z-10 bg-white/80 backdrop-blur border-b">
               <tr className="text-gray-600">
                 <th className="px-4 py-3 text-left font-semibold">Carnet</th>
@@ -273,7 +287,9 @@ export default function voluntarios() {
                   </td>
 
                   <td className="px-4 py-3">
-                    <span className={badgeClass(u.state.name)}>{u.state.name}</span>
+                    <span className={badgeClass(u.state.name)}>
+                      {u.state.name}
+                    </span>
                   </td>
                   {/* Acciones */}
                   <td className="px-3 py-2">
@@ -316,6 +332,7 @@ export default function voluntarios() {
           </table>
         </div>
       </div>
+        )}
 
       {/* Footer de paginación */}
       <div className="flex flex-col  mt-6  ">

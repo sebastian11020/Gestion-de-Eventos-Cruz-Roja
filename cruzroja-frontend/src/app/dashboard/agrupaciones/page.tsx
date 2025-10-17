@@ -20,14 +20,15 @@ import ChangeLeaderTable from "@/components/tables/changeLeaderTable";
 import type { group } from "@/types/usertType";
 import { CreateGroupForm } from "@/components/forms/createGroupForm";
 import { AssociateGroupForm } from "@/components/forms/associateGroupForm";
+import {Loading} from "@/components/ui/loading";
 
 export default function Agrupaciones() {
   const [open, setOpen] = useState(false);
   const [isNewGroup, setIsNewGroup] = useState(false);
   const [openChangeLeader, setOpenChangeLeader] = useState(false);
-    const [documentSelected, setDocumentSelected] = useState<string>("");
-    const [nameLeader, setNameLeader] = useState<string>("");
-  const { sectionals, groups, catalogGroups,users, loading, reload } =
+  const [documentSelected, setDocumentSelected] = useState<string>("");
+  const [nameLeader, setNameLeader] = useState<string>("");
+  const { sectionals, groups, catalogGroups, users, loading, reload } =
     useGroupsData();
   const [query, setQuery] = useState("");
   const {
@@ -77,7 +78,7 @@ export default function Agrupaciones() {
     idGroup: string;
     idHeadquarters: string;
   }) {
-    const newPayload = {...payload,leader:documentSelected}
+    const newPayload = { ...payload, leader: documentSelected };
     setOpen(false);
     setQuery("");
     setPage(1);
@@ -140,9 +141,7 @@ export default function Agrupaciones() {
         {total === 1 ? "" : "es"}
       </div>
       {loading ? (
-        <div className="rounded-xl border border-dashed border-gray-300 bg-white p-8 text-center text-sm text-gray-600">
-          Cargando…
-        </div>
+          <Loading size="lg" label="Cargando Agrupaciones"/>
       ) : paged.length === 0 ? (
         <div className="rounded-xl border border-dashed border-gray-300 bg-white p-8 text-center text-sm text-gray-600">
           {total === 0
@@ -152,7 +151,12 @@ export default function Agrupaciones() {
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {paged.map((sec) => (
-            <GroupCard key={`${sec.id}-${sec.sectional}`} group={sec} users={users} onDeleted={reload} />
+            <GroupCard
+              key={`${sec.id}-${sec.sectional}`}
+              group={sec}
+              users={users}
+              onDeleted={reload}
+            />
           ))}
         </div>
       )}
@@ -240,7 +244,15 @@ export default function Agrupaciones() {
         onClose={() => setOpenChangeLeader(false)}
         title={"Seleccionar Lider"}
       >
-        <ChangeLeaderTable users={users} onSelect={(document,name)=>{{setDocumentSelected(document),setNameLeader(name)}}} onCancel={()=>setOpenChangeLeader(false)}/>
+        <ChangeLeaderTable
+          users={users}
+          onSelect={(document, name) => {
+            {
+              (setDocumentSelected(document), setNameLeader(name));
+            }
+          }}
+          onCancel={() => setOpenChangeLeader(false)}
+        />
       </Modal>
     </div>
   );

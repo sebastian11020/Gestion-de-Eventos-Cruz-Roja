@@ -15,10 +15,11 @@ import { usePageNumbers } from "@/hooks/usedPaginatedNumbers";
 import { usePaginatedSearch } from "@/hooks/usePaginatedSearch";
 import { PageBtn } from "@/components/buttons/pageButton";
 import { CreateSectionalForm } from "@/components/forms/createSectionalForm";
+import {Loading} from "@/components/ui/loading";
 
 export default function Sedes() {
   const [open, setOpen] = useState(false);
-  const { cities, sectionals,users,loading, reload } = useSedesData();
+  const { cities, sectionals, users, loading, reload } = useSedesData();
   const [query, setQuery] = useState("");
   const [openChangeLeader, setOpenChangeLeader] = useState(false);
   const [documentSelected, setDocumentSelected] = useState<string>("");
@@ -46,7 +47,7 @@ export default function Sedes() {
     setOpen(false);
     setQuery("");
     setPage(1);
-    const newPayload = {...payload,leader:documentSelected}
+    const newPayload = { ...payload, leader: documentSelected };
     toast.loading("Creando sede", { duration: 1000 });
     const response = await createSectionalService(newPayload);
     if (response.success) {
@@ -101,9 +102,7 @@ export default function Sedes() {
         {total === 1 ? "" : "s"}
       </div>
       {loading ? (
-        <div className="rounded-xl border border-dashed border-gray-300 bg-white p-8 text-center text-sm text-gray-600">
-          Cargando…
-        </div>
+          <Loading size="lg" label="Cargando Sedes"/>
       ) : paged.length === 0 ? (
         <div className="rounded-xl border border-dashed border-gray-300 bg-white p-8 text-center text-sm text-gray-600">
           {total === 0
@@ -113,7 +112,12 @@ export default function Sedes() {
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {paged.map((sec) => (
-            <SectionalCard key={sec.id} sectional={sec} users={users} onDeleted={reload}/>
+            <SectionalCard
+              key={sec.id}
+              sectional={sec}
+              users={users}
+              onDeleted={reload}
+            />
           ))}
         </div>
       )}
@@ -180,7 +184,13 @@ export default function Sedes() {
         onClose={() => setOpenChangeLeader(false)}
         title={"Seleccionar Lider"}
       >
-        <ChangeLeaderTable users={users} onSelect={(document,name)=>{setDocumentSelected(document),setNameLeader(name)}} onCancel={()=>setOpenChangeLeader(false)} />
+        <ChangeLeaderTable
+          users={users}
+          onSelect={(document, name) => {
+            (setDocumentSelected(document), setNameLeader(name));
+          }}
+          onCancel={() => setOpenChangeLeader(false)}
+        />
       </Modal>
     </div>
   );

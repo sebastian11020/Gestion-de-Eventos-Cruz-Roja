@@ -45,12 +45,14 @@ export function AssociateProgramForm({
     [groupOptions, form.group],
   );
   const programOptions: ProgramItem[] = groupSelected?.program ?? [];
-    const programSelected = useMemo(
-        () => programOptions.find((p) => String(p.id) === String(form.programId)) ?? null,
-        [programOptions, form.programId]
-    );
+  const programSelected = useMemo(
+    () =>
+      programOptions.find((p) => String(p.id) === String(form.programId)) ??
+      null,
+    [programOptions, form.programId],
+  );
 
-    const canSave = Boolean(form.sectional && form.group && form.programId);
+  const canSave = Boolean(form.sectional && form.group && form.programId);
 
   return (
     <form
@@ -59,7 +61,7 @@ export function AssociateProgramForm({
         const payload: createProgram = {
           idHeadquarters: form.sectional ?? "",
           idProgram: form.programId ?? "",
-          id_group:form.group ?? "",
+          id_group: form.group ?? "",
         };
         onSubmit(payload);
       }}
@@ -166,10 +168,13 @@ export function AssociateProgramForm({
         Seleccionar Líder
       </Button>
 
-        <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-600">
-            <span className="font-medium text-gray-700">Vista previa:</span>{" "}
-            {groupSelected?.name ?? "—"} {" en "} {sectionalSelected?.city ?? "—"}{programSelected?.name}{" Lider: "}{nameLeader}
-        </div>
+      <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-600">
+        <span className="font-medium text-gray-700">Vista previa:</span>{" "}
+        {groupSelected?.name ?? "—"} {" en "} {sectionalSelected?.city ?? "—"}
+        {programSelected?.name}
+        {" Lider: "}
+        {nameLeader}
+      </div>
 
       <div className="flex items-center justify-end gap-2 pt-1">
         <Button

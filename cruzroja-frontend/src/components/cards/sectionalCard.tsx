@@ -23,16 +23,20 @@ import ChangeLeaderTable from "@/components/tables/changeLeaderTable";
 import { ConfirmDialog } from "@/components/cards/confitmDialog";
 import { deleteSectional } from "@/services/serviceCreateSectional";
 import toast from "react-hot-toast";
-import {getGroupTable} from "@/services/serviceGetGroup";
-import {getPersonId} from "@/services/serviceGetPerson";
+import { getGroupTable } from "@/services/serviceGetGroup";
+import { getPersonId } from "@/services/serviceGetPerson";
 
 type SectionalCardProps = {
   sectional: sectional;
-  users:leaderDataTable[];
-    onDeleted?: () => Promise<void> | void;
+  users: leaderDataTable[];
+  onDeleted?: () => Promise<void> | void;
 };
 
-export function SectionalCard({ sectional,users,onDeleted }: SectionalCardProps) {
+export function SectionalCard({
+  sectional,
+  users,
+  onDeleted,
+}: SectionalCardProps) {
   const [openGroups, setOpenGroups] = useState(false);
   const [openChangeLeader, setOpenChangeLeader] = useState(false);
   const [viewUser, setViewUser] = useState<FormState | null>(null);
@@ -44,16 +48,16 @@ export function SectionalCard({ sectional,users,onDeleted }: SectionalCardProps)
 
   async function onView(id: string) {
     try {
-        const response = await getPersonId(id);
-        console.log(response.leader);
-        if (response.success) {
-            setOpenView(true);
-            setViewUser(response.leader);
-        }else {
-            toast.error(response.message);
-        }
-    }catch (error) {
-        console.error(error);
+      const response = await getPersonId(id);
+      console.log(response.leader);
+      if (response.success) {
+        setOpenView(true);
+        setViewUser(response.leader);
+      } else {
+        toast.error(response.message);
+      }
+    } catch (error) {
+      console.error(error);
     }
   }
 
@@ -64,19 +68,19 @@ export function SectionalCard({ sectional,users,onDeleted }: SectionalCardProps)
       toast.success("Sede eliminada correctamente", { duration: 3000 });
       await onDeleted?.();
     } else {
-      toast.error("No se ha podido eliminar la sede", { duration: 3000 });
+      toast.error(response.message, { duration: 3000 });
     }
     setConfirmOpen(false);
   }
 
-  async function GetGroupTable(id:string) {
-      try {
-          const response = await getGroupTable(id)
-          console.log(response)
-          setGroups(response)
-      }catch (error){
-          console.error(error);
-      }
+  async function GetGroupTable(id: string) {
+    try {
+      const response = await getGroupTable(id);
+      console.log(response);
+      setGroups(response);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   return (
@@ -135,7 +139,9 @@ export function SectionalCard({ sectional,users,onDeleted }: SectionalCardProps)
             </span>
           </div>
           <button
-            onClick={() => {setOpenGroups(true),GetGroupTable(sectional.id ?? '')}}
+            onClick={() => {
+              (setOpenGroups(true), GetGroupTable(sectional.id ?? ""));
+            }}
             className="flex items-center justify-center rounded-full bg-green-100 p-1.5 text-green-600 hover:bg-green-200 transition-colors"
             aria-label="Ver agrupaciones"
             title="Ver agrupaciones"
@@ -198,7 +204,14 @@ export function SectionalCard({ sectional,users,onDeleted }: SectionalCardProps)
         onClose={() => setOpenChangeLeader(false)}
         title={`Voluntarios - ${sectional.city}`}
       >
-        <ChangeLeaderTable users={users} onCancel={() => setOpenChangeLeader(false)} sectional={sectional.id} isChange={true} isSectional={true} onDeleted={onDeleted} />
+        <ChangeLeaderTable
+          users={users}
+          onCancel={() => setOpenChangeLeader(false)}
+          sectional={sectional.id}
+          isChange={true}
+          isSectional={true}
+          onDeleted={onDeleted}
+        />
       </Modal>
       <ViewUser infUser={viewUser} onClose={handleCloseView}></ViewUser>
       <ConfirmDialog

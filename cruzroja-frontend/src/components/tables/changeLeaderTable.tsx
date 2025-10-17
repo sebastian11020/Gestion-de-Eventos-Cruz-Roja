@@ -1,25 +1,25 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { Check, ChevronLeft, ChevronRight, Search } from "lucide-react";
-import type {leaderDataTable} from "@/types/usertType";
-import {normalize} from "@/utils/normalize";
-import {PageBtn} from "@/components/buttons/pageButton";
-import {changeLeaderSectionalService} from "@/services/serviceCreateSectional";
+import type { leaderDataTable } from "@/types/usertType";
+import { normalize } from "@/utils/normalize";
+import { PageBtn } from "@/components/buttons/pageButton";
+import { changeLeaderSectionalService } from "@/services/serviceCreateSectional";
 import toast from "react-hot-toast";
-import {changeLeaderGroup} from "@/services/serviceCreateGroups";
-import {changeLeaderProgram} from "@/services/serviceCreateProgram";
+import { changeLeaderGroup } from "@/services/serviceCreateGroups";
+import { changeLeaderProgram } from "@/services/serviceCreateProgram";
 
 type ChangeLeaderTableProps = {
   users: leaderDataTable[];
   isChange?: boolean;
-  isSectional?:boolean;
-  isGroup?:boolean;
-  isProgram?:boolean;
+  isSectional?: boolean;
+  isGroup?: boolean;
+  isProgram?: boolean;
   sectional?: string;
-  group?:string;
+  group?: string;
   initialPageSize?: number;
-  onSelect?:(document:string,name:string) => void;
-  onCancel?:()=>void;
+  onSelect?: (document: string, name: string) => void;
+  onCancel?: () => void;
   onDeleted?: () => Promise<void> | void;
 };
 
@@ -38,7 +38,6 @@ function badgeClass(state: string) {
   return "inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-700 ring-1 ring-inset ring-gray-200";
 }
 
-
 export default function ChangeLeaderTable({
   users,
   initialPageSize = 10,
@@ -50,7 +49,7 @@ export default function ChangeLeaderTable({
   isGroup,
   onCancel,
   onDeleted,
-  isChange = false
+  isChange = false,
 }: ChangeLeaderTableProps) {
   const [query, setQuery] = useState("");
   const [pageSize, setPageSize] = useState(initialPageSize);
@@ -91,44 +90,50 @@ export default function ChangeLeaderTable({
     return Array.from({ length: to - from + 1 }, (_, i) => from + i);
   }, [page, totalPages]);
 
-  async function handleChange(data:{idSectional?:string,leader:string, idGroupHeadquarters?:string}) {
-      try {
-         if (isSectional){
-             toast.loading("Cambiando lider",{duration:1000})
-             console.log(data)
-             const response = await changeLeaderSectionalService(data)
-             if (response.success) {
-                 toast.success(response.message);
-                 await onDeleted?.();
-             }else {
-                 toast.error(response.message);
-             }
-         }if (isGroup){
-              toast.loading("Cambiando lider",{duration:1000})
-              const newData = {...data,idGroupHeadquarters:group}
-              console.log(newData)
-              const response = await changeLeaderGroup(newData)
-              if (response.success) {
-                  toast.success(response.message);
-                  await onDeleted?.();
-              }else {
-                  toast.error(response.message);
-              }
-          }if (isProgram){
-              toast.loading("Cambiando lider",{duration:1000})
-              const newData = {...data,idProgramsHeadquarters:group}
-              console.log(newData)
-              const response = await changeLeaderProgram(newData)
-              if (response.success) {
-                  toast.success(response.message);
-                  await onDeleted?.();
-              }else {
-                  toast.error(response.message);
-              }
-          }
-      }catch (error){
-          console.error(error)
+  async function handleChange(data: {
+    idSectional?: string;
+    leader: string;
+    idGroupHeadquarters?: string;
+  }) {
+    try {
+      if (isSectional) {
+        toast.loading("Cambiando lider", { duration: 1000 });
+        console.log(data);
+        const response = await changeLeaderSectionalService(data);
+        if (response.success) {
+          toast.success(response.message);
+          await onDeleted?.();
+        } else {
+          toast.error(response.message);
+        }
       }
+      if (isGroup) {
+        toast.loading("Cambiando lider", { duration: 1000 });
+        const newData = { ...data, idGroupHeadquarters: group };
+        console.log(newData);
+        const response = await changeLeaderGroup(newData);
+        if (response.success) {
+          toast.success(response.message);
+          await onDeleted?.();
+        } else {
+          toast.error(response.message);
+        }
+      }
+      if (isProgram) {
+        toast.loading("Cambiando lider", { duration: 1000 });
+        const newData = { ...data, idProgramsHeadquarters: group };
+        console.log(newData);
+        const response = await changeLeaderProgram(newData);
+        if (response.success) {
+          toast.success(response.message);
+          await onDeleted?.();
+        } else {
+          toast.error(response.message);
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   return (
@@ -282,17 +287,17 @@ export default function ChangeLeaderTable({
                         "
                         title="Seleccionar"
                         aria-label={`Seleccionar a ${g.name}`}
-                        onClick={()=> {onSelect?.(g.document,g.name)
-                        onCancel?.()
-                        if(isChange){
+                        onClick={() => {
+                          onSelect?.(g.document, g.name);
+                          onCancel?.();
+                          if (isChange) {
                             const payload = {
-                                idSectional:sectional,
-                                leader:g.document
-                            }
-                            handleChange(payload)
-                         }
-                        }
-                      }
+                              idSectional: sectional,
+                              leader: g.document,
+                            };
+                            handleChange(payload);
+                          }
+                        }}
                       >
                         <Check className="size-4" />
                       </button>
@@ -365,4 +370,3 @@ export default function ChangeLeaderTable({
     </section>
   );
 }
-

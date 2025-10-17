@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import type { sectional } from "@/types/sectionalType";
 import type { group } from "@/types/usertType";
-import {useMemo, useState} from "react";
+import { useMemo, useState } from "react";
 import { Crown } from "lucide-react";
 
 export function AssociateGroupForm({
@@ -22,15 +22,16 @@ export function AssociateGroupForm({
   const [idGroup, setIdGroup] = useState("");
   const [idHeadquarters, setIdHeadquarters] = useState("");
 
-    const groupSelected = useMemo(
-        () => groups.find(g => String(g.id) === String(idGroup)) ?? null,
-        [groups, idGroup]
-    );
+  const groupSelected = useMemo(
+    () => groups.find((g) => String(g.id) === String(idGroup)) ?? null,
+    [groups, idGroup],
+  );
 
-    const sectionalSelected = useMemo(
-        () => sectionals.find(s => String(s.id) === String(idHeadquarters)) ?? null,
-        [sectionals, idHeadquarters]
-    );
+  const sectionalSelected = useMemo(
+    () =>
+      sectionals.find((s) => String(s.id) === String(idHeadquarters)) ?? null,
+    [sectionals, idHeadquarters],
+  );
 
   return (
     <form
@@ -103,10 +104,12 @@ export function AssociateGroupForm({
         Seleccionar Líder
       </Button>
 
-        <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-600">
-            <span className="font-medium text-gray-700">Vista previa:</span>{" "}
-            {groupSelected?.name ?? "—"} {" en "} {sectionalSelected?.city ?? "—"}{" Lider: "}{nameLeader}
-        </div>
+      <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-600">
+        <span className="font-medium text-gray-700">Vista previa:</span>{" "}
+        {groupSelected?.name ?? "—"} {" en "} {sectionalSelected?.city ?? "—"}
+        {" Lider: "}
+        {nameLeader}
+      </div>
 
       <div className="flex items-center justify-end gap-2 pt-1">
         <Button

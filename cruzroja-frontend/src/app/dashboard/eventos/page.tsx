@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, History, PlusCircle } from "lucide-react";
 import type { event as EventType } from "@/types/usertType";
 import CreateEventForm from "@/components/forms/createEventForm";
-import {PAGE_SIZE} from "@/const/consts";
+import { PAGE_SIZE } from "@/const/consts";
 
 type TopVolunteer = { id: string; name: string; hours: number };
 

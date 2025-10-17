@@ -20,10 +20,19 @@ export async function getEPS() {
 }
 
 export async function getState() {
+  try {
+    const response = await axios.get(`http://localhost:8080/state/all`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function getSkills(){
     try {
-        const response = await axios.get(`http://localhost:8080/state/all`);
+        const response = await axios.get(`http://localhost:8080/skill/all`);
         return response.data;
-    } catch (error) {
+    }catch (error) {
         console.error(error);
     }
 }

@@ -100,9 +100,7 @@ export function CreateSectionalForm({
       <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-600">
         <span className="font-medium text-gray-700">Vista previa:</span>{" "}
         {form.type || "—"} en{" "}
-        {citySelected
-          ? `${citySelected.name} (${nameLeader})`
-          : "—"}
+        {citySelected ? `${citySelected.name} (${nameLeader})` : "—"}
       </div>
 
       <div className="flex items-center justify-end gap-2 pt-1">

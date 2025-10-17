@@ -13,16 +13,16 @@ export async function createSectionalService(sectional: createSectional) {
   }
 }
 
-export async function changeLeaderSectionalService(newLeader:any) {
-    try {
-        const response = await axios.post(
-            `http://localhost:8080/headquarters/change-leader`,
-            newLeader,
-        );
-        return response.data;
-    } catch (error) {
-        console.error(error);
-    }
+export async function changeLeaderSectionalService(newLeader: any) {
+  try {
+    const response = await axios.post(
+      `http://localhost:8080/headquarters/change-leader`,
+      newLeader,
+    );
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 export async function getSectionalInfo() {
@@ -37,14 +37,14 @@ export async function getSectionalInfo() {
 }
 
 export async function getSectionalCreate() {
-    try {
-        const response = await axios.get(
-            "http://localhost:8080/headquarters/MissingProgram",
-        );
-        return response.data;
-    } catch (error) {
-        console.error(error);
-    }
+  try {
+    const response = await axios.get(
+      "http://localhost:8080/headquarters/MissingProgram",
+    );
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 export async function deleteSectional(id: string) {

@@ -20,11 +20,13 @@ export async function getGroup() {
   }
 }
 
-export async function getGroupTable(id:string) {
-    try {
-        const response = await axios.get(`http://localhost:8080/headquarters/table/${id}`);
-        return response.data;
-    } catch (error) {
-        console.error(error);
-    }
+export async function getGroupTable(id: string) {
+  try {
+    const response = await axios.get(
+      `http://localhost:8080/headquarters/table/${id}`,
+    );
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
 }

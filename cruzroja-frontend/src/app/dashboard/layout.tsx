@@ -1,19 +1,14 @@
-"use client";
-import { useState } from "react";
-import { AppSidebar } from "@/components/layout/sidebar";
-import { Topbar } from "@/components/layout/topbar";
+import { cookies } from "next/headers";
+import { DashboardShell } from "./shell";
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
+export default async function DashboardLayout({
+                                                  children,
+                                              }: {
+    children: React.ReactNode;
 }) {
-  const [open, setOpen] = useState(false); // para móvil
-  return (
-    <div className="min-h-screen bg-slate-50 md:pl-64">
-      <Topbar onOpenSidebar={() => setOpen(true)} />
-      <AppSidebar open={open} setOpen={setOpen} />
-      <main className="p-4 md:p-6 lg:p-8">{children}</main>
-    </div>
-  );
+    const cookieStore = await cookies();
+    const raw = cookieStore.get("cr_role")?.value ?? null;
+    const initialRole = raw ? decodeURIComponent(raw) : null;
+
+    return <DashboardShell initialRole={initialRole}>{children}</DashboardShell>;
 }

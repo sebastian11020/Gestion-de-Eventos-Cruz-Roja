@@ -1,5 +1,5 @@
 export type FormState = {
-  id?: string,
+  id?: string;
   typeDocument?: string;
   document?: string;
   carnet?: string;
@@ -8,10 +8,11 @@ export type FormState = {
   bloodType?: string;
   sex?: string;
   gender?: string;
+  skills?:skill[];
   state: {
-      id:string;
-      name: string;
-  }
+    id: string;
+    name: string;
+  };
   bornDate?: string;
   department?: string;
   city?: {
@@ -56,6 +57,7 @@ export type formCreatePerson = {
   sex: string;
   gender: string;
   phone: string;
+  skills:string[]
   emergencyContact: {
     name: string;
     relationShip: string;
@@ -110,9 +112,9 @@ export type program = {
   id_program?: string;
   name: string;
   sectional?: {
-      id: string;
-      name: string;
-  }
+    id: string;
+    name: string;
+  };
   group?: string;
   numberVolunteers?: string;
   leader?: {
@@ -133,7 +135,7 @@ export type leaderDataTable = {
 export type createSectional = {
   idLocation: string;
   type: string;
-  leader?:string;
+  leader?: string;
 };
 
 export type createGroup = {
@@ -156,7 +158,7 @@ export type event = {
 
 export type createProgram = {
   name?: string;
-  leader?:string;
+  leader?: string;
   id_group?: string;
   idProgram?: string;
   idHeadquarters?: string;
@@ -190,7 +192,18 @@ export type eps = {
 };
 
 export type state = {
+  id: string;
+  name: string;
+  type: string;
+};
+
+export type user = {
+  name: string;
+  lastName: string;
+  role: string;
+};
+
+export type skill = {
     id: string;
-    name: string;
-    type:string;
+    name?: string;
 }

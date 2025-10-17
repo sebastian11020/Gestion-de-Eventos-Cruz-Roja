@@ -1,23 +1,23 @@
 import { useState, useEffect } from "react";
-import {getSectionalCreate} from "@/services/serviceCreateSectional";
+import { getSectionalCreate } from "@/services/serviceCreateSectional";
 import { getProgramService } from "@/services/serviceCreateProgram";
-import type {leaderDataTable, program} from "@/types/usertType";
+import type { leaderDataTable, program } from "@/types/usertType";
 import type { SectionalNode } from "@/types/programType";
-import {getPersonTable} from "@/services/serviceGetPerson";
+import { getPersonTable } from "@/services/serviceGetPerson";
 
 export function useProgramsData() {
   const [items, setItems] = useState<program[]>([]);
   const [sectionals, setSectionals] = useState<SectionalNode[]>([]);
-  const [users,setUsers] = useState<leaderDataTable[]>([])
+  const [users, setUsers] = useState<leaderDataTable[]>([]);
   const [loading, setLoading] = useState(false);
 
   async function loadAll() {
     setLoading(true);
     try {
-      const [programsData, sectionalsData,usersData] = await Promise.all([
+      const [programsData, sectionalsData, usersData] = await Promise.all([
         getProgramService(),
         getSectionalCreate(),
-        getPersonTable()
+        getPersonTable(),
       ]);
       setItems(programsData);
       setSectionals(sectionalsData);
@@ -30,5 +30,5 @@ export function useProgramsData() {
   useEffect(() => {
     loadAll();
   }, []);
-  return { items, sectionals,users, loading, reload: loadAll };
+  return { items, sectionals, users, loading, reload: loadAll };
 }

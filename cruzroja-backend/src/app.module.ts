@@ -55,6 +55,6 @@ import { PersonSkillModule } from './modules/person-skill/person-skill.module';
     PersonSkillModule,
   ],
   controllers: [AppController],
-  providers: [AppService, PersonSkillService],
+  providers: [AppService],
 })
 export class AppModule {}

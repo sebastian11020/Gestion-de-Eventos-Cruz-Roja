@@ -75,7 +75,7 @@ export default function ViewUser({ infUser, onClose }: viewUserProps) {
   const photo = "/4792929.png";
 
   const viewUI = (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto md:overflow-hidden ">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto">
       {/* overlay + blur */}
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
