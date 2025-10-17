@@ -124,7 +124,10 @@ export class HeadquartersService {
             }
           }
         } else {
-          if (await this.thereIsSectionalInDepartment(location)) {
+          if (
+            dto.type === HeadquartersTypeEnum.SEDE_SECCIONAL &&
+            (await this.thereIsSectionalInDepartment(location))
+          ) {
             conflict('Solo puede haber una sede seccional por departamento');
           }
           message = 'La sede se creo correctamente';
