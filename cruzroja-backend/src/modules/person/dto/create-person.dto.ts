@@ -1,4 +1,5 @@
 import {
+  IsArray,
   IsDefined,
   IsEmail,
   IsEnum,
@@ -95,4 +96,8 @@ export class CreatePersonDto {
   @IsString()
   @IsNotEmpty()
   password: string;
+  @IsArray()
+  @IsNotEmpty()
+  @Type(() => Number)
+  skills: number[];
 }

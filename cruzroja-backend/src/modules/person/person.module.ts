@@ -7,6 +7,7 @@ import { EpsPersonModule } from '../eps-person/eps-person.module';
 import { GroupStatusModule } from '../group-status/group-status.module';
 import { ProgramStatusModule } from '../program-status/program-status.module';
 import { EmailModule } from '../email/email.module';
+import { PersonSkillModule } from '../person-skill/person-skill.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { EmailModule } from '../email/email.module';
     ProgramStatusModule,
     EpsPersonModule,
     EmailModule,
+    PersonSkillModule,
   ],
   providers: [PersonService],
   controllers: [PersonController],

@@ -25,7 +25,6 @@ export class EpsPersonService {
       where: {
         id_person: id_person,
         id_eps: id_eps,
-        state: true,
       },
     });
   }

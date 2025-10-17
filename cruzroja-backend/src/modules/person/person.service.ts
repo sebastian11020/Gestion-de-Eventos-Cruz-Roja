@@ -27,6 +27,8 @@ import { EmailService } from '../email/email.service';
 import { SendEmail } from '../email/dto/send-email.dto';
 import { GetPersons } from './dto/get-person.dto';
 import { GetLoginPersonDto } from './dto/get-login-person.dto';
+import { PersonSkillService } from '../person-skill/person-skill.service';
+import { PersonSkill } from '../person-skill/entity/person-skill.entity';
 
 @Injectable()
 export class PersonService {
@@ -37,6 +39,7 @@ export class PersonService {
     private programStatusService: ProgramStatusService,
     private epsPersonService: EpsPersonService,
     private nodeEmailerService: EmailService,
+    private personSkillService: PersonSkillService,
   ) {}
 
   async getLoginPerson(id: string): Promise<GetLoginPersonDto> {
@@ -185,6 +188,7 @@ export class PersonService {
         dto.id_program,
       );
       await this.associateStatus(manager, dto.id, dto.id_state);
+      await this.associateSkills(manager, dto.skills, dto.id);
       await this.sendEmail(dto.email, dto.password);
       return { success: true, message: 'Persona creada exitosamente.' };
     });
@@ -226,6 +230,7 @@ export class PersonService {
       });
       await this.associateEps(manager, id, dto.id_eps, dto.type_affiliation);
       await this.associateStatus(manager, id, dto.id_state);
+      await this.associateSkills(manager, dto.skills, id);
       return { success: true, message: 'Persona actualizada exitosamente.' };
     });
   }
@@ -244,7 +249,9 @@ export class PersonService {
         dto.id_person = id_person;
         dto.id_eps = id_eps;
         dto.affiliation = affiliation;
-        await manager.save(manager.create(EpsPerson, dto));
+        await manager.update(EpsPerson, currentEps.id_eps, {
+          affiliation: affiliation,
+        });
       }
     } else {
       const dto = new CreateEpsPersonDTO();
@@ -295,6 +302,59 @@ export class PersonService {
     await manager
       .getRepository(PersonRole)
       .insert(this.createRolePerson(manager, dto));
+  }
+
+  private async associateSkills(
+    manager: EntityManager,
+    ids_skills: number[],
+    id_person: string,
+  ) {
+    let currentSkills =
+      await this.personSkillService.getSkillsPerson(id_person);
+    for (const id_skill of ids_skills) {
+      const personSkill = await this.personSkillService.findByIds(
+        id_person,
+        id_skill,
+      );
+      if (personSkill) {
+        currentSkills = currentSkills.filter(
+          (ps) => ps.id_skill != personSkill?.id_skill,
+        );
+        if (!personSkill.state) {
+          await manager.update(
+            PersonSkill,
+            { id_skill, id_person },
+            {
+              state: true,
+            },
+          );
+        }
+      } else {
+        await manager.save(
+          manager.create(PersonSkill, {
+            person: {
+              id: id_person,
+            },
+            skill: {
+              id: id_skill,
+            },
+          }),
+        );
+      }
+    }
+    if (currentSkills.length > 0)
+      await this.deactivateSkill(manager, currentSkills);
+  }
+
+  private async deactivateSkill(
+    manager: EntityManager,
+    person_skills: PersonSkill[],
+  ) {
+    for (const person_skill of person_skills) {
+      await manager.update(PersonSkill, person_skill.id_skill, {
+        state: false,
+      });
+    }
   }
 
   private createRolePerson(manager: EntityManager, dto: CreatePersonRoleDto) {
