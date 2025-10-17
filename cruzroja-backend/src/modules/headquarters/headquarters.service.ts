@@ -91,6 +91,9 @@ export class HeadquartersService {
           where: {
             id: dto.idLocation,
           },
+          relations: {
+            parent: true,
+          },
         });
         assertFound(
           location,
@@ -115,11 +118,15 @@ export class HeadquartersService {
           } else {
             message = 'La sede se reactivo correctamente';
             if (headquarter.type != dto.type) {
-              headquarter.type = dto.type;
-              await manager.update(Headquarters, headquarter.id, headquarter);
+              await manager.update(Headquarters, headquarter.id, {
+                type: dto.type,
+              });
             }
           }
         } else {
+          if (await this.thereIsSectionalInDepartment(location)) {
+            conflict('Solo puede haber una sede seccional por departamento');
+          }
           message = 'La sede se creo correctamente';
           headquarter = manager.create(Headquarters, {
             type: dto.type,
@@ -137,6 +144,20 @@ export class HeadquartersService {
         return { success: true, message: message };
       },
     );
+  }
+
+  private async thereIsSectionalInDepartment(location: Location) {
+    const headquarters = await this.headquartersRepository.findOne({
+      where: {
+        type: HeadquartersTypeEnum.SEDE_SECCIONAL,
+        location: {
+          parent: {
+            id: location.parent?.id ?? 0,
+          },
+        },
+      },
+    });
+    return headquarters != null;
   }
 
   private async assignLeader(

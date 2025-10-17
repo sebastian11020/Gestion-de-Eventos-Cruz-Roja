@@ -22,7 +22,6 @@ import { GroupStatusModule } from './modules/group-status/group-status.module';
 import { ProgramStatusModule } from './modules/program-status/program-status.module';
 import { EmailModule } from './modules/email/email.module';
 import { SkillModule } from './modules/skill/skill.module';
-import { PersonSkillService } from './modules/person-skill/person-skill.service';
 import { PersonSkillModule } from './modules/person-skill/person-skill.module';
 
 @Module({
