@@ -1,4 +1,5 @@
 import {
+  IsArray,
   IsDefined,
   IsEmail,
   IsEnum,
@@ -89,4 +90,8 @@ export class UpdatePersonDto {
   @IsOptional()
   @Min(1)
   id_state: number;
+  @IsArray()
+  @IsNotEmpty()
+  @Type(() => Number)
+  skills: number[];
 }
