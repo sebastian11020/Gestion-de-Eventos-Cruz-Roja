@@ -153,6 +153,7 @@ export class HeadquartersService {
         location: {
           parent: {
             id: location.parent?.id ?? 0,
+            type: LocationTypeEnum.DEPARTAMENTO,
           },
         },
       },

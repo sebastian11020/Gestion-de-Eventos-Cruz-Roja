@@ -283,25 +283,34 @@ export class PersonService {
     id_group?: number,
     id_program?: number,
   ) {
-    const dto = new CreatePersonRoleDto();
-    dto.id_role = 5;
-    dto.id_person = id_person;
-    dto.id_headquarters = id_headquarters;
+    const newRole = manager.create(PersonRole, {
+      person: {
+        id: id_person,
+      },
+      headquarters: {
+        id: id_headquarters,
+      },
+      role: {
+        id: 5,
+      },
+      group: id_group
+        ? {
+            id: id_group,
+          }
+        : undefined,
+      program: id_program
+        ? {
+            id: id_program,
+          }
+        : undefined,
+    });
     if (id_group) {
-      dto.id_group_headquarters = await this.checkGroupStatus(
-        id_headquarters,
-        id_group,
-      );
+      newRole.group.id = id_group;
     }
     if (id_program) {
-      dto.id_program_headquarters = await this.checkProgramStatus(
-        id_headquarters,
-        id_program,
-      );
+      newRole.program.id = id_program;
     }
-    await manager
-      .getRepository(PersonRole)
-      .insert(this.createRolePerson(manager, dto));
+    await manager.getRepository(PersonRole).insert(newRole);
   }
 
   private async associateSkills(
