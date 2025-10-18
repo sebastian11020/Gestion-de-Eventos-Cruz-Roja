@@ -300,12 +300,22 @@ export class PersonService {
       },
       group: id_group
         ? {
-            id: id_group,
+            group: {
+              id: id_group,
+            },
+            headquarters: {
+              id: id_headquarters,
+            },
           }
         : undefined,
       program: id_program
         ? {
-            id: id_program,
+            program: {
+              id: id_program,
+            },
+            headquarters: {
+              id: id_headquarters,
+            },
           }
         : undefined,
     });
@@ -397,7 +407,7 @@ export class PersonService {
         norm(currentRole.group.id) === norm(id_program);
       if (!samePlacement) {
         if (currentRole.role.id === 5) {
-          await manager.update(PersonRole, currentRole.role, {
+          await manager.update(PersonRole, currentRole.id, {
             end_date: new Date(),
           });
           await this.associateRole(
