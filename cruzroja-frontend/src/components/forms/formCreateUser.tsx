@@ -34,16 +34,28 @@ export default function VolunteerWizard({
   ];
   const progress = Math.round(((step + 1) / steps.length) * 100);
   const [form, setForm] = useState<formCreatePerson>(INITIAL_FORM);
-  const { cities, eps, sectionals,skills} = useSectionalsNode();
+  const { cities, eps, sectionals} = useSectionalsNode();
 
   useEffect(() => {
-    if (!open) return;
     if (editForm) {
       setForm(editForm);
     } else {
       setForm(INITIAL_FORM);
     }
-  }, [open, editForm]);
+  }, [editForm]);
+
+    useEffect(() => {
+        if (!open) {
+            setForm(INITIAL_FORM);
+            setStep(0);
+        }
+    }, [open]);
+
+    const handleClose = () => {
+        setForm(INITIAL_FORM);
+        setStep(0);
+        onClose();
+    };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -105,30 +117,29 @@ export default function VolunteerWizard({
   const prev = () => setStep((s) => Math.max(0, s - 1));
 
   const resetForm = () => {
+    handleClose();
     setForm(INITIAL_FORM);
     setStep(0);
   };
 
-  const submit = () => {
-    resetForm();
-    onSubmit(form);
-  };
+    const submit = () => {
+        onSubmit(form);
+        setForm(INITIAL_FORM);
+        setStep(0);
+    };
 
   if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-[100]">
-      {/* overlay */}
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/50"/>
       {/* modal */}
       <div className="absolute left-1/2 top-1/2 w-[95vw] max-w-3xl -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white shadow-2xl overflow-hidden">
         {/* header */}
-        <Header onClose={onClose} />
+        <Header onClose={handleClose} />
 
         <Progress progress={progress} />
         <Stepper steps={steps} step={step} />
-
-        {/* body */}
         <div className="max-h[65vh] md:max-h-[65vh] overflow-y-auto px-6 pb-6 pt-4">
           {step === 0 && (
             <StepIdentification form={form} handleChange={handleChange} />
@@ -168,7 +179,7 @@ export default function VolunteerWizard({
           step={step}
           stepsLen={steps.length}
           canNext={!!canNext}
-          onClose={onClose}
+          onClose={handleClose}
           onReset={resetForm}
           onPrev={prev}
           onNext={next}

@@ -76,14 +76,11 @@ export default function ViewUser({ infUser, onClose }: viewUserProps) {
 
   const viewUI = (
     <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto">
-      {/* overlay + blur */}
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
       />
-
-      {/* modal glassy */}
-      <div className="relative z-[101] w-[96vw] max-w-7xl max-h-[95vh] overflow-hidden rounded-3xl bg-white/90 shadow-[0_10px_40px_-5px_rgba(0,0,0,0.25)] ring-1 ring-black/5 md:overflow-hidden  max-h-[90vh] overflow-y-auto">
+      <div className="relative z-[101] w-[96vw] max-w-7xl max-h-[95vh] rounded-3xl bg-white/90 shadow-[0_10px_40px_-5px_rgba(0,0,0,0.25)] ring-1 ring-black/5  max-h-[90vh] overflow-y-auto">
         {/* header degradado */}
         <div className="relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 opacity-90" />
@@ -238,6 +235,7 @@ export default function ViewUser({ infUser, onClose }: viewUserProps) {
                 items={[
                   ["Estado", data?.state.name],
                   ["Tipo de sangre", data?.bloodType],
+                  ["Habilidades",data?.skills?.map((s)=>s.name).join(", ")]
                 ]}
               />
             </CardBlock>

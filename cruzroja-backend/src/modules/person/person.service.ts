@@ -91,6 +91,7 @@ export class PersonService {
           state: {
             id: 3,
           },
+          end_date: IsNull(),
         },
       },
       relations: {

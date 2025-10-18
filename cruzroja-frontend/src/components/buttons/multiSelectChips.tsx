@@ -6,15 +6,15 @@ import { cn } from "@/lib/utils";
 export type MultiOption = { id: string; name: string };
 
 export function MultiSelectChips({
-                                     options,
-                                     value,
+                                     options = [],
+                                     value = [],
                                      onChange,
                                      placeholder = "Seleccionar…",
                                      disabled,
                                      className,
                                  }: {
-    options: MultiOption[];
-    value: string[];
+    options?: MultiOption[];
+    value?: string[];
     onChange: (next: string[]) => void;
     placeholder?: string;
     disabled?: boolean;
@@ -23,34 +23,39 @@ export function MultiSelectChips({
     const [open, setOpen] = React.useState(false);
     const ref = React.useRef<HTMLDivElement>(null);
 
-    const baseId =
-        React.useMemo(
-            () => options.find((o) => o.name.toLowerCase() === "base")?.id ?? "3",
-            [options]
-        );
+    // Siempre trabaja con un arreglo “seguro”
+    const safeValue = Array.isArray(value) ? value : [];
+
+    const baseId = React.useMemo(
+        () => options.find((o) => o.name.toLowerCase() === "base")?.id ?? "3",
+        [options]
+    );
+
+    // Garantiza que "base" siempre esté seleccionado
     React.useEffect(() => {
-        if (!value.includes(baseId)) {
-            onChange([...value, baseId]);
+        if (!safeValue.includes(baseId)) {
+            onChange([...safeValue, baseId]);
         }
-    }, [baseId, value]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [baseId]); // evitar re-ejecutar por cada cambio de value
 
     const selected = React.useMemo(
-        () => options.filter((o) => value.includes(o.id)),
-        [options, value]
+        () => options.filter((o) => safeValue.includes(o.id)),
+        [options, safeValue]
     );
+
     const remaining = React.useMemo(
-        () => options.filter((o) => !value.includes(o.id)),
-        [options, value]
+        () => options.filter((o) => !safeValue.includes(o.id)),
+        [options, safeValue]
     );
 
     const remove = (id: string) => {
-        // No permitir quitar "Base"
-        if (id === baseId) return;
-        onChange(value.filter((v) => v !== id));
+        if (id === baseId) return; // no quitar "base"
+        onChange(safeValue.filter((v) => v !== id));
     };
 
     const add = (id: string) => {
-        if (!value.includes(id)) onChange([...value, id]);
+        if (!safeValue.includes(id)) onChange([...safeValue, id]);
     };
 
     React.useEffect(() => {
@@ -83,7 +88,6 @@ export function MultiSelectChips({
                             aria-label={o.name}
                         >
               {o.name}
-                            {/* Ocultar botón de quitar si es "Base" */}
                             {o.id !== baseId && (
                                 <button
                                     type="button"
