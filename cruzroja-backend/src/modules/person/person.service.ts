@@ -188,13 +188,6 @@ export class PersonService {
       await this.associateStatus(manager, dto.id, dto.id_state);
       await this.associateSkills(manager, dto.skills, dto.id);
       await this.sendEmail(dto.email, dto.password);
-      await this.checkCurrentRolePerson(
-        manager,
-        dto.id,
-        dto.id_headquarters,
-        dto.id_group,
-        dto.id_program,
-      );
       return { success: true, message: 'Persona creada exitosamente.' };
     });
   }
@@ -233,6 +226,13 @@ export class PersonService {
           id: dto.id_location,
         },
       });
+      await this.checkCurrentRolePerson(
+        manager,
+        id,
+        dto.id_headquarters,
+        dto.id_group,
+        dto.id_program,
+      );
       await this.associateEps(manager, id, dto.id_eps, dto.type_affiliation);
       await this.associateStatus(manager, id, dto.id_state);
       await this.associateSkills(manager, dto.skills, id);
