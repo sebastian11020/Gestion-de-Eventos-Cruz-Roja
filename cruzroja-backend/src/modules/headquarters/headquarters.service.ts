@@ -273,7 +273,7 @@ export class HeadquartersService {
       headquarter,
       `No se encontro una sede con el sigueinte id: ${id}`,
     );
-    if (await this.personService.thereAreActiveVolunteersActive(id)) {
+    if (await this.personService.thereAreActiveVolunteers(id)) {
       return {
         success: false,
         message:

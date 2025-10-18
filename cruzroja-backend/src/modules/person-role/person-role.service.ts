@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, Repository } from 'typeorm';
 import { PersonRole } from './entity/person-role.entity';
-import { CreatePersonRoleDto } from './dto/create-person-rol.dto';
+import { IsNull, Repository } from 'typeorm';
 
 @Injectable()
 export class PersonRoleService {
@@ -11,14 +10,19 @@ export class PersonRoleService {
     private personRoleRepository: Repository<PersonRole>,
   ) {}
 
-  async create(dto: CreatePersonRoleDto) {
-    return this.personRoleRepository.manager.transaction(async (manager) => {});
-  }
-
-  private async findPersonCurrentRole(
-    manager: EntityManager,
-    id_person: number,
-  ): Promise<PersonRole | null> {
-    return await manager.findOne(PersonRole, {});
+  async findPersonCurrentRole(id_person: string): Promise<PersonRole | null> {
+    return await this.personRoleRepository.findOne({
+      where: {
+        person: {
+          id: id_person,
+        },
+        end_date: IsNull(),
+      },
+      relations: {
+        headquarters: true,
+        group: true,
+        program: true,
+      },
+    });
   }
 }
