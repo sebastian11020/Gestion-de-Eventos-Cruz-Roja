@@ -42,4 +42,8 @@ export class GetPersons {
   eps: { id?: string; name?: string; type?: string };
   totalHours?: string;
   monthHours?: string;
+  skills?: {
+    id: string;
+    name: string;
+  }[];
 }
