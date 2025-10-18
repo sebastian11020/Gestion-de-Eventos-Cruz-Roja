@@ -6,13 +6,8 @@ import { CreatePersonDto } from './dto/create-person.dto';
 import { type_affiliation } from '../eps-person/enum/eps-person.enum';
 import { CreateEpsPersonDTO } from '../eps-person/dto/create-eps-person.dto';
 import { EpsPerson } from '../eps-person/entity/eps-person.entity';
-import { CreatePersonRoleDto } from '../person-role/dto/create-person-rol.dto';
 import { PersonRole } from '../person-role/entity/person-role.entity';
-import { GroupHeadquarters } from '../group-headquarters/entity/group-headquarters.entity';
-import { ProgramHeadquarters } from '../program-headquarters/entity/program-headquarters.entity';
-import { Role } from '../role/entity/role.entity';
-import { Headquarters } from '../headquarters/entity/headquarters.entity';
-import { assertFound } from '../../common/utils/assert';
+import { assertFound, conflict } from '../../common/utils/assert';
 import { PersonStatus } from '../person-status/entity/person-status.entity';
 import { GetPersonTableDto } from './dto/get-person-table.dto';
 import {
@@ -29,6 +24,7 @@ import { GetPersons } from './dto/get-person.dto';
 import { GetLoginPersonDto } from './dto/get-login-person.dto';
 import { PersonSkillService } from '../person-skill/person-skill.service';
 import { PersonSkill } from '../person-skill/entity/person-skill.entity';
+import { PersonRoleService } from '../person-role/person-role.service';
 
 @Injectable()
 export class PersonService {
@@ -40,6 +36,7 @@ export class PersonService {
     private epsPersonService: EpsPersonService,
     private nodeEmailerService: EmailService,
     private personSkillService: PersonSkillService,
+    private personRoleService: PersonRoleService,
   ) {}
 
   async getLoginPerson(id: string): Promise<GetLoginPersonDto> {
@@ -91,6 +88,7 @@ export class PersonService {
           state: {
             id: 3,
           },
+          end_date: IsNull(),
         },
       },
       relations: {
@@ -190,6 +188,13 @@ export class PersonService {
       await this.associateStatus(manager, dto.id, dto.id_state);
       await this.associateSkills(manager, dto.skills, dto.id);
       await this.sendEmail(dto.email, dto.password);
+      await this.checkCurrentRolePerson(
+        manager,
+        dto.id,
+        dto.id_headquarters,
+        dto.id_group,
+        dto.id_program,
+      );
       return { success: true, message: 'Persona creada exitosamente.' };
     });
   }
@@ -304,12 +309,6 @@ export class PersonService {
           }
         : undefined,
     });
-    if (id_group) {
-      newRole.group.id = id_group;
-    }
-    if (id_program) {
-      newRole.program.id = id_program;
-    }
     await manager.getRepository(PersonRole).insert(newRole);
   }
 
@@ -352,41 +351,69 @@ export class PersonService {
       }
     }
     if (currentSkills.length > 0)
-      await this.deactivateSkill(manager, currentSkills);
+      await this.deactivateSkill(manager, currentSkills, id_person);
   }
 
   private async deactivateSkill(
     manager: EntityManager,
     person_skills: PersonSkill[],
+    id_person: string,
   ) {
     for (const person_skill of person_skills) {
-      await manager.update(PersonSkill, person_skill.id_skill, {
-        state: false,
-      });
+      const id_skill = person_skill.id_skill;
+      await manager.update(
+        PersonSkill,
+        { id_skill, id_person },
+        {
+          state: false,
+        },
+      );
     }
   }
 
-  private createRolePerson(manager: EntityManager, dto: CreatePersonRoleDto) {
-    const personStub = manager
-      .getRepository(Person)
-      .create({ id: dto.id_person });
-    const roleStub = manager.getRepository(Role).create({ id: dto.id_role });
-    const headquartersStub = manager
-      .getRepository(Headquarters)
-      .create({ id: dto.id_headquarters });
-    const groupHeadquartersStub = manager
-      .getRepository(GroupHeadquarters)
-      .create({ id: dto.id_group_headquarters });
-    const programHeadquartersStub = manager
-      .getRepository(ProgramHeadquarters)
-      .create({ id: dto.id_program_headquarters });
-    return manager.create(PersonRole, {
-      person: personStub,
-      role: roleStub,
-      headquarters: headquartersStub,
-      ...(groupHeadquartersStub ? { group: groupHeadquartersStub } : {}),
-      ...(programHeadquartersStub ? { program: programHeadquartersStub } : {}),
-    });
+  private async checkCurrentRolePerson(
+    manager: EntityManager,
+    id_person: string,
+    id_headquarters: number,
+    id_group?: number,
+    id_program?: number,
+  ) {
+    const norm = (v?: number | null) =>
+      v === undefined || v === null ? null : Number(v);
+    const currentRole =
+      await this.personRoleService.findPersonCurrentRole(id_person);
+    if (!currentRole) {
+      await this.associateRole(
+        manager,
+        id_person,
+        id_headquarters,
+        id_group,
+        id_program,
+      );
+    } else {
+      const samePlacement =
+        currentRole.headquarters.id === id_headquarters &&
+        norm(currentRole.group.id) === norm(id_group) &&
+        norm(currentRole.group.id) === norm(id_program);
+      if (!samePlacement) {
+        if (currentRole.role.id === 5) {
+          await manager.update(PersonRole, currentRole.role, {
+            end_date: new Date(),
+          });
+          await this.associateRole(
+            manager,
+            id_person,
+            id_headquarters,
+            id_group,
+            id_program,
+          );
+        } else {
+          conflict(
+            'No se puede cambiar la sede, agrupacion o programa de una persona que tenga un rol diferente a voluntario',
+          );
+        }
+      }
+    }
   }
 
   private async checkGroupStatus(id_headquarters: number, id_group: number) {
@@ -454,7 +481,7 @@ export class PersonService {
     }
   }
 
-  async thereAreActiveVolunteersActive(idHeadquarters: number) {
+  async thereAreActiveVolunteers(idHeadquarters: number) {
     const volunteers = await this.personRepository.count({
       where: {
         person_roles: {
@@ -471,7 +498,6 @@ export class PersonService {
         },
       },
     });
-    console.log(volunteers);
     return volunteers > 0;
   }
 }
