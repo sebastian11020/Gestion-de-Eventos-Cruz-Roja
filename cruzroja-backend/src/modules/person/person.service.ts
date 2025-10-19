@@ -403,8 +403,8 @@ export class PersonService {
     } else {
       const samePlacement =
         currentRole.headquarters.id === id_headquarters &&
-        norm(currentRole.group.id) === norm(id_group) &&
-        norm(currentRole.group.id) === norm(id_program);
+        norm(currentRole.group?.id) === norm(id_group) &&
+        norm(currentRole.group?.id) === norm(id_program);
       if (!samePlacement) {
         if (currentRole.role.id === 5) {
           await manager.update(PersonRole, currentRole.id, {
