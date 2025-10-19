@@ -24,6 +24,7 @@ import { EmailModule } from './modules/email/email.module';
 import { SkillModule } from './modules/skill/skill.module';
 import { PersonSkillModule } from './modules/person-skill/person-skill.module';
 import { ScopeModule } from './modules/scope/scope.module';
+import { EventFrameModule } from './modules/event-frame/event-frame.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { ScopeModule } from './modules/scope/scope.module';
     SkillModule,
     PersonSkillModule,
     ScopeModule,
+    EventFrameModule,
   ],
   controllers: [AppController],
   providers: [AppService],
