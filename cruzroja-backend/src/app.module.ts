@@ -23,6 +23,7 @@ import { ProgramStatusModule } from './modules/program-status/program-status.mod
 import { EmailModule } from './modules/email/email.module';
 import { SkillModule } from './modules/skill/skill.module';
 import { PersonSkillModule } from './modules/person-skill/person-skill.module';
+import { ScopeModule } from './modules/scope/scope.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { PersonSkillModule } from './modules/person-skill/person-skill.module';
     EmailModule,
     SkillModule,
     PersonSkillModule,
+    ScopeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

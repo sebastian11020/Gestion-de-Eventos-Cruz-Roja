@@ -92,7 +92,7 @@ export class GlobalHttpExceptionFilter implements ExceptionFilter {
       message = exception.message;
     }
 
-    res.status(status).json({
+    res.json({
       success: false,
       statusCode: status,
       message,
