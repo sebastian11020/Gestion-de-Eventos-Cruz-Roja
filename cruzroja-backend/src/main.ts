@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import 'reflect-metadata';
 import { ValidationPipe } from '@nestjs/common';
 import * as process from 'node:process';
+import { GlobalHttpExceptionFilter } from './common/filters/GlobalHttpExceptionFilter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -14,6 +15,8 @@ async function bootstrap() {
     }),
   );
   const allowedOrigins = process.env.ALLOWED_ORIGINS;
+
+  app.useGlobalFilters(new GlobalHttpExceptionFilter());
 
   app.enableCors({
     origin: allowedOrigins,
