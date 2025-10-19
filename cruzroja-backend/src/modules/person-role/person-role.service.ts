@@ -22,6 +22,7 @@ export class PersonRoleService {
         headquarters: true,
         group: true,
         program: true,
+        role: true,
       },
     });
   }
