@@ -13,7 +13,8 @@ import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import 'dayjs/locale/es';
 import { Repository } from 'typeorm';
-import { PersonService } from '../person/person.service';
+import { Person } from '../person/entity/person.entity';
+import { assertFound } from '../../common/utils/assert';
 
 @Injectable()
 export class EventService {
@@ -21,7 +22,6 @@ export class EventService {
     @InjectRepository(EventEntity)
     private eventRepository: Repository<EventEntity>,
     private groupHeadquartersService: GroupHeadquartersService,
-    private personService: PersonService,
   ) {}
 
   async create(eventForm: CreateEventForm) {
@@ -31,9 +31,12 @@ export class EventService {
           eventForm.sectionalId,
           eventForm.groupId,
         );
-      const coordinatorEvent = await this.personService.findByIdDto(
-        eventForm.attendant,
-      );
+      const coordinatorEvent = await manager.findOne(Person, {
+        where: {
+          document: eventForm.attendant,
+        },
+      });
+      assertFound(coordinatorEvent, 'No se encontro el encargado especificado');
       const newEvent = manager.create(EventEntity, {
         name: NormalizeString(eventForm.name),
         description: NormalizeString(eventForm.description),
@@ -58,7 +61,7 @@ export class EventService {
           id: eventForm.marcActivity,
         },
         person: {
-          id: coordinatorEvent.leader?.id,
+          id: coordinatorEvent.id,
         },
         headquarters: {
           id: eventForm.sectionalId,
