@@ -21,7 +21,7 @@ import GroupTable from "@/components/tables/groupTable";
 import ViewUser from "@/components/cards/viewUser";
 import ChangeLeaderTable from "@/components/tables/changeLeaderTable";
 import { ConfirmDialog } from "@/components/cards/confitmDialog";
-import { deleteSectional } from "@/services/serviceCreateSectional";
+import {createSectionalService, deleteSectional} from "@/services/serviceCreateSectional";
 import toast from "react-hot-toast";
 import { getGroupTable } from "@/services/serviceGetGroup";
 import { getPersonId } from "@/services/serviceGetPerson";
@@ -62,14 +62,24 @@ export function SectionalCard({
   }
 
   async function handleDelete() {
-    toast.loading("Eliminando sede", { duration: 1000 });
-    const response = await deleteSectional(idDelete);
-    if (response.success) {
-      toast.success("Sede eliminada correctamente", { duration: 3000 });
+      await toast.promise(
+          deleteSectional(idDelete).then((res) => {
+              if (!res.success) {
+                  return Promise.reject(res);
+              }
+              return res;
+          }),
+          {
+              loading: "Eliminando...",
+              success: (res: { message?: string }) => {
+                  return <b>{res.message ?? "Eliminado correctamente"}</b>;
+              },
+              error: (res: { message?: string }) => (
+                  <b>{res.message ?? "No se pudo eliminar"}</b>
+              ),
+          }
+      );
       await onDeleted?.();
-    } else {
-      toast.error(response.message, { duration: 3000 });
-    }
     setConfirmOpen(false);
   }
 

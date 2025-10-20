@@ -15,11 +15,13 @@ import { usePageNumbers } from "@/hooks/usedPaginatedNumbers";
 import { usePaginatedSearch } from "@/hooks/usePaginatedSearch";
 import { PageBtn } from "@/components/buttons/pageButton";
 import { CreateSectionalForm } from "@/components/forms/createSectionalForm";
-import {Loading} from "@/components/ui/loading";
+import { Loading } from "@/components/ui/loading";
+import {useSectionalsNode} from "@/hooks/useSectionalsNode";
 
 export default function Sedes() {
   const [open, setOpen] = useState(false);
   const { cities, sectionals, users, loading, reload } = useSedesData();
+  const {skills} = useSectionalsNode();
   const [query, setQuery] = useState("");
   const [openChangeLeader, setOpenChangeLeader] = useState(false);
   const [documentSelected, setDocumentSelected] = useState<string>("");
@@ -48,14 +50,26 @@ export default function Sedes() {
     setQuery("");
     setPage(1);
     const newPayload = { ...payload, leader: documentSelected };
-    toast.loading("Creando sede", { duration: 1000 });
-    const response = await createSectionalService(newPayload);
-    if (response.success) {
-      toast.success("Sede creada correctamente");
-      await reload();
-    } else {
-      toast.error("No se ha podido crear la sede");
-    }
+      await toast.promise(
+          createSectionalService(newPayload).then((res) => {
+              if (!res.success) {
+                  return Promise.reject(res);
+              }
+              return res;
+          }),
+          {
+              loading: "Guardando...",
+              success: (res: { message?: string }) => {
+                  setOpen(false);
+                  setQuery("");
+                  setPage(1);
+                  return <b>{res.message ?? "Creado correctamente"}</b>;
+              },
+              error: (res: { message?: string }) => (
+                  <b>{res.message ?? "No se pudo crear"}</b>
+              ),
+          }
+      );
   }
 
   return (
@@ -102,7 +116,7 @@ export default function Sedes() {
         {total === 1 ? "" : "s"}
       </div>
       {loading ? (
-          <Loading size="lg" label="Cargando Sedes"/>
+        <Loading size="lg" label="Cargando Sedes" />
       ) : paged.length === 0 ? (
         <div className="rounded-xl border border-dashed border-gray-300 bg-white p-8 text-center text-sm text-gray-600">
           {total === 0

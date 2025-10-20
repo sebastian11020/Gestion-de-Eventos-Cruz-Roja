@@ -140,8 +140,6 @@ export default function ChangeLeaderTable({
     <section className="space-y-3">
       {/* Toolbar */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-base font-semibold text-gray-900">Cambiar líder</h2>
-
         <div className="flex w-full items-center gap-2 sm:w-auto">
           <div className="relative w-full sm:w-80">
             <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />

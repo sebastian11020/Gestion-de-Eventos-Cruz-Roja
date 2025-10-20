@@ -1,7 +1,7 @@
 "use client";
 
 import { useSectionalsNode } from "@/hooks/useSectionalsNode";
-import {useMemo} from "react";
+import { useMemo } from "react";
 
 export function StepReview({
   form,
@@ -12,7 +12,7 @@ export function StepReview({
   cityMap: Map<string, string>;
   epsMap: Map<string, string> | undefined;
 }) {
-  const { sectionals,skills } = useSectionalsNode();
+  const { sectionals, skills } = useSectionalsNode();
   const sectionalMap = new Map<string, string>();
   sectionals.forEach((s) => sectionalMap.set(String(s.id), s.city));
   const { state } = useSectionalsNode();
@@ -32,19 +32,18 @@ export function StepReview({
     ),
   );
 
-    const skillsMap = useMemo(() => {
-        const m = new Map<string, string>();
-        (skills ?? []).forEach((s) => m.set(String(s.id), s.name ?? ""));
-        return m;
-    }, [skills]);
+  const skillsMap = useMemo(() => {
+    const m = new Map<string, string>();
+    (skills ?? []).forEach((s) => m.set(String(s.id), s.name ?? ""));
+    return m;
+  }, [skills]);
 
-    const selectedSkillNames = useMemo(() => {
-        const ids: string[] = Array.isArray(form.skills) ? form.skills : [];
-        return ids
-            .map((id) => skillsMap.get(String(id)))
-            .filter((n): n is string => !!n && n.length > 0);
-    }, [form.skills, skillsMap]);
-
+  const selectedSkillNames = useMemo(() => {
+    const ids: string[] = Array.isArray(form.skills) ? form.skills : [];
+    return ids
+      .map((id) => skillsMap.get(String(id)))
+      .filter((n): n is string => !!n && n.length > 0);
+  }, [form.skills, skillsMap]);
 
   return (
     <section className="space-y-3">
@@ -123,10 +122,10 @@ export function StepReview({
               <strong>Programa:</strong>{" "}
               {programMap.get(String(form.id_program)) ?? "—"}
             </li>
-              <li>
-                  <strong>Habilidades:</strong>{" "}
-                  {selectedSkillNames.length ? selectedSkillNames.join(" · ") : "—"}
-              </li>
+            <li>
+              <strong>Habilidades:</strong>{" "}
+              {selectedSkillNames.length ? selectedSkillNames.join(" · ") : "—"}
+            </li>
           </ul>
         </div>
         <div className="rounded-lg border p-3">

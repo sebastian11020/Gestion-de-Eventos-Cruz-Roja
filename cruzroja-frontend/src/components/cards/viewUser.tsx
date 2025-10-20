@@ -235,7 +235,7 @@ export default function ViewUser({ infUser, onClose }: viewUserProps) {
                 items={[
                   ["Estado", data?.state.name],
                   ["Tipo de sangre", data?.bloodType],
-                  ["Habilidades",data?.skills?.map((s)=>s.name).join(", ")]
+                  ["Habilidades", data?.skills?.map((s) => s.name).join(", ")],
                 ]}
               />
             </CardBlock>

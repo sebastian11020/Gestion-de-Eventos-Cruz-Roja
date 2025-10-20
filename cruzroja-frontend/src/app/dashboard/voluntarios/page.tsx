@@ -17,7 +17,8 @@ import {
 import toast from "react-hot-toast";
 import { getSupabaseUserId } from "@/utils/getSupabaseId";
 import { usePersonData } from "@/hooks/usePersonData";
-import {Loading} from "@/components/ui/loading";
+import { Loading } from "@/components/ui/loading";
+import {associateProgramService} from "@/services/serviceCreateProgram";
 
 function normalize(v: unknown) {
   return String(v ?? "").toLowerCase();
@@ -101,16 +102,24 @@ export default function voluntarios() {
   async function handleCreateOrUpdate(data: formCreatePerson) {
     try {
       if (editUser) {
-        console.log(data);
-        toast.loading("Actualizando voluntario", { duration: 1000 });
-        const response = await updatePersonService(data);
-        if (response.success) {
-          setOpenWizard(false);
-          toast.success(response.message, { duration: 1000 });
-          await reload();
-        } else {
-          toast.error(response.message);
-        }
+          await toast.promise(
+              updatePersonService(data).then((res) => {
+                  if (!res.success) {
+                      return Promise.reject(res);
+                  }
+                  return res;
+              }),
+              {
+                  loading: "Creando...",
+                  success: (res: { message?: string }) => {
+                      return <b>{res.message ?? "Creado correctamente"}</b>;
+                  },
+                  error: (res: { message?: string }) => (
+                      <b>{res.message ?? "No se pudo crear"}</b>
+                  ),
+              }
+          );
+          setOpenWizard(false)
       } else {
         const reg = await register(data);
         const newData = {
@@ -118,15 +127,24 @@ export default function voluntarios() {
           id: reg?.id ?? "",
           password: reg?.password ?? "",
         };
-        toast.loading("Creando voluntario", { duration: 3000 });
-        const response = await createPersonService(newData);
-        if (response.success) {
+          await toast.promise(
+              createPersonService(newData).then((res) => {
+                  if (!res.success) {
+                      return Promise.reject(res);
+                  }
+                  return res;
+              }),
+              {
+                  loading: "Creando...",
+                  success: (res: { message?: string }) => {
+                      return <b>{res.message ?? "Creando correctamente"}</b>;
+                  },
+                  error: (res: { message?: string }) => (
+                      <b>{res.message ?? "No se pudo asociar"}</b>
+                  ),
+              }
+          );
           setOpenWizard(false);
-          toast.success(response.message, { duration: 1000 });
-          await reload();
-        } else {
-          toast.error(response.message);
-        }
       }
       setEditUser(null);
     } catch (error) {
@@ -230,109 +248,121 @@ export default function voluntarios() {
           + Agregar Voluntario
         </Button>
       </div>
-        {loading ? (
-            <div className="mt-6 overflow-hidden rounded-xl border border-gray-200 shadow-sm">
-                <Loading size="lg" label="Cargando voluntarios…" minHeight="min-h-[260px]" />
-            </div>
-        ) : (
+      {loading ? (
         <div className="mt-6 overflow-hidden rounded-xl border border-gray-200 shadow-sm">
-            <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-            <thead className="sticky top-0 z-10 bg-white/80 backdrop-blur border-b">
-              <tr className="text-gray-600">
-                <th className="px-4 py-3 text-left font-semibold">Carnet</th>
-                <th className="px-4 py-3 text-left font-semibold">Tipo Doc</th>
-                <th className="px-4 py-3 text-left font-semibold">Documento</th>
-                <th className="px-4 py-3 text-left font-semibold">
-                  Nombre completo
-                </th>
-                <th className="px-4 py-3 text-left font-semibold">Celular</th>
-                <th className="px-4 py-3 text-left font-semibold">Seccional</th>
-                <th className="px-4 py-3 text-left font-semibold">Email</th>
-                <th className="px-4 py-3 text-left font-semibold">Estado</th>
-                <th className="px-4 py-3 text-right font-semibold">Acciones</th>
-              </tr>
-            </thead>
-
-            <tbody className="divide-y divide-gray-100">
-              {pageData.map((u) => (
-                <tr
-                  key={u.document}
-                  className="even:bg-gray-50/60 hover:bg-blue-50/50 transition-colors"
-                >
-                  <td className="px-4 py-3 text-gray-700">{u.carnet}</td>
-                  <td className="px-4 py-3 text-center text-gray-700">
-                    {u.typeDocument}
-                  </td>
-                  <td className="px-4 py-3 text-gray-700">{u.document}</td>
-
-                  {/* Nombre y email truncados con tooltip */}
-                  <td className="px-4 py-3 text-gray-800 max-w-[260px]">
-                    <div className="truncate font-medium" title={u.name}>
-                      {u.name} {u.lastName}
-                    </div>
-                  </td>
-
-                  <td className="px-4 py-3 text-gray-700">{u.cellphone}</td>
-                  <td className="px-4 py-3 text-gray-700">
-                    {u.sectional.city}
-                  </td>
-                  <td className="px-4 py-3 text-gray-700">
-                    <span
-                      className="truncate block max-w-[220px]"
-                      title={u.email}
-                    >
-                      {u.email}
-                    </span>
-                  </td>
-
-                  <td className="px-4 py-3">
-                    <span className={badgeClass(u.state.name)}>
-                      {u.state.name}
-                    </span>
-                  </td>
-                  {/* Acciones */}
-                  <td className="px-3 py-2">
-                    <div className="flex items-center justify-end gap-1.5">
-                      <button
-                        type="button"
-                        onClick={() => onView(u)}
-                        className="inline-flex items-center justify-center rounded-md p-2 hover:bg-blue-100 text-blue-700 hover:text-blue-800 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-                        aria-label={`Ver ${u.name} ${u.lastName}`}
-                        title="Ver"
-                      >
-                        <Eye className="size-4" />
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => onEdit(u)}
-                        className="inline-flex items-center justify-center rounded-md p-2 hover:bg-amber-100 text-amber-700 hover:text-amber-800 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
-                        aria-label={`Editar ${u.name} ${u.lastName}`}
-                        title="Editar"
-                      >
-                        <PencilLine className="size-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-
-              {pageData.length === 0 && (
-                <tr>
-                  <td
-                    className="px-4 py-8 text-center text-gray-500"
-                    colSpan={9}
-                  >
-                    No se encontraron resultados para “{filtro}”.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+          <Loading
+            size="lg"
+            label="Cargando voluntarios…"
+            minHeight="min-h-[260px]"
+          />
         </div>
-      </div>
-        )}
+      ) : (
+        <div className="mt-6 overflow-hidden rounded-xl border border-gray-200 shadow-sm">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="sticky top-0 z-10 bg-white/80 backdrop-blur border-b">
+                <tr className="text-gray-600">
+                  <th className="px-4 py-3 text-left font-semibold">Carnet</th>
+                  <th className="px-4 py-3 text-left font-semibold">
+                    Tipo Doc
+                  </th>
+                  <th className="px-4 py-3 text-left font-semibold">
+                    Documento
+                  </th>
+                  <th className="px-4 py-3 text-left font-semibold">
+                    Nombre completo
+                  </th>
+                  <th className="px-4 py-3 text-left font-semibold">Celular</th>
+                  <th className="px-4 py-3 text-left font-semibold">
+                    Seccional
+                  </th>
+                  <th className="px-4 py-3 text-left font-semibold">Email</th>
+                  <th className="px-4 py-3 text-left font-semibold">Estado</th>
+                  <th className="px-4 py-3 text-right font-semibold">
+                    Acciones
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody className="divide-y divide-gray-100">
+                {pageData.map((u) => (
+                  <tr
+                    key={u.document}
+                    className="even:bg-gray-50/60 hover:bg-blue-50/50 transition-colors"
+                  >
+                    <td className="px-4 py-3 text-gray-700">{u.carnet}</td>
+                    <td className="px-4 py-3 text-center text-gray-700">
+                      {u.typeDocument}
+                    </td>
+                    <td className="px-4 py-3 text-gray-700">{u.document}</td>
+
+                    {/* Nombre y email truncados con tooltip */}
+                    <td className="px-4 py-3 text-gray-800 max-w-[260px]">
+                      <div className="truncate font-medium" title={u.name}>
+                        {u.name} {u.lastName}
+                      </div>
+                    </td>
+
+                    <td className="px-4 py-3 text-gray-700">{u.cellphone}</td>
+                    <td className="px-4 py-3 text-gray-700">
+                      {u.sectional.city}
+                    </td>
+                    <td className="px-4 py-3 text-gray-700">
+                      <span
+                        className="truncate block max-w-[220px]"
+                        title={u.email}
+                      >
+                        {u.email}
+                      </span>
+                    </td>
+
+                    <td className="px-4 py-3">
+                      <span className={badgeClass(u.state.name)}>
+                        {u.state.name}
+                      </span>
+                    </td>
+                    {/* Acciones */}
+                    <td className="px-3 py-2">
+                      <div className="flex items-center justify-end gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => onView(u)}
+                          className="inline-flex items-center justify-center rounded-md p-2 hover:bg-blue-100 text-blue-700 hover:text-blue-800 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                          aria-label={`Ver ${u.name} ${u.lastName}`}
+                          title="Ver"
+                        >
+                          <Eye className="size-4" />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => onEdit(u)}
+                          className="inline-flex items-center justify-center rounded-md p-2 hover:bg-amber-100 text-amber-700 hover:text-amber-800 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+                          aria-label={`Editar ${u.name} ${u.lastName}`}
+                          title="Editar"
+                        >
+                          <PencilLine className="size-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+
+                {pageData.length === 0 && (
+                  <tr>
+                    <td
+                      className="px-4 py-8 text-center text-gray-500"
+                      colSpan={9}
+                    >
+                      No se encontraron resultados para “{filtro}”.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {/* Footer de paginación */}
       <div className="flex flex-col  mt-6  ">

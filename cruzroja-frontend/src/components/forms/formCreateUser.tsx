@@ -34,7 +34,7 @@ export default function VolunteerWizard({
   ];
   const progress = Math.round(((step + 1) / steps.length) * 100);
   const [form, setForm] = useState<formCreatePerson>(INITIAL_FORM);
-  const { cities, eps, sectionals} = useSectionalsNode();
+  const { cities, eps, sectionals } = useSectionalsNode();
 
   useEffect(() => {
     if (editForm) {
@@ -44,18 +44,18 @@ export default function VolunteerWizard({
     }
   }, [editForm]);
 
-    useEffect(() => {
-        if (!open) {
-            setForm(INITIAL_FORM);
-            setStep(0);
-        }
-    }, [open]);
+  useEffect(() => {
+    if (!open) {
+      setForm(INITIAL_FORM);
+      setStep(0);
+    }
+  }, [open]);
 
-    const handleClose = () => {
-        setForm(INITIAL_FORM);
-        setStep(0);
-        onClose();
-    };
+  const handleClose = () => {
+    setForm(INITIAL_FORM);
+    setStep(0);
+    onClose();
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -122,17 +122,17 @@ export default function VolunteerWizard({
     setStep(0);
   };
 
-    const submit = () => {
-        onSubmit(form);
-        setForm(INITIAL_FORM);
-        setStep(0);
-    };
+  const submit = () => {
+    onSubmit(form);
+    setForm(INITIAL_FORM);
+    setStep(0);
+  };
 
   if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-[100]">
-      <div className="absolute inset-0 bg-black/50"/>
+      <div className="absolute inset-0 bg-black/50" />
       {/* modal */}
       <div className="absolute left-1/2 top-1/2 w-[95vw] max-w-3xl -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white shadow-2xl overflow-hidden">
         {/* header */}
@@ -144,13 +144,15 @@ export default function VolunteerWizard({
           {step === 0 && (
             <StepIdentification form={form} handleChange={handleChange} />
           )}
-            {step === 1 && (
-                <StepPersonal
-                    form={form}
-                    handleChange={handleChange}
-                    onChangeSkills={(next) => setForm((f) => ({ ...f, skills: next }))}
-                />
-            )}
+          {step === 1 && (
+            <StepPersonal
+              form={form}
+              handleChange={handleChange}
+              onChangeSkills={(next) =>
+                setForm((f) => ({ ...f, skills: next }))
+              }
+            />
+          )}
           {step === 2 && (
             <StepLocationContact
               form={form}

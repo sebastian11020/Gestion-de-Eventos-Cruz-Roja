@@ -30,6 +30,7 @@ import toast from "react-hot-toast";
 import { deleteGroup, updateGroup } from "@/services/serviceCreateGroups";
 import { getProgramTable } from "@/services/serviceCreateProgram";
 import { getPersonId } from "@/services/serviceGetPerson";
+import {deleteSectional} from "@/services/serviceCreateSectional";
 
 type SectionalCardProps = {
   sectional?: TSectional;
@@ -64,14 +65,24 @@ export function GroupCard({ group, users, onDeleted }: SectionalCardProps) {
     if (!next) return;
     setLocalName(next);
     setEditing(false);
-    toast.loading("Editando agrupacion", { duration: 1000 });
-    const response = await updateGroup(id, nameDraft);
-    if (response.success) {
-      toast.success("Actualizada correctamente", { duration: 3000 });
+      await toast.promise(
+          updateGroup(id,nameDraft).then((res) => {
+              if (!res.success) {
+                  return Promise.reject(res);
+              }
+              return res;
+          }),
+          {
+              loading: "Eliminando...",
+              success: (res: { message?: string }) => {
+                  return <b>{res.message ?? "Eliminado correctamente"}</b>;
+              },
+              error: (res: { message?: string }) => (
+                  <b>{res.message ?? "No se pudo eliminar"}</b>
+              ),
+          }
+      );
       await onDeleted?.();
-    } else {
-      toast.error(response.message, { duration: 3000 });
-    }
   }
 
   async function onView(id: string) {
@@ -91,16 +102,25 @@ export function GroupCard({ group, users, onDeleted }: SectionalCardProps) {
 
   async function handleDelete() {
     try {
-      toast.loading("Eliminando Agrupacion", { duration: 3000 });
-      const response = await deleteGroup(deleteGroupId, deleteSectionalId);
-      if (response.success) {
-        toast.success("Agrupacion eliminada correctamente", { duration: 2000 });
+        await toast.promise(
+            deleteGroup(deleteGroupId,deleteSectionalId).then((res) => {
+                if (!res.success) {
+                    return Promise.reject(res);
+                }
+                return res;
+            }),
+            {
+                loading: "Eliminando...",
+                success: (res: { message?: string }) => {
+                    return <b>{res.message ?? "Eliminado correctamente"}</b>;
+                },
+                error: (res: { message?: string }) => (
+                    <b>{res.message ?? "No se pudo eliminar"}</b>
+                ),
+            }
+        );
+        await onDeleted?.();
         setConfirmOpen(false);
-        onDeleted?.();
-      } else {
-        toast.error(response.message, { duration: 2000 });
-        setConfirmOpen(false);
-      }
     } catch (error) {
       console.error(error);
     }
@@ -300,7 +320,6 @@ export function GroupCard({ group, users, onDeleted }: SectionalCardProps) {
         />
       </Modal>
       <ViewUser infUser={viewUser} onClose={() => setViewUser(null)} />
-
       <ConfirmDialog
         open={confirmOpen}
         onCancel={() => setConfirmOpen(false)}

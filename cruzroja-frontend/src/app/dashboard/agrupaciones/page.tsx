@@ -20,7 +20,8 @@ import ChangeLeaderTable from "@/components/tables/changeLeaderTable";
 import type { group } from "@/types/usertType";
 import { CreateGroupForm } from "@/components/forms/createGroupForm";
 import { AssociateGroupForm } from "@/components/forms/associateGroupForm";
-import {Loading} from "@/components/ui/loading";
+import { Loading } from "@/components/ui/loading";
+import {deleteSectional} from "@/services/serviceCreateSectional";
 
 export default function Agrupaciones() {
   const [open, setOpen] = useState(false);
@@ -63,15 +64,24 @@ export default function Agrupaciones() {
     setOpen(false);
     setQuery("");
     setPage(1);
-    toast.loading("Creando agrupacion", { duration: 3000 });
-
-    const response = await createGroupService({ name });
-    if (response.success) {
-      toast.success("Agrupacion creada", { duration: 1000 });
+      await toast.promise(
+          createGroupService({name}).then((res) => {
+              if (!res.success) {
+                  return Promise.reject(res);
+              }
+              return res;
+          }),
+          {
+              loading: "Creando...",
+              success: (res: { message?: string }) => {
+                  return <b>{res.message ?? "Creado correctamente"}</b>;
+              },
+              error: (res: { message?: string }) => (
+                  <b>{res.message ?? "No se pudo crear"}</b>
+              ),
+          }
+      );
       await reload();
-    } else {
-      toast.error(response.message);
-    }
   }
 
   async function onAssociateSubmit(payload: {
@@ -82,15 +92,24 @@ export default function Agrupaciones() {
     setOpen(false);
     setQuery("");
     setPage(1);
-    toast.loading("Creando agrupacion", { duration: 1000 });
-    console.log(newPayload);
-    const response = await associateGroupService(newPayload);
-    if (response.success) {
-      toast.success("Agrupacion creada", { duration: 3000 });
-      reload();
-    } else {
-      toast.error("No se ha podido crear la agrupacion", { duration: 3000 });
-    }
+      await toast.promise(
+          associateGroupService(newPayload).then((res) => {
+              if (!res.success) {
+                  return Promise.reject(res);
+              }
+              return res;
+          }),
+          {
+              loading: "Asociando...",
+              success: (res: { message?: string }) => {
+                  return <b>{res.message ?? "Asociado correctamente"}</b>;
+              },
+              error: (res: { message?: string }) => (
+                  <b>{res.message ?? "No se pudo asociado"}</b>
+              ),
+          }
+      );
+      await reload();
   }
   return (
     <div className="space-y-6">
@@ -141,7 +160,7 @@ export default function Agrupaciones() {
         {total === 1 ? "" : "es"}
       </div>
       {loading ? (
-          <Loading size="lg" label="Cargando Agrupaciones"/>
+        <Loading size="lg" label="Cargando Agrupaciones" />
       ) : paged.length === 0 ? (
         <div className="rounded-xl border border-dashed border-gray-300 bg-white p-8 text-center text-sm text-gray-600">
           {total === 0

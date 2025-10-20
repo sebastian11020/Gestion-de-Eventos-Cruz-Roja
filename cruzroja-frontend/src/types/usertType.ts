@@ -8,7 +8,7 @@ export type FormState = {
   bloodType?: string;
   sex?: string;
   gender?: string;
-  skills?:skill[];
+  skills?: skill[];
   state: {
     id: string;
     name: string;
@@ -57,7 +57,7 @@ export type formCreatePerson = {
   sex: string;
   gender: string;
   phone: string;
-  skills:string[]
+  skills: string[];
   emergencyContact: {
     name: string;
     relationShip: string;
@@ -163,27 +163,29 @@ export type createProgram = {
   idProgram?: string;
   idHeadquarters?: string;
 };
-export type createEvent = {
-  ambit: string;
-  classification: string;
-  applyDecreet: boolean;
-  marcActivity: string;
-  sectional: string;
-  group: string;
-  startDate: string;
-  endDate: string;
-  name: string;
-  description: string;
-  department: string;
-  city: string;
-  attendant: {
+export type SkillQuota = { id: string; qty: number };
+export type CreateEventForm = {
+    ambit: string;
+    classification: string;
+    applyDecreet: boolean;
+    marcActivity: string;
+    startDate: string;
+    endDate: string;
     name: string;
-    phone: string;
-  };
-  capacity: string;
-  isVirtual: boolean;
-  latitud: string;
-  longitud: string;
+    description: string;
+    department: string;
+    city: string;
+    streetAddress:string;
+    sectionalId: string;
+    groupId: string;
+    attendant: { document: string; name: string };
+    capacity:number
+    isVirtual: boolean;
+    isPrivate: "true" | "false";
+    isAdult: boolean;
+    participants?: string[];
+    requiresSkills?: boolean;
+    skillsQuotasList?: SkillQuota[];
 };
 
 export type eps = {
@@ -204,6 +206,6 @@ export type user = {
 };
 
 export type skill = {
-    id: string;
-    name?: string;
-}
+  id: string;
+  name?: string;
+};

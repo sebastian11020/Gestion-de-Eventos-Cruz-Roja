@@ -9,8 +9,7 @@ import { ChevronLeft, ChevronRight, History, PlusCircle } from "lucide-react";
 import type { event as EventType } from "@/types/usertType";
 import CreateEventForm from "@/components/forms/createEventForm";
 import { PAGE_SIZE } from "@/const/consts";
-
-type TopVolunteer = { id: string; name: string; hours: number };
+import {useSectionalsNode} from "@/hooks/useSectionalsNode";
 
 function asDateRange(e: Pick<EventType, "startDate" | "endDate">) {
   if (e.startDate && e.endDate) return `${e.startDate} – ${e.endDate}`;
@@ -23,14 +22,8 @@ function isPast(startAt?: string) {
 }
 
 export default function EventosPage() {
-  const events: EventType[] = [
-    // ... tus mocks
-  ];
-
-  const topVolunteers: TopVolunteer[] = [
-    // ... tus mocks
-  ];
-
+  const events: EventType[] = [];
+  const {sectionals,cities,loading,reload} = useSectionalsNode()
   const [page, setPage] = useState(1);
   const [showHistory, setShowHistory] = useState(false);
 
@@ -72,33 +65,40 @@ export default function EventosPage() {
         <h1 className="text-xl md:text-2xl font-bold text-gray-800 tracking-tight">
           Eventos
         </h1>
-
         <div className="flex items-center gap-2">
           <Button
             type="button"
             variant="outline"
-            className="rounded-xl"
             onClick={() => setShowHistory((v) => !v)}
+            className={`
+    flex items-center gap-2 rounded-xl border-2 
+    border-gray-300 text-gray-700 font-medium
+    hover:bg-gray-100 hover:text-blue-700 hover:border-blue-400
+    active:scale-[0.97]
+    transition-all duration-200 ease-in-out
+    focus:ring-2 focus:ring-blue-400 focus:ring-offset-2
+  `}
           >
-            <History className="w-4 h-4 mr-2" />
+            <History className="w-4 h-4" />
             {showHistory ? "Ver próximos" : "Ver historial"}
           </Button>
 
-          {/* 👉 Abre modal de crear */}
           <Button
             type="button"
-            className="rounded-xl"
             onClick={() => setOpenCreate(true)}
+            className="
+    flex items-center gap-2 rounded-xl
+    bg-blue-600 text-white font-medium
+    hover:bg-blue-700 hover:shadow-md
+    transition-all duration-200 ease-in-out
+    focus:ring-2 focus:ring-blue-400 focus:ring-offset-2
+  "
           >
-            <PlusCircle className="w-4 h-4 mr-2" />
+            <PlusCircle className="w-4 h-4" />
             Crear evento
           </Button>
         </div>
       </div>
-
-      <Podium top={topVolunteers} />
-
-      {/* Grid de tarjetas */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {pageSlice.map((e, idx) => {
           const composedDate = (e as any).date ?? asDateRange(e);
@@ -126,7 +126,6 @@ export default function EventosPage() {
         )}
       </div>
 
-      {/* Paginación */}
       <div className="mt-2 flex items-center justify-between">
         <span className="text-sm text-gray-600">
           Mostrando {showingFrom}–{showingTo} de {filtered.length}
@@ -158,7 +157,6 @@ export default function EventosPage() {
         </div>
       </div>
 
-      {/* Modal con el formulario de crear evento */}
       <Modal
         open={openCreate}
         onClose={() => setOpenCreate(false)}
@@ -169,6 +167,8 @@ export default function EventosPage() {
           onSuccess={() => {
             setOpenCreate(false);
           }}
+          cities={cities}
+          sectionals={sectionals}
         />
       </Modal>
     </div>

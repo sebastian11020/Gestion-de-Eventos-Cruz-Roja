@@ -19,7 +19,8 @@ import { PAGE_SIZE } from "@/const/consts";
 import { PageBtn } from "@/components/buttons/pageButton";
 import { CreateProgramForm } from "@/components/forms/createProgramForm";
 import { AssociateProgramForm } from "@/components/forms/associateProgramForm";
-import {Loading} from "@/components/ui/loading";
+import { Loading } from "@/components/ui/loading";
+import {deleteSectional} from "@/services/serviceCreateSectional";
 
 export default function Programas() {
   const [open, setOpen] = useState(false);
@@ -61,15 +62,24 @@ export default function Programas() {
     setOpen(false);
     setQuery("");
     setPage(1);
-    toast.loading("Creando Programa", { duration: 1000 });
-
-    const response = await createProgramService(payload);
-    if (response.success) {
-      toast.success("Programa Creado Correctamente", { duration: 3000 });
+      await toast.promise(
+         createProgramService(payload).then((res) => {
+              if (!res.success) {
+                  return Promise.reject(res);
+              }
+              return res;
+          }),
+          {
+              loading: "Creando...",
+              success: (res: { message?: string }) => {
+                  return <b>{res.message ?? "Creando correctamente"}</b>;
+              },
+              error: (res: { message?: string }) => (
+                  <b>{res.message ?? "No se pudo crear"}</b>
+              ),
+          }
+      );
       await reload();
-    } else {
-      toast.error(response.message, { duration: 3000 });
-    }
   }
   async function handleAssociateCatalog(payload: createProgram) {
     const newPayload = { ...payload, leader: documentSelected };
@@ -77,14 +87,24 @@ export default function Programas() {
     setOpen(false);
     setQuery("");
     setPage(1);
-    toast.loading("Asociando Programa", { duration: 1000 });
-    const response = await associateProgramService(newPayload);
-    if (response.success) {
-      toast.success("Programa Asociado Correctamente", { duration: 3000 });
+      await toast.promise(
+          associateProgramService(newPayload).then((res) => {
+              if (!res.success) {
+                  return Promise.reject(res);
+              }
+              return res;
+          }),
+          {
+              loading: "Asociando...",
+              success: (res: { message?: string }) => {
+                  return <b>{res.message ?? "Asociando correctamente"}</b>;
+              },
+              error: (res: { message?: string }) => (
+                  <b>{res.message ?? "No se pudo asociar"}</b>
+              ),
+          }
+      );
       await reload();
-    } else {
-      toast.error(response.message, { duration: 3000 });
-    }
   }
 
   return (
@@ -143,7 +163,7 @@ export default function Programas() {
 
       {/* Grid */}
       {loading ? (
-          <Loading size="lg" label="Cargando Programas"/>
+        <Loading size="lg" label="Cargando Programas" />
       ) : paged.length === 0 ? (
         <div className="rounded-xl border border-dashed border-gray-300 bg-white p-8 text-center text-sm text-gray-600">
           {total === 0

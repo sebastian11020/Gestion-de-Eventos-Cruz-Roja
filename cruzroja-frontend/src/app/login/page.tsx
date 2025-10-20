@@ -9,8 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Eye, EyeOff, Loader2 } from "lucide-react"; // 👈 1) importar spinner
 import { supabase } from "@/lib/supabase-browser";
 import { useRouter } from "next/navigation";
-import {getPersonData} from "@/services/serviceGetPerson";
-import {user} from "@/types/usertType";
+import { getPersonData } from "@/services/serviceGetPerson";
+import { user } from "@/types/usertType";
 
 export default function LoginCR() {
   const router = useRouter();
@@ -31,13 +31,13 @@ export default function LoginCR() {
       });
       if (error) throw error;
       const id = localStorage.getItem("supabase_uid");
-      const userData:user = await getPersonData(id ?? '')
-        await fetch('/api/session', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ role: userData.role }),
-        });
-        localStorage.setItem("role",userData.role)
+      const userData: user = await getPersonData(id ?? "");
+      await fetch("/api/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role: userData.role }),
+      });
+      localStorage.setItem("role", userData.role);
       router.replace("/dashboard");
     } catch (e: any) {
       setErr(e.message ?? "Error al iniciar sesión");

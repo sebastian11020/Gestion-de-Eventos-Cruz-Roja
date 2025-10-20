@@ -10,7 +10,7 @@ export function useSideBarData() {
       const supaBaseId: string = localStorage.getItem("supabase_uid") ?? "";
       const userData = await getPersonData(supaBaseId);
       setUser(userData);
-        localStorage.setItem("role",userData.role)
+      localStorage.setItem("role", userData.role);
     } catch (error) {
       console.error(error);
     }

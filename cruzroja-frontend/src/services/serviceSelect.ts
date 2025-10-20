@@ -28,11 +28,11 @@ export async function getState() {
   }
 }
 
-export async function getSkills(){
-    try {
-        const response = await axios.get(`http://localhost:8080/skill/all`);
-        return response.data;
-    }catch (error) {
-        console.error(error);
-    }
+export async function getSkills() {
+  try {
+    const response = await axios.get(`http://localhost:8080/skill/all`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
 }

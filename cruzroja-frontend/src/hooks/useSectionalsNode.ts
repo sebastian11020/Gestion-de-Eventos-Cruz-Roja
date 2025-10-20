@@ -2,15 +2,20 @@ import { useEffect, useState } from "react";
 import { getSectionalInfo } from "@/services/serviceCreateSectional";
 import type { SectionalNode } from "@/types/programType";
 import type { cities } from "@/components/volunteer/constants";
-import type {eps, skill, state} from "@/types/usertType";
-import {getCities, getEPS, getSkills, getState} from "@/services/serviceSelect";
+import type { eps, skill, state } from "@/types/usertType";
+import {
+  getCities,
+  getEPS,
+  getSkills,
+  getState,
+} from "@/services/serviceSelect";
 
 export function useSectionalsNode() {
   const [sectionals, setSectionals] = useState<SectionalNode[]>([]);
   const [cities, setCities] = useState<cities[]>();
   const [eps, setEps] = useState<eps[]>([]);
   const [state, setState] = useState<state[]>([]);
-  const [skills,setSkills] = useState<skill[]>([]);
+  const [skills, setSkills] = useState<skill[]>([]);
   const [loading, setLoading] = useState(false);
 
   async function loadAll() {
@@ -29,7 +34,6 @@ export function useSectionalsNode() {
       setEps(epsData);
       setState(stateData);
       setSkills(skillData);
-      console.log(skillData);
     } finally {
       setLoading(false);
     }
@@ -37,5 +41,5 @@ export function useSectionalsNode() {
   useEffect(() => {
     loadAll();
   }, []);
-  return { sectionals, cities, eps, state,skills, loading, reload: loadAll };
+  return { sectionals, cities, eps, state, skills, loading, reload: loadAll };
 }

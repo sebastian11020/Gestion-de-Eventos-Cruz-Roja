@@ -24,6 +24,7 @@ import type {
 import { deleteProgram, updateProgram } from "@/services/serviceCreateProgram";
 import toast from "react-hot-toast";
 import { getPersonId } from "@/services/serviceGetPerson";
+import {deleteGroup} from "@/services/serviceCreateGroups";
 
 type SectionalCardProps = {
   program?: TProgram;
@@ -55,15 +56,24 @@ export function ProgramCard({ program, users, onDeleted }: SectionalCardProps) {
       const next = nameDraft.trim();
       if (!next) return;
       setLocalName(next);
-      toast.loading("Actualizando nombre de programas", { duration: 1000 });
-      const response = await updateProgram(id, nameDraft);
-      if (response.success) {
-        toast.success(response.message);
+        await toast.promise(
+            updateProgram(id,nameDraft).then((res) => {
+                if (!res.success) {
+                    return Promise.reject(res);
+                }
+                return res;
+            }),
+            {
+                loading: "Editando programa...",
+                success: (res: { message?: string }) => {
+                    return <b>{res.message ?? "Editado correctamente"}</b>;
+                },
+                error: (res: { message?: string }) => (
+                    <b>{res.message ?? "No se pudo editar"}</b>
+                ),
+            }
+        );
         await onDeleted?.();
-        setEditing(false);
-      } else {
-        toast.error(response.message);
-      }
     } catch (error) {
       console.error(error);
     }
@@ -86,20 +96,28 @@ export function ProgramCard({ program, users, onDeleted }: SectionalCardProps) {
 
   async function handleDelete() {
     try {
-      toast.loading("Eliminando el programa", { duration: 1000 });
-      const response = await deleteProgram(deleteProgramId);
-      if (response.success) {
-        toast.success(response.message);
-        setConfirmOpen(false);
+        await toast.promise(
+            deleteProgram(deleteProgramId).then((res) => {
+                if (!res.success) {
+                    return Promise.reject(res);
+                }
+                return res;
+            }),
+            {
+                loading: "Eliminando programa...",
+                success: (res: { message?: string }) => {
+                    return <b>{res.message ?? "Eliminando correctamente"}</b>;
+                },
+                error: (res: { message?: string }) => (
+                    <b>{res.message ?? "No se pudo editar"}</b>
+                ),
+            }
+        );
         await onDeleted?.();
-      } else {
-        toast.error(response.message);
         setConfirmOpen(false);
-      }
     } catch (error) {
       console.error(error);
     }
-    setConfirmOpen(false);
   }
 
   return (

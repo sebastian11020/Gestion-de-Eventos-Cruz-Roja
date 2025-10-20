@@ -15,7 +15,7 @@ export const INITIAL_FORM: formCreatePerson = {
   id_state: "Formacion",
   birthDate: "",
   id_location: "",
-  skills:[],
+  skills: [],
   address: { streetAddress: "", zone: "" },
   email: "",
   phone: "",
