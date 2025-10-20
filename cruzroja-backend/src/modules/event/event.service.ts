@@ -13,6 +13,7 @@ import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import 'dayjs/locale/es';
 import { Repository } from 'typeorm';
+import { PersonService } from '../person/person.service';
 
 @Injectable()
 export class EventService {
@@ -20,6 +21,7 @@ export class EventService {
     @InjectRepository(EventEntity)
     private eventRepository: Repository<EventEntity>,
     private groupHeadquartersService: GroupHeadquartersService,
+    private personService: PersonService,
   ) {}
 
   async create(eventForm: CreateEventForm) {
@@ -29,7 +31,9 @@ export class EventService {
           eventForm.sectionalId,
           eventForm.groupId,
         );
-      console.log(idGroupHeadquarters);
+      const coordinatorEvent = await this.personService.findByIdDto(
+        eventForm.attendant.document,
+      );
       const newEvent = manager.create(EventEntity, {
         name: NormalizeString(eventForm.name),
         description: NormalizeString(eventForm.description),
@@ -54,7 +58,7 @@ export class EventService {
           id: eventForm.marcActivity,
         },
         person: {
-          id: eventForm.attendant.id,
+          id: coordinatorEvent.leader?.id,
         },
         headquarters: {
           id: eventForm.sectionalId,

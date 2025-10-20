@@ -28,6 +28,11 @@ export class PersonController {
     return this.personService.findAllDtoTable();
   }
 
+  @Get('/table/special-event')
+  async getTableSpecialEvent() {
+    return this.personService.getTableSpecialEvent();
+  }
+
   @Post('/create')
   async create(@Body() personDto: CreatePersonDto) {
     return this.personService.create(personDto);
