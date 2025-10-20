@@ -1,21 +1,12 @@
 import {
   IsBoolean,
   IsDate,
-  IsDefined,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
   Min,
-  ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
-
-export class Attendant {
-  @IsString()
-  @IsNotEmpty()
-  document: string;
-}
 
 export class CreateEventForm {
   @IsNumber()
@@ -51,10 +42,9 @@ export class CreateEventForm {
   @IsOptional()
   @IsNumber()
   groupId: number;
-  @IsDefined({ message: 'Es necesario un encargado para el evento' })
-  @ValidateNested()
-  @Type(() => Attendant)
-  attendant: Attendant;
+  @IsString()
+  @IsNotEmpty()
+  attendant: string;
   @IsNumber()
   @Min(1)
   capacity: number;
