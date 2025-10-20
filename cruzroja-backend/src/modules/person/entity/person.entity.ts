@@ -19,6 +19,7 @@ import { EpsPerson } from '../../eps-person/entity/eps-person.entity';
 import { PersonRole } from '../../person-role/entity/person-role.entity';
 import { PersonStatus } from '../../person-status/entity/person-status.entity';
 import { PersonSkill } from '../../person-skill/entity/person-skill.entity';
+import { Event } from '../../event/entity/event.entity';
 
 @Entity()
 export class Person {
@@ -66,4 +67,6 @@ export class Person {
   person_status: PersonStatus[];
   @OneToMany(() => PersonSkill, (personSkill) => personSkill.person)
   person_skills: PersonSkill[];
+  @OneToMany(() => PersonSkill, (personSkill) => personSkill.person)
+  events: Event[];
 }

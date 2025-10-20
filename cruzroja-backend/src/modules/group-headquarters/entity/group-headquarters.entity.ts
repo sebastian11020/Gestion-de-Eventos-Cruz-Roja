@@ -9,6 +9,7 @@ import { Groups } from '../../group/entity/groups.entity';
 import { Headquarters } from '../../headquarters/entity/headquarters.entity';
 import { PersonRole } from '../../person-role/entity/person-role.entity';
 import { GroupStatus } from '../../group-status/entity/group-status.entity';
+import { Event } from '../../event/entity/event.entity';
 
 @Entity()
 export class GroupHeadquarters {
@@ -31,4 +32,7 @@ export class GroupHeadquarters {
 
   @OneToMany(() => GroupStatus, (gs) => gs.groupHeadquarters)
   states: GroupStatus[];
+
+  @OneToMany(() => Event, (e) => e.groupHeadquarters)
+  events: Event[];
 }

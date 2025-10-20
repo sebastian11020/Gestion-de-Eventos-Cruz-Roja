@@ -22,7 +22,10 @@ export class ClassificationEventService {
         name: NormalizeString(dto.name),
       }),
     );
-    return { success: true, message: dto };
+    return {
+      success: true,
+      message: `Se creo corectamente la siguiente clasificacion: ${dto.name}`,
+    };
   }
 
   async getAll(): Promise<GetClassificationEventDto[]> {
