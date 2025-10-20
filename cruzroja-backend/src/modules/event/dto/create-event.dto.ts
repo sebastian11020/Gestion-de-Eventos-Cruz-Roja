@@ -4,6 +4,7 @@ import {
   IsDefined,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
   Min,
   ValidateNested,
@@ -47,8 +48,8 @@ export class CreateEventForm {
   @IsNumber()
   @Min(1)
   sectionalId: number;
+  @IsOptional()
   @IsNumber()
-  @Min(1)
   groupId: number;
   @IsDefined({ message: 'Es necesario un encargado para el evento' })
   @ValidateNested()
