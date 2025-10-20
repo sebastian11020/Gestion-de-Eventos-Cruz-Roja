@@ -26,6 +26,7 @@ import { PersonSkillModule } from './modules/person-skill/person-skill.module';
 import { ScopeModule } from './modules/scope/scope.module';
 import { EventFrameModule } from './modules/event-frame/event-frame.module';
 import { ClassificationEventModule } from './modules/classification_event/classification_event.module';
+import { EventModule } from './modules/event/event.module';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { ClassificationEventModule } from './modules/classification_event/classi
     ScopeModule,
     EventFrameModule,
     ClassificationEventModule,
+    EventModule,
   ],
   controllers: [AppController],
   providers: [AppService],

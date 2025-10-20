@@ -19,6 +19,7 @@ export class ScopeService {
     const rows = await this.scopeRepository.find();
     return rows.map((row) => {
       const dto = new GetScopeDto();
+      dto.id = String(row.id);
       dto.name = FormatNamesString(row.name);
       return dto;
     });
