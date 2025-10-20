@@ -41,7 +41,7 @@ export class CreateEventForm {
   sectionalId: number;
   @IsOptional()
   @IsNumber()
-  groupId?: number;
+  groupId: number;
   @IsString()
   @IsNotEmpty()
   attendant: string;
