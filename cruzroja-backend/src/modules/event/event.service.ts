@@ -101,7 +101,10 @@ export class EventService {
       dto.location = FormatNamesString(row.location.name);
       dto.leader = {
         id: row.person.id,
-        name: FormatNamesString(row.person.name),
+        name:
+          FormatNamesString(row.person.name) +
+          ' ' +
+          FormatNamesString(row.person.last_name),
       };
       dto.startAt = row.start_date;
       return dto;
