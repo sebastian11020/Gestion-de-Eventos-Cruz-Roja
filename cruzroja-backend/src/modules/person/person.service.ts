@@ -25,6 +25,7 @@ import { GetLoginPersonDto } from './dto/get-login-person.dto';
 import { PersonSkillService } from '../person-skill/person-skill.service';
 import { PersonSkill } from '../person-skill/entity/person-skill.entity';
 import { PersonRoleService } from '../person-role/person-role.service';
+import { GetTableSpecialEvent } from './dto/get-table-special-event';
 
 @Injectable()
 export class PersonService {
@@ -509,5 +510,45 @@ export class PersonService {
       },
     });
     return volunteers > 0;
+  }
+
+  async getTableSpecialEvent() {
+    const rows = await this.personRepository.find({
+      where: {
+        person_roles: {
+          role: {
+            id: 5,
+          },
+          end_date: IsNull(),
+        },
+        person_status: {
+          state: {
+            id: 3,
+          },
+          end_date: IsNull(),
+        },
+      },
+      relations: {
+        person_status: {
+          state: true,
+        },
+        person_roles: {
+          program: {
+            program: true,
+          },
+          group: {
+            group: true,
+          },
+        },
+      },
+    });
+    return rows.map((row) => {
+      const dto = new GetTableSpecialEvent();
+      dto.id = String(row.id);
+      dto.name = FormatNamesString(row.name);
+      dto.document = row.document;
+      dto.email = FormatNamesString(row.email);
+      return dto;
+    });
   }
 }

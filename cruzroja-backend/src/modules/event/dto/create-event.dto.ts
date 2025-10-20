@@ -13,7 +13,7 @@ import { Type } from 'class-transformer';
 export class Attendant {
   @IsString()
   @IsNotEmpty()
-  id: string;
+  document: string;
 }
 
 export class CreateEventForm {
