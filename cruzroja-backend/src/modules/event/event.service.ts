@@ -32,7 +32,7 @@ export class EventService {
           eventForm.groupId,
         );
       const coordinatorEvent = await this.personService.findByIdDto(
-        eventForm.attendant.document,
+        eventForm.attendant,
       );
       const newEvent = manager.create(EventEntity, {
         name: NormalizeString(eventForm.name),
