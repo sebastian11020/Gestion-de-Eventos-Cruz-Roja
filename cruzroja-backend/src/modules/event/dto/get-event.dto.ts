@@ -11,5 +11,6 @@ export class GetEventCardDDto {
     id: string;
     name: string;
   };
+  state: string;
   startAt: Date;
 }

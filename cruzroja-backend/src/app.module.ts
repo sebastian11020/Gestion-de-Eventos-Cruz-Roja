@@ -27,6 +27,8 @@ import { ScopeModule } from './modules/scope/scope.module';
 import { EventFrameModule } from './modules/event-frame/event-frame.module';
 import { ClassificationEventModule } from './modules/classification_event/classification_event.module';
 import { EventModule } from './modules/event/event.module';
+import { EventStatusController } from './modules/event-status/event-status.controller';
+import { EventStatusModule } from './modules/event-status/event-status.module';
 
 @Module({
   imports: [
@@ -60,6 +62,7 @@ import { EventModule } from './modules/event/event.module';
     EventFrameModule,
     ClassificationEventModule,
     EventModule,
+    EventStatusModule,
   ],
   controllers: [AppController],
   providers: [AppService],

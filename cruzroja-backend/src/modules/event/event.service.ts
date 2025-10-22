@@ -12,9 +12,11 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import 'dayjs/locale/es';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { Person } from '../person/entity/person.entity';
 import { assertFound } from '../../common/utils/assert';
+import { EventStatusService } from '../event-status/event-status.service';
+import { EventStatus } from '../event-status/entity/event-status.entity';
 
 @Injectable()
 export class EventService {
@@ -22,6 +24,7 @@ export class EventService {
     @InjectRepository(EventEntity)
     private eventRepository: Repository<EventEntity>,
     private groupHeadquartersService: GroupHeadquartersService,
+    private eventStatusService: EventStatusService,
   ) {}
 
   async create(eventForm: CreateEventForm) {
@@ -37,7 +40,7 @@ export class EventService {
         },
       });
       assertFound(coordinatorEvent, 'No se encontro el encargado especificado');
-      const newEvent = manager.create(EventEntity, {
+      let newEvent = manager.create(EventEntity, {
         name: NormalizeString(eventForm.name),
         description: NormalizeString(eventForm.description),
         start_date: eventForm.startDate,
@@ -70,9 +73,36 @@ export class EventService {
           id: idGroupHeadquarters?.id ?? undefined,
         },
       });
-      await manager.save(EventEntity, newEvent);
+      newEvent = await manager.save(EventEntity, newEvent);
+      console.log(newEvent);
+      await this.assignStatus(manager, newEvent.id, 8);
       return { success: true, message: 'Evento creado exitosamente.' };
     });
+  }
+
+  private async assignStatus(
+    manager: EntityManager,
+    id_event: number,
+    id_state: number,
+  ) {
+    let currentStatus =
+      await this.eventStatusService.findOneOpenStateByIdPk(id_event);
+    if (currentStatus) {
+      await manager.update(EventStatus, currentStatus.id, {
+        end_date: new Date(),
+      });
+      console.log('Cerrando estado actual');
+    }
+    currentStatus = manager.create(EventStatus, {
+      event: {
+        id: id_event,
+      },
+      state: {
+        id: id_state,
+      },
+      start_date: new Date(),
+    });
+    await manager.save(EventStatus, currentStatus);
   }
 
   async getAllDto() {
@@ -83,6 +113,9 @@ export class EventService {
       relations: {
         location: true,
         person: true,
+        eventStatus: {
+          state: true,
+        },
       },
     });
     return rows.map((row) => {
@@ -106,8 +139,22 @@ export class EventService {
           ' ' +
           FormatNamesString(row.person.last_name),
       };
+      dto.state = row.eventStatus.find((e) => !e.end_date)?.state.name ?? '';
       dto.startAt = row.start_date;
       return dto;
+    });
+  }
+
+  async deactivate(id_event: number) {
+    return this.eventRepository.manager.transaction(async (manager) => {
+      const currentEvent = this.eventRepository.findOne({
+        where: {
+          id: id_event,
+        },
+      });
+      assertFound(currentEvent, 'No se encontro el vento que deseas cancelar');
+      await this.assignStatus(manager, id_event, 11);
+      return { success: true, message: 'Evento cancelado exitosamente.' };
     });
   }
 }

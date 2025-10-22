@@ -3,6 +3,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Location } from '../../location/entity/location.entity';
@@ -12,6 +13,7 @@ import { EventFrame } from '../../event-frame/entity/event-frame';
 import { Person } from '../../person/entity/person.entity';
 import { Headquarters } from '../../headquarters/entity/headquarters.entity';
 import { GroupHeadquarters } from '../../group-headquarters/entity/group-headquarters.entity';
+import { EventStatus } from '../../event-status/entity/event-status.entity';
 
 @Entity()
 export class Event {
@@ -64,4 +66,6 @@ export class Event {
   })
   @JoinColumn({ name: 'id_group' })
   groupHeadquarters: GroupHeadquarters;
+  @OneToMany(() => EventStatus, (es) => es.event)
+  eventStatus: EventStatus[];
 }
