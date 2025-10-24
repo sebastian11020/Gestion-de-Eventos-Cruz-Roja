@@ -19,13 +19,14 @@ import { ProgramStatusService } from '../program-status/program-status.service';
 import { UpdatePersonDto } from './dto/update-person.dto';
 import { EpsPersonService } from '../eps-person/eps-person.service';
 import { EmailService } from '../email/email.service';
-import { SendEmail } from '../email/dto/send-email.dto';
+import { SendEmailRegister } from '../email/dto/send-email.dto';
 import { GetPersons } from './dto/get-person.dto';
 import { GetLoginPersonDto } from './dto/get-login-person.dto';
 import { PersonSkillService } from '../person-skill/person-skill.service';
 import { PersonSkill } from '../person-skill/entity/person-skill.entity';
 import { PersonRoleService } from '../person-role/person-role.service';
 import { GetTableSpecialEvent } from './dto/get-table-special-event';
+import { GetEventCardDDto } from '../event/dto/get-event.dto';
 
 @Injectable()
 export class PersonService {
@@ -194,7 +195,7 @@ export class PersonService {
   }
 
   async sendEmail(email: string, password: string): Promise<void> {
-    const send = new SendEmail();
+    const send = new SendEmailRegister();
     send.email = email;
     send.password = password;
     await this.nodeEmailerService.sendEmailRegister(send);
@@ -550,5 +551,38 @@ export class PersonService {
       dto.email = FormatNamesString(row.email);
       return dto;
     });
+  }
+
+  async sendNotification(id_headquarters: number, event: GetEventCardDDto) {
+    const persons = await this.personRepository.find({
+      where: {
+        person_roles: {
+          end_date: IsNull(),
+          headquarters: {
+            id: id_headquarters,
+          },
+          role: {
+            id: 5,
+          },
+        },
+        person_status: {
+          state: {
+            id: 3,
+          },
+          end_date: IsNull(),
+        },
+      },
+      select: {
+        email: true,
+      },
+    });
+    const emails = Array.from(
+      new Set(
+        persons
+          .map((p) => (p.email ?? '').trim())
+          .filter((e) => e && e.includes('@')),
+      ),
+    );
+    await this.nodeEmailerService.sendEmailNewEventMany(emails, event);
   }
 }

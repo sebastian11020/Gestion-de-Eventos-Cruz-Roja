@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { EventService } from './event.service';
 import { CreateEventForm } from './dto/create-event.dto';
 
@@ -9,6 +17,11 @@ export class EventController {
   @Post('/create')
   async create(@Body() dto: CreateEventForm) {
     return this.eventService.create(dto);
+  }
+
+  @Put('/deactivate/:id')
+  async deactivate(@Param('id', ParseIntPipe) id_event: number) {
+    return this.eventService.deactivate(id_event);
   }
 
   @Get('/all')
