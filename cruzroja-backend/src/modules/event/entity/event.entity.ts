@@ -14,6 +14,8 @@ import { Person } from '../../person/entity/person.entity';
 import { Headquarters } from '../../headquarters/entity/headquarters.entity';
 import { GroupHeadquarters } from '../../group-headquarters/entity/group-headquarters.entity';
 import { EventStatus } from '../../event-status/entity/event-status.entity';
+import { ManagerEvent } from '../../manager-event/entity/manager-event.entity';
+import { EventQuota } from '../../event-quota/entity/event-quota.entity';
 
 @Entity()
 export class Event {
@@ -68,4 +70,6 @@ export class Event {
   groupHeadquarters: GroupHeadquarters;
   @OneToMany(() => EventStatus, (es) => es.event)
   eventStatus: EventStatus[];
+  @OneToMany(() => EventQuota, (eq) => eq.event)
+  event_quotas: EventQuota[];
 }

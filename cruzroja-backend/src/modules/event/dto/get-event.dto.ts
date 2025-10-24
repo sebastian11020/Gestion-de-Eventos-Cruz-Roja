@@ -13,4 +13,11 @@ export class GetEventCardDDto {
   };
   state: string;
   startAt: Date;
+  skill_quota: GetSkillQuota[];
+}
+
+export class GetSkillQuota {
+  id: string;
+  name: string;
+  quantity: string;
 }
