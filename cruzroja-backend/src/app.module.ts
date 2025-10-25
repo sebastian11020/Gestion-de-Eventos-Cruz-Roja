@@ -30,6 +30,7 @@ import { EventModule } from './modules/event/event.module';
 import { EventStatusModule } from './modules/event-status/event-status.module';
 import { ManagerEventModule } from './modules/manager-event/manager-event.module';
 import { EventQuotaModule } from './modules/event-quota/event-quota.module';
+import { EventEnrollmentModule } from './modules/event-enrollment/event-enrollment.module';
 
 @Module({
   imports: [
@@ -66,6 +67,7 @@ import { EventQuotaModule } from './modules/event-quota/event-quota.module';
     EventStatusModule,
     ManagerEventModule,
     EventQuotaModule,
+    EventEnrollmentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
