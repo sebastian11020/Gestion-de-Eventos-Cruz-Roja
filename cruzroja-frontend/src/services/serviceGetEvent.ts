@@ -30,9 +30,10 @@ export async function getClassificationService() {
 }
 
 export async function getEventService() {
+    const id= localStorage.getItem('supabase_uid')
     try {
         const response = await axios.get(
-            `http://localhost:8080/event/all`,
+            `http://localhost:8080/event/all?id_user=${id}`,
         );
         return response.data;
     } catch (error) {
@@ -45,6 +46,15 @@ export async function createEventService(event:CreateEventForm) {
         const response = await axios.post(
             `http://localhost:8080/event/create`,event
         );
+        return response.data;
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+export async function getLeaderEvent() {
+    try {
+        const response = await axios.get(`http://localhost:8080/person/table/all`);
         return response.data;
     } catch (error) {
         console.error(error);

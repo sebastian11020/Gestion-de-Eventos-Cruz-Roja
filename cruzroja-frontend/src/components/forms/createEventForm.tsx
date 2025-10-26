@@ -35,9 +35,8 @@ export default function CreateEventForm({
   const [loading, setLoading] = useState(false);
   const [openPicker, setOpenPicker] = useState(false);
   const [openChangeLeader, setOpenChangeLeader] = useState(false);
-  const { users } = useSedesData();
   const { skills } = useSectionalsNode();
-  const { scopes, classificationEvent, frame,person } = useEventData();
+  const { scopes, classificationEvent,frame,users,person } = useEventData();
   const [documentLeader, setDocumentLeader] = useState<string>("");
   const [nameLeader, setNameLeader] = useState<string>("");
   const [selectedVolunteers, setSelectedVolunteers] = useState<

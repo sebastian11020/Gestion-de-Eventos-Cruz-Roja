@@ -83,7 +83,7 @@ export class EventService {
         newEvent.id,
         eventForm.skillsQuotasList,
       );
-      await this.sendNotification(manager, eventForm.sectionalId, newEvent.id);
+      //await this.sendNotification(manager, eventForm.sectionalId, newEvent.id);
       return { success: true, message: 'Evento creado exitosamente.' };
     });
   }
