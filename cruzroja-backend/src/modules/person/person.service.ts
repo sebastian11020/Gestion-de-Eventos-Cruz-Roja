@@ -516,12 +516,6 @@ export class PersonService {
   async getTableSpecialEvent() {
     const rows = await this.personRepository.find({
       where: {
-        person_roles: {
-          role: {
-            id: 5,
-          },
-          end_date: IsNull(),
-        },
         person_status: {
           state: {
             id: 3,
