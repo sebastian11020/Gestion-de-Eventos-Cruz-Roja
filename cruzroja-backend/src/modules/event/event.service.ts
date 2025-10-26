@@ -113,7 +113,7 @@ export class EventService {
     await manager.save(EventStatus, currentStatus);
   }
 
-  async getAllDto() {
+  async getAllDto(id_user: string) {
     dayjs.extend(utc);
     dayjs.extend(timezone);
     dayjs.locale('es');
@@ -126,6 +126,9 @@ export class EventService {
         },
         event_quotas: {
           skill: true,
+        },
+        event_enrollment: {
+          person: true,
         },
       },
     });
@@ -161,6 +164,12 @@ export class EventService {
         skill_quota.quantity = String(r.quota - r.taken);
         return skill_quota;
       });
+      dto.is_leader = id_user == row.person.id;
+      dto.is_participant =
+        Array.isArray(row.event_enrollment) &&
+        row.event_enrollment.some(
+          (ee) => ee.state && String(ee.person?.id) === String(id_user),
+        );
       return dto;
     });
   }

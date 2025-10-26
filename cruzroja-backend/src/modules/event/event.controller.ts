@@ -6,6 +6,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { EventService } from './event.service';
 import { CreateEventForm } from './dto/create-event.dto';
@@ -26,7 +27,7 @@ export class EventController {
   }
 
   @Get('/all')
-  async getAll() {
-    return this.eventService.getAllDto();
+  async getAll(@Query('id_user') id_user: string) {
+    return this.eventService.getAllDto(id_user);
   }
 }

@@ -56,7 +56,7 @@ export class CreateEventForm {
   @IsBoolean()
   isAdult: boolean;
   @IsOptional()
-  @IsNumber()
+  @IsArray()
   participants?: string[];
   @IsArray()
   skillsQuotasList: SkillQuota[];
