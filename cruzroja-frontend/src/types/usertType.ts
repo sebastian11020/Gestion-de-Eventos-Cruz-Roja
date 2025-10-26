@@ -153,6 +153,12 @@ export type event = {
   endDate: string;
   location: string;
   capacity: string;
+  skill_quota: skillQuota[];
+  leader:{
+      id: string;
+      name: string;
+  }
+  streetAddress: string;
   startAt: string;
 };
 
@@ -163,29 +169,38 @@ export type createProgram = {
   idProgram?: string;
   idHeadquarters?: string;
 };
-export type SkillQuota = { id: string; qty: number };
+export type skillQuota = { id: string; quantity: number; name: string };
+export type SkillQuota = { id: string; qty: number};
 export type CreateEventForm = {
-    ambit: string;
-    classification: string;
-    applyDecreet: boolean;
-    marcActivity: string;
-    startDate: string;
-    endDate: string;
+  ambit: string;
+  classification: string;
+  applyDecreet: boolean;
+  marcActivity: string;
+  startDate: string;
+  endDate: string;
+  name: string;
+  description: string;
+  department: string;
+  city: string;
+  streetAddress: string;
+  sectionalId: string;
+  groupId: string;
+  attendant: string;
+  capacity: number;
+  isVirtual: boolean;
+  isPrivate: "true" | "false";
+  isAdult: boolean;
+  isEmergency: boolean;
+  participants?: string[];
+  requiresSkills?: boolean;
+  skillsQuotasList?: SkillQuota[];
+};
+
+export type Volunteer = {
+    id: string;
     name: string;
-    description: string;
-    department: string;
-    city: string;
-    streetAddress:string;
-    sectionalId: string;
-    groupId: string;
-    attendant: { document: string; name: string };
-    capacity:number
-    isVirtual: boolean;
-    isPrivate: "true" | "false";
-    isAdult: boolean;
-    participants?: string[];
-    requiresSkills?: boolean;
-    skillsQuotasList?: SkillQuota[];
+    document?: string;
+    email?: string;
 };
 
 export type eps = {

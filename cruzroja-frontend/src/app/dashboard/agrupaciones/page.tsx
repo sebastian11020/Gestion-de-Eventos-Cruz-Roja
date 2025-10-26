@@ -21,7 +21,7 @@ import type { group } from "@/types/usertType";
 import { CreateGroupForm } from "@/components/forms/createGroupForm";
 import { AssociateGroupForm } from "@/components/forms/associateGroupForm";
 import { Loading } from "@/components/ui/loading";
-import {deleteSectional} from "@/services/serviceCreateSectional";
+import { deleteSectional } from "@/services/serviceCreateSectional";
 
 export default function Agrupaciones() {
   const [open, setOpen] = useState(false);
@@ -64,24 +64,24 @@ export default function Agrupaciones() {
     setOpen(false);
     setQuery("");
     setPage(1);
-      await toast.promise(
-          createGroupService({name}).then((res) => {
-              if (!res.success) {
-                  return Promise.reject(res);
-              }
-              return res;
-          }),
-          {
-              loading: "Creando...",
-              success: (res: { message?: string }) => {
-                  return <b>{res.message ?? "Creado correctamente"}</b>;
-              },
-              error: (res: { message?: string }) => (
-                  <b>{res.message ?? "No se pudo crear"}</b>
-              ),
-          }
-      );
-      await reload();
+    await toast.promise(
+      createGroupService({ name }).then((res) => {
+        if (!res.success) {
+          return Promise.reject(res);
+        }
+        return res;
+      }),
+      {
+        loading: "Creando...",
+        success: (res: { message?: string }) => {
+          return <b>{res.message ?? "Creado correctamente"}</b>;
+        },
+        error: (res: { message?: string }) => (
+          <b>{res.message ?? "No se pudo crear"}</b>
+        ),
+      },
+    );
+    await reload();
   }
 
   async function onAssociateSubmit(payload: {
@@ -92,24 +92,24 @@ export default function Agrupaciones() {
     setOpen(false);
     setQuery("");
     setPage(1);
-      await toast.promise(
-          associateGroupService(newPayload).then((res) => {
-              if (!res.success) {
-                  return Promise.reject(res);
-              }
-              return res;
-          }),
-          {
-              loading: "Asociando...",
-              success: (res: { message?: string }) => {
-                  return <b>{res.message ?? "Asociado correctamente"}</b>;
-              },
-              error: (res: { message?: string }) => (
-                  <b>{res.message ?? "No se pudo asociado"}</b>
-              ),
-          }
-      );
-      await reload();
+    await toast.promise(
+      associateGroupService(newPayload).then((res) => {
+        if (!res.success) {
+          return Promise.reject(res);
+        }
+        return res;
+      }),
+      {
+        loading: "Asociando...",
+        success: (res: { message?: string }) => {
+          return <b>{res.message ?? "Asociado correctamente"}</b>;
+        },
+        error: (res: { message?: string }) => (
+          <b>{res.message ?? "No se pudo asociado"}</b>
+        ),
+      },
+    );
+    await reload();
   }
   return (
     <div className="space-y-6">

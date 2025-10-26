@@ -3,23 +3,20 @@
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Search, Plus, Check, X, Trash2 } from "lucide-react";
+import {Volunteer} from "@/types/usertType";
 
-type Volunteer = {
-  id: string;
-  name: string;
-  document?: string;
-  email?: string;
-};
 
 export default function VolunteerPickerModal({
   open,
   onClose,
   defaultSelected = [],
+  volunteer,
   onSave,
 }: {
   open: boolean;
   onClose: () => void;
   defaultSelected?: Volunteer[];
+  volunteer: Volunteer[];
   onSave: (list: Volunteer[]) => void;
 }) {
   const [query, setQuery] = useState("");
@@ -27,51 +24,20 @@ export default function VolunteerPickerModal({
   const [page, setPage] = useState(1);
   const PAGE = 8;
 
-  // TODO: reemplazar por fetch real
-  const all: Volunteer[] = useMemo(
-    () => [
-      {
-        id: "v1",
-        name: "Ana Rodríguez",
-        document: "1234567890",
-        email: "ana@x.com",
-      },
-      {
-        id: "v2",
-        name: "Carlos Pérez",
-        document: "1098765432",
-        email: "carlos@x.com",
-      },
-      {
-        id: "v3",
-        name: "Luisa Gómez",
-        document: "555555555",
-        email: "luisa@x.com",
-      },
-      {
-        id: "v4",
-        name: "Mario López",
-        document: "888888888",
-        email: "mario@x.com",
-      },
-    ],
-    [],
-  );
-
   useEffect(() => {
     setSelected(defaultSelected);
   }, [defaultSelected, open]);
 
   const filtered = useMemo(() => {
-    if (!query.trim()) return all;
+    if (!query.trim()) return volunteer;
     const q = query.toLowerCase();
-    return all.filter(
+    return volunteer.filter(
       (v) =>
         v.name.toLowerCase().includes(q) ||
         (v.document ?? "").toLowerCase().includes(q) ||
         (v.email ?? "").toLowerCase().includes(q),
     );
-  }, [all, query]);
+  }, [volunteer, query]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE));
   const paged = filtered.slice((page - 1) * PAGE, (page - 1) * PAGE + PAGE);

@@ -39,3 +39,16 @@ export async function getPersonData(id: string) {
     console.error(error);
   }
 }
+
+export async function getPersonEvent() {
+    try {
+        const response = await axios.get(
+            `http://localhost:8080/person/table/special-event`,
+        );
+        return response.data;
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+

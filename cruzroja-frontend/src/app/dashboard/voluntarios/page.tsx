@@ -18,7 +18,7 @@ import toast from "react-hot-toast";
 import { getSupabaseUserId } from "@/utils/getSupabaseId";
 import { usePersonData } from "@/hooks/usePersonData";
 import { Loading } from "@/components/ui/loading";
-import {associateProgramService} from "@/services/serviceCreateProgram";
+import { associateProgramService } from "@/services/serviceCreateProgram";
 
 function normalize(v: unknown) {
   return String(v ?? "").toLowerCase();
@@ -102,24 +102,25 @@ export default function voluntarios() {
   async function handleCreateOrUpdate(data: formCreatePerson) {
     try {
       if (editUser) {
-          await toast.promise(
-              updatePersonService(data).then((res) => {
-                  if (!res.success) {
-                      return Promise.reject(res);
-                  }
-                  return res;
-              }),
-              {
-                  loading: "Creando...",
-                  success: (res: { message?: string }) => {
-                      return <b>{res.message ?? "Creado correctamente"}</b>;
-                  },
-                  error: (res: { message?: string }) => (
-                      <b>{res.message ?? "No se pudo crear"}</b>
-                  ),
-              }
-          );
-          setOpenWizard(false)
+        await toast.promise(
+          updatePersonService(data).then((res) => {
+            if (!res.success) {
+              return Promise.reject(res);
+            }
+            return res;
+          }),
+          {
+            loading: "Editando...",
+            success: (res: { message?: string }) => {
+              return <b>{res.message ?? "Editado correctamente"}</b>;
+            },
+            error: (res: { message?: string }) => (
+              <b>{res.message ?? "No se pudo editar"}</b>
+            ),
+          },
+        );
+        await reload();
+        setOpenWizard(false);
       } else {
         const reg = await register(data);
         const newData = {
@@ -127,24 +128,25 @@ export default function voluntarios() {
           id: reg?.id ?? "",
           password: reg?.password ?? "",
         };
-          await toast.promise(
-              createPersonService(newData).then((res) => {
-                  if (!res.success) {
-                      return Promise.reject(res);
-                  }
-                  return res;
-              }),
-              {
-                  loading: "Creando...",
-                  success: (res: { message?: string }) => {
-                      return <b>{res.message ?? "Creando correctamente"}</b>;
-                  },
-                  error: (res: { message?: string }) => (
-                      <b>{res.message ?? "No se pudo asociar"}</b>
-                  ),
-              }
-          );
-          setOpenWizard(false);
+        await toast.promise(
+          createPersonService(newData).then((res) => {
+            if (!res.success) {
+              return Promise.reject(res);
+            }
+            return res;
+          }),
+          {
+            loading: "Creando...",
+            success: (res: { message?: string }) => {
+              return <b>{res.message ?? "Creando correctamente"}</b>;
+            },
+            error: (res: { message?: string }) => (
+              <b>{res.message ?? "No se pudo asociar"}</b>
+            ),
+          },
+        );
+        await reload();
+        setOpenWizard(false);
       }
       setEditUser(null);
     } catch (error) {

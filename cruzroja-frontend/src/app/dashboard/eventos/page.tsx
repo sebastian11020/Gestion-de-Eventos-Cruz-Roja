@@ -3,13 +3,13 @@
 import { useMemo, useState } from "react";
 import { EventCard } from "@/components/cards/eventCard";
 import Modal from "@/components/layout/modal";
-import Podium from "@/components/layout/podium";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, History, PlusCircle } from "lucide-react";
 import type { event as EventType } from "@/types/usertType";
 import CreateEventForm from "@/components/forms/createEventForm";
 import { PAGE_SIZE } from "@/const/consts";
-import {useSectionalsNode} from "@/hooks/useSectionalsNode";
+import { useSectionalsNode } from "@/hooks/useSectionalsNode";
+import {useEventData} from "@/hooks/useEventData";
 
 function asDateRange(e: Pick<EventType, "startDate" | "endDate">) {
   if (e.startDate && e.endDate) return `${e.startDate} – ${e.endDate}`;
@@ -22,12 +22,11 @@ function isPast(startAt?: string) {
 }
 
 export default function EventosPage() {
-  const events: EventType[] = [];
-  const {sectionals,cities,loading,reload} = useSectionalsNode()
+  const { sectionals, cities, loading, reload } = useSectionalsNode();
   const [page, setPage] = useState(1);
   const [showHistory, setShowHistory] = useState(false);
-
   const [openCreate, setOpenCreate] = useState(false);
+  const {events} = useEventData();
 
   const filtered = useMemo(
     () =>
@@ -59,6 +58,9 @@ export default function EventosPage() {
     console.log("Inscrito en evento", eventId);
   };
 
+  async function reloadPage(){
+      await reload();
+  }
   return (
     <div className="p-6 space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -107,10 +109,13 @@ export default function EventosPage() {
             <EventCard
               key={id}
               title={e.title}
+              streetAddress={e.streetAddress}
+              leader={e.leader}
               description={e.description}
               date={composedDate}
               location={e.location}
               capacity={e.capacity as any}
+              skillQuotas={e.skill_quota}
               showSuscribe={!showHistory}
               onSubscribe={() => handleSubscribe(id)}
               onViewEnrolled={() => console.log("Ver inscritos de", id)}
