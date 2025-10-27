@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { PersonService } from './person.service';
 import { CreatePersonDto } from './dto/create-person.dto';
 import { GetPersonTableDto } from './dto/get-person-table.dto';
@@ -41,5 +41,10 @@ export class PersonController {
   @Put('/update/:id')
   async update(@Param('id') id: string, @Body() personDto: UpdatePersonDto) {
     return this.personService.update(id, personDto);
+  }
+
+  @Get('/skills')
+  async getSkills(@Query('id_user') id_user: string) {
+    return this.personService.getSkills(id_user);
   }
 }

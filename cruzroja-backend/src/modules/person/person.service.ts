@@ -228,15 +228,16 @@ export class PersonService {
           id: dto.id_location,
         },
       });
+      await this.associateStatus(manager, id, dto.id_state);
       await this.checkCurrentRolePerson(
         manager,
         id,
         dto.id_headquarters,
+        dto.id_state,
         dto.id_group,
         dto.id_program,
       );
       await this.associateEps(manager, id, dto.id_eps, dto.type_affiliation);
-      await this.associateStatus(manager, id, dto.id_state);
       await this.associateSkills(manager, dto.skills, id);
       return { success: true, message: 'Persona actualizada exitosamente.' };
     });
@@ -387,6 +388,7 @@ export class PersonService {
     manager: EntityManager,
     id_person: string,
     id_headquarters: number,
+    id_state: number,
     id_group?: number,
     id_program?: number,
   ) {
@@ -406,24 +408,19 @@ export class PersonService {
       const samePlacement =
         currentRole.headquarters.id === id_headquarters &&
         norm(currentRole.group?.id) === norm(id_group) &&
-        norm(currentRole.group?.id) === norm(id_program);
+        norm(currentRole.group?.id) === norm(id_program) &&
+        id_state != 3;
       if (!samePlacement) {
-        if (currentRole.role.id === 5) {
-          await manager.update(PersonRole, currentRole.id, {
-            end_date: new Date(),
-          });
-          await this.associateRole(
-            manager,
-            id_person,
-            id_headquarters,
-            id_group,
-            id_program,
-          );
-        } else {
-          conflict(
-            'No se puede cambiar la sede, agrupacion o programa de una persona que tenga un rol diferente a voluntario',
-          );
-        }
+        await manager.update(PersonRole, currentRole.id, {
+          end_date: new Date(),
+        });
+        await this.associateRole(
+          manager,
+          id_person,
+          id_headquarters,
+          id_group,
+          id_program,
+        );
       }
     }
   }
@@ -578,5 +575,26 @@ export class PersonService {
       ),
     );
     await this.nodeEmailerService.sendEmailNewEventMany(emails, event);
+  }
+
+  async getSkills(id_user: string) {
+    const person = await this.personRepository.findOne({
+      where: {
+        id: id_user,
+        person_skills: {
+          state: true,
+        },
+      },
+      relations: {
+        person_skills: {
+          skill: true,
+        },
+      },
+    });
+    assertFound(person, 'No se encontro a la persona especificada');
+    const skills = person.person_skills;
+    return skills?.map((skill) => {
+      return skill.skill.id;
+    });
   }
 }
