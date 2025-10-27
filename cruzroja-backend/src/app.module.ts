@@ -31,15 +31,23 @@ import { EventStatusModule } from './modules/event-status/event-status.module';
 import { ManagerEventModule } from './modules/manager-event/manager-event.module';
 import { EventQuotaModule } from './modules/event-quota/event-quota.module';
 import { EventEnrollmentModule } from './modules/event-enrollment/event-enrollment.module';
+import configuration from './common/config/configuration';
+import { SupabaseModule } from './common/config/supabase/supabase.module';
+import { SupabaseAuthModule } from './common/config/guards/supabase-auth.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [configuration],
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       url: process.env.DB_URL,
       autoLoadEntities: true,
     }),
+    SupabaseModule,
+    SupabaseAuthModule,
     PersonModule,
     LocationModule,
     HeadquartersModule,

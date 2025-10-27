@@ -6,12 +6,15 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { StateService } from './state.service';
 import { CreateStateDto } from './dto/create-state.dto';
 import { GetStateDto } from './dto/get-state.dto';
+import { SupabaseAuthGuard } from '../../common/config/guards/supabase-auth.guard';
 
 @Controller('state')
+@UseGuards(SupabaseAuthGuard)
 export class StateController {
   constructor(private stateService: StateService) {}
 

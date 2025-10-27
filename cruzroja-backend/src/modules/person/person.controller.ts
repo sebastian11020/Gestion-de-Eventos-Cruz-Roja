@@ -1,10 +1,21 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { PersonService } from './person.service';
 import { CreatePersonDto } from './dto/create-person.dto';
 import { GetPersonTableDto } from './dto/get-person-table.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
+import { SupabaseAuthGuard } from '../../common/config/guards/supabase-auth.guard';
 
 @Controller('person')
+@UseGuards(SupabaseAuthGuard)
 export class PersonController {
   constructor(private readonly personService: PersonService) {}
 

@@ -7,11 +7,14 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { EventService } from './event.service';
 import { CreateEventForm } from './dto/create-event.dto';
+import { SupabaseAuthGuard } from '../../common/config/guards/supabase-auth.guard';
 
 @Controller('event')
+@UseGuards(SupabaseAuthGuard)
 export class EventController {
   constructor(private eventService: EventService) {}
 

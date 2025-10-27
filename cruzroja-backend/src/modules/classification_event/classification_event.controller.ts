@@ -1,8 +1,10 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { ClassificationEventService } from './classification_event.service';
 import { CreateClassificationEventDto } from './dto/create-classification-event.dto';
+import { SupabaseAuthGuard } from '../../common/config/guards/supabase-auth.guard';
 
 @Controller('classification-event')
+@UseGuards(SupabaseAuthGuard)
 export class ClassificationEventController {
   constructor(private classificationEventService: ClassificationEventService) {}
 
