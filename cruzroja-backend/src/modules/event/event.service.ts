@@ -265,4 +265,30 @@ export class EventService {
     });
     await this.personService.sendNotification(id_headquarters, dto);
   }
+
+  async startEvent(id_event: number) {
+    return this.eventRepository.manager.transaction(async (manager) => {
+      const currentEvent = this.eventRepository.findOne({
+        where: {
+          id: id_event,
+        },
+      });
+      assertFound(currentEvent, 'No se encontro el vento que deseas cancelar');
+      await this.assignStatus(manager, id_event, 9);
+      return { success: true, message: 'Evento cancelado exitosamente.' };
+    });
+  }
+
+  async endEvent(id_event: number) {
+    return this.eventRepository.manager.transaction(async (manager) => {
+      const currentEvent = this.eventRepository.findOne({
+        where: {
+          id: id_event,
+        },
+      });
+      assertFound(currentEvent, 'No se encontro el vento que deseas cancelar');
+      await this.assignStatus(manager, id_event, 10);
+      return { success: true, message: 'Evento cancelado exitosamente.' };
+    });
+  }
 }

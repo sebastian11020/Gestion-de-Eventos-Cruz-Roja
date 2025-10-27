@@ -34,6 +34,7 @@ import { EventEnrollmentModule } from './modules/event-enrollment/event-enrollme
 import configuration from './common/config/configuration';
 import { SupabaseModule } from './common/config/supabase/supabase.module';
 import { SupabaseAuthModule } from './common/config/guards/supabase-auth.module';
+import { EventAttendanceModule } from './modules/event_attendance/event_attendance.module';
 
 @Module({
   imports: [
@@ -76,6 +77,7 @@ import { SupabaseAuthModule } from './common/config/guards/supabase-auth.module'
     ManagerEventModule,
     EventQuotaModule,
     EventEnrollmentModule,
+    EventAttendanceModule,
   ],
   controllers: [AppController],
   providers: [AppService],

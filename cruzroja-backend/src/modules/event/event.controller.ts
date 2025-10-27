@@ -32,4 +32,14 @@ export class EventController {
   async getAll(@Query('id_user') id_user: string) {
     return this.eventService.getAllDto(id_user);
   }
+
+  @Put('/start/:id')
+  async start(@Param('id', ParseIntPipe) id_event: number) {
+    return this.eventService.startEvent(id_event);
+  }
+
+  @Put('/end/:id')
+  async end(@Param('id', ParseIntPipe) id_event: number) {
+    return this.eventService.endEvent(id_event);
+  }
 }
