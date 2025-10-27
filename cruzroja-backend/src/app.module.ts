@@ -28,7 +28,6 @@ import { EventFrameModule } from './modules/event-frame/event-frame.module';
 import { ClassificationEventModule } from './modules/classification_event/classification_event.module';
 import { EventModule } from './modules/event/event.module';
 import { EventStatusModule } from './modules/event-status/event-status.module';
-import { ManagerEventModule } from './modules/manager-event/manager-event.module';
 import { EventQuotaModule } from './modules/event-quota/event-quota.module';
 import { EventEnrollmentModule } from './modules/event-enrollment/event-enrollment.module';
 import configuration from './common/config/configuration';
@@ -74,7 +73,6 @@ import { EventAttendanceModule } from './modules/event_attendance/event_attendan
     ClassificationEventModule,
     EventModule,
     EventStatusModule,
-    ManagerEventModule,
     EventQuotaModule,
     EventEnrollmentModule,
     EventAttendanceModule,

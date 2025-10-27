@@ -20,7 +20,6 @@ import { PersonRole } from '../../person-role/entity/person-role.entity';
 import { PersonStatus } from '../../person-status/entity/person-status.entity';
 import { PersonSkill } from '../../person-skill/entity/person-skill.entity';
 import { Event } from '../../event/entity/event.entity';
-import { ManagerEvent } from '../../manager-event/entity/manager-event.entity';
 import { EventEnrollment } from '../../event-enrollment/entity/event-enrollment.entity';
 
 @Entity()
@@ -71,8 +70,6 @@ export class Person {
   person_skills: PersonSkill[];
   @OneToMany(() => PersonSkill, (personSkill) => personSkill.person)
   events: Event[];
-  @OneToMany(() => ManagerEvent, (me) => me.person)
-  manager_events: ManagerEvent[];
   @OneToMany(() => EventEnrollment, (e) => e.person)
   event_enrollment: EventEnrollment[];
 }
