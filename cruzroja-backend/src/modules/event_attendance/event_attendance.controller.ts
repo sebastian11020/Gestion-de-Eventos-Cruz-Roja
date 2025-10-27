@@ -7,7 +7,7 @@ import { CheckInOutDto } from './dto/check-in-out.dto';
 export class EventAttendanceController {
   constructor(private event_attendanceService: EventAttendanceService) {}
 
-  @Post()
+  @Post('/attendance')
   async checkIn(@UserId() id_user: string, @Body() dto: CheckInOutDto) {
     return this.event_attendanceService.checkInAndCheckOut(id_user, dto);
   }
