@@ -15,9 +15,10 @@ export class SupabaseAuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<Request & { user?: User }>();
 
+    if (req.method === 'OPTIONS') return true;
+
     const authHeader: string | string[] | undefined =
       req.headers['authorization'];
-
     if (typeof authHeader !== 'string') {
       throw new UnauthorizedException('Token no enviado');
     }
