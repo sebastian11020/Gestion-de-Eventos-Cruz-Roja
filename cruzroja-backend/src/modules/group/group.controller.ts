@@ -8,13 +8,16 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { GroupService } from './group.service';
 import { GetGroupDto } from './dto/get-group.dto';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group';
+import { SupabaseAuthGuard } from '../../common/config/guards/supabase-auth.guard';
 
 @Controller('group')
+@UseGuards(SupabaseAuthGuard)
 export class GroupController {
   constructor(private groupService: GroupService) {}
 

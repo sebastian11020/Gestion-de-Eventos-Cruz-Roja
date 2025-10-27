@@ -6,11 +6,14 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { EpsService } from './eps.service';
 import { CreateEpsDto } from './dto/create-eps.dto';
+import { SupabaseAuthGuard } from '../../common/config/guards/supabase-auth.guard';
 
 @Controller('eps')
+@UseGuards(SupabaseAuthGuard)
 export class EpsController {
   constructor(private epsService: EpsService) {}
 

@@ -6,11 +6,14 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { RoleService } from './role.service';
 import { CreateRoleDto } from './dto/create-role.dto';
+import { SupabaseAuthGuard } from '../../common/config/guards/supabase-auth.guard';
 
 @Controller('role')
+@UseGuards(SupabaseAuthGuard)
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}
 

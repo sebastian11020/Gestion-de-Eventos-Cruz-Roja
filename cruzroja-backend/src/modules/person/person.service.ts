@@ -7,7 +7,7 @@ import { type_affiliation } from '../eps-person/enum/eps-person.enum';
 import { CreateEpsPersonDTO } from '../eps-person/dto/create-eps-person.dto';
 import { EpsPerson } from '../eps-person/entity/eps-person.entity';
 import { PersonRole } from '../person-role/entity/person-role.entity';
-import { assertFound, conflict } from '../../common/utils/assert';
+import { assertFound } from '../../common/utils/assert';
 import { PersonStatus } from '../person-status/entity/person-status.entity';
 import { GetPersonTableDto } from './dto/get-person-table.dto';
 import {
@@ -537,7 +537,8 @@ export class PersonService {
     return rows.map((row) => {
       const dto = new GetTableSpecialEvent();
       dto.id = String(row.id);
-      dto.name = FormatNamesString(row.name);
+      dto.name =
+        FormatNamesString(row.name) + ' ' + FormatNamesString(row.last_name);
       dto.document = row.document;
       dto.email = FormatNamesString(row.email);
       return dto;

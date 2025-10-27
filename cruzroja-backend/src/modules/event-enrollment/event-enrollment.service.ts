@@ -4,6 +4,8 @@ import { EventEnrollment } from './entity/event-enrollment.entity';
 import { EntityManager, Repository } from 'typeorm';
 import { CreateEventEnrollmentDto } from './dto/create-event-enrollment.dto';
 import { CanceledEventEnrollmentDto } from './dto/canceled-event-enrollment.dto';
+import { GetParticipantDto } from './dto/get-participant.dto';
+import { FormatNamesString } from '../../common/utils/string.utils';
 
 @Injectable()
 export class EventEnrollmentService {
@@ -81,7 +83,7 @@ export class EventEnrollmentService {
     });
   }
 
-  async findPersonInEvent(id_person: string, id_event: number) {
+  async findEnrollmentInEvent(id_person: string, id_event: number) {
     return this.enrollmentRepository.findOne({
       where: {
         person: {
@@ -90,6 +92,7 @@ export class EventEnrollmentService {
         event: {
           id: id_event,
         },
+        state: true,
       },
     });
   }
@@ -161,5 +164,31 @@ export class EventEnrollmentService {
         };
       },
     );
+  }
+
+  async getParticipants(id_event: number) {
+    const enrollments: EventEnrollment[] = await this.enrollmentRepository.find(
+      {
+        where: {
+          event: {
+            id: id_event,
+          },
+          state: true,
+        },
+        relations: {
+          person: true,
+        },
+      },
+    );
+    return enrollments.map((enrollment) => {
+      const person = new GetParticipantDto();
+      person.name =
+        FormatNamesString(enrollment.person.name) +
+        ' ' +
+        FormatNamesString(enrollment.person.last_name);
+      person.licence = enrollment.person.license ?? '';
+      person.phone = String(enrollment.person.phone);
+      return person;
+    });
   }
 }

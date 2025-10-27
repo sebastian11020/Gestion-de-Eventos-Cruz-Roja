@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ManagerEventService } from '../manager-event.service';
+import { SupabaseService } from './supabase.service';
 
-describe('ManagerEventService', () => {
-  let service: ManagerEventService;
+describe('SupabaseService', () => {
+  let service: SupabaseService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [ManagerEventService],
+      providers: [SupabaseService],
     }).compile();
 
-    service = module.get<ManagerEventService>(ManagerEventService);
+    service = module.get<SupabaseService>(SupabaseService);
   });
 
   it('should be defined', () => {
