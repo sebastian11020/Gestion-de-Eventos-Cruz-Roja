@@ -1,4 +1,12 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { EventEnrollmentService } from './event-enrollment.service';
 import { CreateEventEnrollmentDto } from './dto/create-event-enrollment.dto';
 import { CanceledEventEnrollmentDto } from './dto/canceled-event-enrollment.dto';
@@ -19,5 +27,10 @@ export class EventEnrollmentController {
   @Post('/canceled-enrollment')
   async canceled(@Body() dto: CanceledEventEnrollmentDto) {
     return this.eventEnrollmentService.canceledEnrollment(dto);
+  }
+
+  @Get('/get-participantst-table/:id')
+  async getParticipantsTable(@Param('id', ParseIntPipe) id: number) {
+    return this.eventEnrollmentService.getParticipants(id);
   }
 }
