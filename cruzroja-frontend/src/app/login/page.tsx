@@ -19,37 +19,36 @@ export default function LoginCR() {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
-    async function login(e: React.FormEvent) {
-        e.preventDefault();
-        setLoading(true);
-        setErr(null);
+  async function login(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setErr(null);
 
-        try {
-            const sb = supabase();
-            const { data, error } = await sb.auth.signInWithPassword({
-                email: loginData.email,
-                password: loginData.password,
-            });
+    try {
+      const sb = supabase();
+      const { data, error } = await sb.auth.signInWithPassword({
+        email: loginData.email,
+        password: loginData.password,
+      });
 
-            if (error) throw error;
-            const id = data.user?.id;
-            if (!id) throw new Error("No se pudo obtener el usuario.");
-            localStorage.setItem("supabase_uid", id);
-            const userData: user = await getPersonData(id);
-            await fetch("/api/session", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ role: userData.role }),
-            });
-            localStorage.setItem("role", userData.role);
-            router.replace("/dashboard");
-        } catch (e: any) {
-            setErr(e.message ?? "Error al iniciar sesión");
-        } finally {
-            setLoading(false);
-        }
+      if (error) throw error;
+      const id = data.user?.id;
+      if (!id) throw new Error("No se pudo obtener el usuario.");
+      localStorage.setItem("supabase_uid", id);
+      const userData: user = await getPersonData(id);
+      await fetch("/api/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role: userData.role }),
+      });
+      localStorage.setItem("role", userData.role);
+      router.replace("/dashboard");
+    } catch (e: any) {
+      setErr(e.message ?? "Error al iniciar sesión");
+    } finally {
+      setLoading(false);
     }
-
+  }
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-4 bg-[radial-gradient(ellipse_at_top_left,rgba(30,64,175,0.35),transparent_45%),radial-gradient(ellipse_at_bottom_right,rgba(220,38,38,0.15),transparent_40%)] bg-white">

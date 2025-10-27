@@ -24,7 +24,6 @@ import type {
 import { deleteProgram, updateProgram } from "@/services/serviceCreateProgram";
 import toast from "react-hot-toast";
 import { getPersonId } from "@/services/serviceGetPerson";
-import { deleteGroup } from "@/services/serviceCreateGroups";
 
 type SectionalCardProps = {
   program?: TProgram;
@@ -106,10 +105,10 @@ export function ProgramCard({ program, users, onDeleted }: SectionalCardProps) {
         {
           loading: "Eliminando programa...",
           success: (res: { message?: string }) => {
-            return <b>{res.message ?? "Eliminando correctamente"}</b>;
+            return <b>{res.message ?? "Eliminado correctamente"}</b>;
           },
           error: (res: { message?: string }) => (
-            <b>{res.message ?? "No se pudo editar"}</b>
+            <b>{res.message ?? "No se pudo eliminar"}</b>
           ),
         },
       );

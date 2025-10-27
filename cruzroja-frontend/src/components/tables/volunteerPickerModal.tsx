@@ -3,8 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Search, Plus, Check, X, Trash2 } from "lucide-react";
-import {Volunteer} from "@/types/usertType";
-
+import { Volunteer } from "@/types/usertType";
 
 export default function VolunteerPickerModal({
   open,

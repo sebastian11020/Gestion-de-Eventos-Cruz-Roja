@@ -15,10 +15,10 @@ export function LocationSection({
   groupOptions,
 }: {
   form: CreateEventForm;
-    onChange: <K extends keyof CreateEventForm>(
-        key: K,
-        value: CreateEventForm[K],
-    ) => void;
+  onChange: <K extends keyof CreateEventForm>(
+    key: K,
+    value: CreateEventForm[K],
+  ) => void;
   cities: CityOption[];
   sectionals: SectionalNode[];
   onChangeSectional: (value: string) => void;
@@ -84,7 +84,7 @@ export function LocationSection({
 
         <Field label="Agrupación">
           <select
-              required
+            required
             disabled={!form.sectionalId}
             value={form.groupId}
             onChange={(e) => onChange("groupId", e.target.value)}

@@ -17,7 +17,7 @@ import { OperationSection } from "@/components/events/sections/operationSection"
 import { PrivacyParticipantsSection } from "@/components/events/sections/privacyParticipantsSection";
 import { useEventData } from "@/hooks/useEventData";
 import toast from "react-hot-toast";
-import {createEventService} from "@/services/serviceGetEvent";
+import { createEventService } from "@/services/serviceGetEvent";
 
 export type CityOption = { id: string; name: string };
 
@@ -26,17 +26,19 @@ export default function CreateEventForm({
   onSuccess,
   cities,
   sectionals,
+  onReload,
 }: {
   onCancel: () => void;
   onSuccess: () => void;
   cities: CityOption[] | undefined;
   sectionals: SectionalNode[];
+  onReload?: () => Promise<void> | void;
 }) {
   const [loading, setLoading] = useState(false);
   const [openPicker, setOpenPicker] = useState(false);
   const [openChangeLeader, setOpenChangeLeader] = useState(false);
   const { skills } = useSectionalsNode();
-  const { scopes, classificationEvent,frame,users,person } = useEventData();
+  const { scopes, classificationEvent, frame, users, person } = useEventData();
   const [documentLeader, setDocumentLeader] = useState<string>("");
   const [nameLeader, setNameLeader] = useState<string>("");
   const [selectedVolunteers, setSelectedVolunteers] = useState<
@@ -61,7 +63,7 @@ export default function CreateEventForm({
     attendant: "",
     isVirtual: false,
     isPrivate: "false",
-      isEmergency:false,
+    isEmergency: false,
     isAdult: false,
     requiresSkills: false,
     skillsQuotasList: [],
@@ -117,30 +119,31 @@ export default function CreateEventForm({
 
     const payload = {
       ...form,
-      attendant:documentLeader,
+      attendant: documentLeader,
       participants:
         form.isPrivate === "true" ? selectedVolunteers.map((v) => v.id) : [],
       skillsQuotasList: skillsQuotasListToSend,
     };
-      console.log(payload)
-      await toast.promise(
-          createEventService(payload).then((res) => {
-              if (!res.success) {
-                  return Promise.reject(res);
-              }
-              return res;
-          }),
-          {
-              loading: "Creando...",
-              success: (res: { message?: string }) => {
-                  return <b>{res.message ?? "Creado correctamente"}</b>;
-              },
-              error: (res: { message?: string }) => (
-                  <b>{res.message ?? "No se pudo crear"}</b>
-              ),
-          },
-      );
+    console.log(payload);
+    await toast.promise(
+      createEventService(payload).then((res) => {
+        if (!res.success) {
+          return Promise.reject(res);
+        }
+        return res;
+      }),
+      {
+        loading: "Creando...",
+        success: (res: { message?: string }) => {
+          return <b>{res.message ?? "Creado correctamente"}</b>;
+        },
+        error: (res: { message?: string }) => (
+          <b>{res.message ?? "No se pudo crear"}</b>
+        ),
+      },
+    );
     setLoading(true);
+    await onReload?.();
     try {
       onSuccess();
     } finally {
@@ -223,10 +226,10 @@ export default function CreateEventForm({
       >
         <ChangeLeaderTable
           users={users}
-          onSelect={( documentLeader,nameLeader ) => {
-            (setDocumentLeader(documentLeader),setNameLeader(nameLeader));
+          onSelect={(documentLeader, nameLeader) => {
+            (setDocumentLeader(documentLeader), setNameLeader(nameLeader));
           }}
-          onCancel={()=>setOpenChangeLeader(false)}
+          onCancel={() => setOpenChangeLeader(false)}
         />
       </Modal>
     </form>

@@ -153,11 +153,14 @@ export type event = {
   endDate: string;
   location: string;
   capacity: string;
+  is_leader: boolean;
+  is_participant: boolean;
+  state: string;
   skill_quota: skillQuota[];
-  leader:{
-      id: string;
-      name: string;
-  }
+  leader: {
+    id: string;
+    name: string;
+  };
   streetAddress: string;
   startAt: string;
 };
@@ -170,7 +173,7 @@ export type createProgram = {
   idHeadquarters?: string;
 };
 export type skillQuota = { id: string; quantity: number; name: string };
-export type SkillQuota = { id: string; qty: number};
+export type SkillQuota = { id: string; qty: number };
 export type CreateEventForm = {
   ambit: string;
   classification: string;
@@ -197,10 +200,10 @@ export type CreateEventForm = {
 };
 
 export type Volunteer = {
-    id: string;
-    name: string;
-    document?: string;
-    email?: string;
+  id: string;
+  name: string;
+  document?: string;
+  email?: string;
 };
 
 export type eps = {
