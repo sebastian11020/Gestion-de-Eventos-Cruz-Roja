@@ -156,7 +156,7 @@ export class EventService {
       dto.state = FormatNamesString(
         row.eventStatus.find((e) => !e.end_date)?.state.name ?? '',
       );
-      dto.startAt = row.start_date;
+      dto.startAt = row.estimated_end_date;
       dto.skill_quota = row.event_quotas.map((r) => {
         const skill_quota = new GetSkillQuota();
         skill_quota.id = String(r.skill.id);
