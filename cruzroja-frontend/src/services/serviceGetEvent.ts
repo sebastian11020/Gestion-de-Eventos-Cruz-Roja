@@ -9,7 +9,7 @@ const {
 
 export async function getAmbitService() {
   try {
-    const response = await axios.get(`http://localhost:8080/scope/all`, {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/scope/all`, {
       headers: {
         Authorization: `Bearer ${session?.access_token}`,
       },
@@ -22,7 +22,7 @@ export async function getAmbitService() {
 
 export async function getFrameService() {
   try {
-    const response = await axios.get(`http://localhost:8080/event-frame/all`, {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/event-frame/all`, {
       headers: {
         Authorization: `Bearer ${session?.access_token}`,
       },
@@ -35,7 +35,7 @@ export async function getFrameService() {
 export async function getClassificationService() {
   try {
     const response = await axios.get(
-      `http://localhost:8080/classification-event/all`,
+      `${process.env.NEXT_PUBLIC_API_URL}/classification-event/all`,
       {
         headers: {
           Authorization: `Bearer ${session?.access_token}`,
@@ -52,7 +52,7 @@ export async function getEventService() {
   const id = localStorage.getItem("supabase_uid");
   try {
     const response = await axios.get(
-      `http://localhost:8080/event/all?id_user=${id}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/event/all?id_user=${id}`,
       {
         headers: {
           Authorization: `Bearer ${session?.access_token}`,
@@ -68,7 +68,7 @@ export async function getEventService() {
 export async function createEventService(event: CreateEventForm) {
   try {
     const response = await axios.post(
-      `http://localhost:8080/event/create`,
+      `${process.env.NEXT_PUBLIC_API_URL}/event/create`,
       event,
       {
         headers: {
@@ -85,7 +85,7 @@ export async function createEventService(event: CreateEventForm) {
 
 export async function getLeaderEvent() {
   try {
-    const response = await axios.get(`http://localhost:8080/person/table/all`, {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/person/table/all`, {
       headers: {
         Authorization: `Bearer ${session?.access_token}`,
       },
@@ -99,7 +99,7 @@ export async function getLeaderEvent() {
 export async function deleteEventService(id: string) {
   try {
     const response = await axios.put(
-      `http://localhost:8080/event/deactivate/${id}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/event/deactivate/${id}`,
         {},
       {
         headers: {
@@ -122,7 +122,7 @@ export async function inscribeEvent(id_event: string, id_skill: string) {
   };
   try {
     const response = await axios.post(
-      `http://localhost:8080/event-enrollment/enrollment`,
+      `${process.env.NEXT_PUBLIC_API_URL}/event-enrollment/enrollment`,
       payload,
       {
         headers: {
@@ -145,7 +145,7 @@ export async function cancelInscribeEvent(id_event: string) {
   };
   try {
     const response = await axios.post(
-      `http://localhost:8080/event-enrollment/canceled-enrollment`,
+      `${process.env.NEXT_PUBLIC_API_URL}/event-enrollment/canceled-enrollment`,
       payload,
       {
         headers: {
@@ -164,7 +164,7 @@ export async function getSkillsPerson() {
   try {
     const id = localStorage.getItem("supabase_uid");
     const response = await axios.get(
-      `http://localhost:8080/person/skills/?id_user=${id}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/person/skills/?id_user=${id}`,
       {
         headers: {
           Authorization: `Bearer ${session?.access_token}`,
@@ -180,7 +180,7 @@ export async function getSkillsPerson() {
 export async function startEventService(id: string) {
     try {
         const response = await axios.put(
-            `http://localhost:8080/event/start/${id}`,{},
+            `${process.env.NEXT_PUBLIC_API_URL}/event/start/${id}`,{},
             {
                 headers: {
                     "content-type": "application/json",
@@ -196,7 +196,7 @@ export async function startEventService(id: string) {
 export async function endEventService(id: string) {
     try {
         const response = await axios.put(
-            `http://localhost:8080/event/end/${id}`,
+            `${process.env.NEXT_PUBLIC_API_URL}/event/end/${id}`,
             {},
             {
                 headers: {

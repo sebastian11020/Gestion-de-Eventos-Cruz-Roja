@@ -8,7 +8,7 @@ const {
 
 export async function getPersonTable() {
   try {
-    const response = await axios.get(`http://localhost:8080/person/table/all`, {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/person/table/all`, {
       headers: {
         Authorization: `Bearer ${session?.access_token}`,
       },
@@ -21,7 +21,7 @@ export async function getPersonTable() {
 
 export async function getPerson() {
   try {
-    const response = await axios.get(`http://localhost:8080/person/all`, {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/person/all`, {
       headers: {
         Authorization: `Bearer ${session?.access_token}`,
       },
@@ -35,7 +35,7 @@ export async function getPerson() {
 export async function getPersonId(document: string) {
   try {
     const response = await axios.get(
-      `http://localhost:8080/person/leaderinfo/${document}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/person/leaderinfo/${document}`,
       {
         headers: {
           Authorization: `Bearer ${session?.access_token}`,
@@ -51,7 +51,7 @@ export async function getPersonId(document: string) {
 export async function getPersonData(id: string) {
   try {
     const response = await axios.get(
-      `http://localhost:8080/person/login/${id}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/person/login/${id}`,
     );
     return response.data;
   } catch (error) {
@@ -62,7 +62,7 @@ export async function getPersonData(id: string) {
 export async function getPersonEvent() {
   try {
     const response = await axios.get(
-      `http://localhost:8080/person/table/special-event`,
+      `${process.env.NEXT_PUBLIC_API_URL}/person/table/special-event`,
       {
         headers: {
           Authorization: `Bearer ${session?.access_token}`,

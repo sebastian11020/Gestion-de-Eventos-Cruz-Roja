@@ -8,7 +8,7 @@ const {
 
 export async function getSectionalService() {
   try {
-    const response = await axios.get(`http://localhost:8080/headquarters/all`, {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/headquarters/all`, {
       headers: {
         Authorization: `Bearer ${session?.access_token}`,
       },

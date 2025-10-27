@@ -10,7 +10,7 @@ const {
 export async function createPersonService(person: formCreatePerson) {
   try {
     const response = await axios.post(
-      `http://localhost:8080/person/create`,
+      `${process.env.NEXT_PUBLIC_API_URL}/person/create`,
       person,
       {
         headers: {
@@ -28,7 +28,7 @@ export async function createPersonService(person: formCreatePerson) {
 export async function updatePersonService(person: formCreatePerson) {
   try {
     const response = await axios.put(
-      `http://localhost:8080/person/update/${person.id}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/person/update/${person.id}`,
       person,
       {
         headers: {

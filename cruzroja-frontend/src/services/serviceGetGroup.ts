@@ -9,7 +9,7 @@ const {
 export async function getGroupService() {
   try {
     const response = await axios.get(
-      `http://localhost:8080/group-headquarters/all`,
+      `${process.env.NEXT_PUBLIC_API_URL}/group-headquarters/all`,
       {
         headers: {
           Authorization: `Bearer ${session?.access_token}`,
@@ -24,7 +24,7 @@ export async function getGroupService() {
 
 export async function getGroup() {
   try {
-    const response = await axios.get(`http://localhost:8080/group/all`, {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/group/all`, {
       headers: {
         Authorization: `Bearer ${session?.access_token}`,
       },
@@ -38,7 +38,7 @@ export async function getGroup() {
 export async function getGroupTable(id: string) {
   try {
     const response = await axios.get(
-      `http://localhost:8080/headquarters/table/${id}`,
+      `${process.env.NEXT_PUBLIC_API_URL}/headquarters/table/${id}`,
       {
         headers: {
           Authorization: `Bearer ${session?.access_token}`,
