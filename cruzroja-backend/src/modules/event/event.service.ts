@@ -275,7 +275,7 @@ export class EventService {
       });
       assertFound(currentEvent, 'No se encontro el vento que deseas cancelar');
       await this.assignStatus(manager, id_event, 9);
-      return { success: true, message: 'Evento cancelado exitosamente.' };
+      return { success: true, message: 'Evento iniciado exitosamente.' };
     });
   }
 
@@ -288,7 +288,7 @@ export class EventService {
       });
       assertFound(currentEvent, 'No se encontro el vento que deseas cancelar');
       await this.assignStatus(manager, id_event, 10);
-      return { success: true, message: 'Evento cancelado exitosamente.' };
+      return { success: true, message: 'Evento finalizado exitosamente.' };
     });
   }
 }
