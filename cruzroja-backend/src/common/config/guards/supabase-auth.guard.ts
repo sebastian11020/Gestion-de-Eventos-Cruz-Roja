@@ -8,14 +8,6 @@ import { Request } from 'express';
 import { SupabaseClient, User } from '@supabase/supabase-js';
 import { SupabaseService } from '../supabase/supabase.service';
 
-function normalizeAuthHeader(
-  raw: string | string[] | undefined,
-): string | undefined {
-  if (!raw) return undefined;
-  const val = Array.isArray(raw) ? raw[0] : raw;
-  return typeof val === 'string' ? val : undefined;
-}
-
 @Injectable()
 export class SupabaseAuthGuard implements CanActivate {
   constructor(private readonly supabaseService: SupabaseService) {}
@@ -25,9 +17,9 @@ export class SupabaseAuthGuard implements CanActivate {
 
     if (req.method === 'OPTIONS') return true;
 
-    const authHeader: string | undefined = normalizeAuthHeader(
-      req.headers['authorization'],
-    );
+    const authHeader: string | string[] | undefined =
+      req.headers['authorization'];
+
     if (!authHeader) {
       throw new UnauthorizedException('Token no enviado');
     }

@@ -15,7 +15,6 @@ import { UpdatePersonDto } from './dto/update-person.dto';
 import { SupabaseAuthGuard } from '../../common/config/guards/supabase-auth.guard';
 
 @Controller('person')
-@UseGuards(SupabaseAuthGuard)
 export class PersonController {
   constructor(private readonly personService: PersonService) {}
 
@@ -24,36 +23,37 @@ export class PersonController {
     return this.personService.getLoginPerson(id);
   }
 
+  @UseGuards(SupabaseAuthGuard)
   @Get('/all')
   async getAll() {
     return this.personService.findAllDto();
   }
-
+  @UseGuards(SupabaseAuthGuard)
   @Get('/leaderinfo/:document')
   async getLeaderInfo(@Param('document') document: string) {
     return this.personService.findByIdDto(document);
   }
-
+  @UseGuards(SupabaseAuthGuard)
   @Get('/table/all')
   async getTableAll(): Promise<GetPersonTableDto[]> {
     return this.personService.findAllDtoTable();
   }
-
+  @UseGuards(SupabaseAuthGuard)
   @Get('/table/special-event')
   async getTableSpecialEvent() {
     return this.personService.getTableSpecialEvent();
   }
-
+  @UseGuards(SupabaseAuthGuard)
   @Post('/create')
   async create(@Body() personDto: CreatePersonDto) {
     return this.personService.create(personDto);
   }
-
+  @UseGuards(SupabaseAuthGuard)
   @Put('/update/:id')
   async update(@Param('id') id: string, @Body() personDto: UpdatePersonDto) {
     return this.personService.update(id, personDto);
   }
-
+  @UseGuards(SupabaseAuthGuard)
   @Get('/skills')
   async getSkills(@Query('id_user') id_user: string) {
     return this.personService.getSkills(id_user);
