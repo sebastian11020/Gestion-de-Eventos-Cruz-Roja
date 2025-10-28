@@ -18,13 +18,13 @@ import { PrivacyParticipantsSection } from "@/components/events/sections/privacy
 import { useEventData } from "@/hooks/useEventData";
 import toast from "react-hot-toast";
 import { createEventService } from "@/services/serviceGetEvent";
+import {cities} from "@/components/volunteer/constants";
 
 export type CityOption = { id: string; name: string };
 
 export default function CreateEventForm({
   onCancel,
   onSuccess,
-  cities,
   sectionals,
   onReload,
 }: {
@@ -38,7 +38,7 @@ export default function CreateEventForm({
   const [openPicker, setOpenPicker] = useState(false);
   const [openChangeLeader, setOpenChangeLeader] = useState(false);
   const { skills } = useSectionalsNode();
-  const { scopes, classificationEvent, frame, users, person } = useEventData();
+  const { scopes, classificationEvent, frame, users, person,departments } = useEventData();
   const [documentLeader, setDocumentLeader] = useState<string>("");
   const [nameLeader, setNameLeader] = useState<string>("");
   const [selectedVolunteers, setSelectedVolunteers] = useState<
@@ -54,7 +54,7 @@ export default function CreateEventForm({
     endDate: "",
     name: "",
     description: "",
-    department: "Boyacá",
+    department: "",
     city: "",
     streetAddress: "",
     sectionalId: "",
@@ -75,17 +75,17 @@ export default function CreateEventForm({
   );
   const groupOptions: GroupNode[] = sectionalSelected?.groups ?? [];
 
-  const groupSelected = useMemo(
-    () =>
-      groupOptions.find((g) => String(g.id) === String(form.groupId)) || null,
-    [groupOptions, form.groupId],
-  );
-
   const skillsOptions = useMemo(
     () => (skills ?? []).map((s) => ({ id: String(s.id), name: s.name ?? "" })),
     [skills],
   );
 
+  const departmentSelected = useMemo(
+      ()=>
+          departments.find((d)=>d.id === form.department) || null,
+      [departments,form.department],
+  )
+    const citiesOptions: cities[] = departmentSelected?.children ?? []
   const updateForm = <K extends keyof CreateEventForm>(
     key: K,
     value: CreateEventForm[K],
@@ -97,6 +97,10 @@ export default function CreateEventForm({
   const handleSectionalChange = (value: string) => {
     setForm((f) => ({ ...f, sectionalId: value, groupId: "" }));
   };
+
+  const handleDepartmentChange = (value: string) => {
+      setForm((f) => ({ ...f, department: value,city:"" }));
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -168,9 +172,11 @@ export default function CreateEventForm({
       <LocationSection
         form={form}
         onChange={updateForm}
-        cities={cities ?? []}
+        departments={departments}
+        cityOptions={citiesOptions}
         sectionals={sectionals}
         onChangeSectional={handleSectionalChange}
+        onChangeDepartment={handleDepartmentChange}
         groupOptions={groupOptions}
       />
 

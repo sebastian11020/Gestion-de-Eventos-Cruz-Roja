@@ -21,6 +21,23 @@ export async function getCities() {
     console.error(error);
   }
 }
+
+export async function getDepartments() {
+    try {
+        const response = await axios.get(
+            `${process.env.NEXT_PUBLIC_API_URL}/location/departmentsWithMunicipalities`,
+            {
+                headers: {
+                    Authorization: `Bearer ${session?.access_token}`,
+                },
+            },
+        );
+        return response.data;
+    } catch (error) {
+        console.error(error);
+    }
+}
+
 export async function getEPS() {
   try {
     const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/eps/all`, {

@@ -6,14 +6,16 @@ import type { skillQuota } from "@/types/usertType";
 export function EventInfo({
                               leaderName,
                               date,
-                              location,
+                              city,
+                                department,
                               streetAddress,
                               capacity,
                               skillQuotas = [],
                           }: {
     leaderName: string;
     date: string;
-    location: string;
+    city:string;
+    department:string
     streetAddress: string;
     capacity?: string;
     skillQuotas?: skillQuota[];
@@ -34,7 +36,7 @@ export function EventInfo({
                 <div className="flex items-center gap-2">
                     <MapPin className="w-4 h-4 text-red-500" />
                     <span>
-            {location} – <span className="text-gray-700">{streetAddress}</span>
+            {department} - {city} – <span className="text-gray-700">{streetAddress}</span>
           </span>
                 </div>
 

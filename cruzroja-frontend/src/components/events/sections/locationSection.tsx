@@ -3,15 +3,18 @@ import { FancyCard } from "@/components/cards/fancyCard";
 import { Field } from "@/components/layout/field";
 import { Landmark, Building2, MapPin } from "lucide-react";
 import type { CreateEventForm } from "@/types/usertType";
-import type { CityOption } from "@/components/forms/createEventForm";
 import type { GroupNode, SectionalNode } from "@/types/programType";
+import {Department} from "@/types/sedesType";
+import {CityOption} from "@/components/forms/createEventForm";
 
 export function LocationSection({
   form,
   onChange,
-  cities,
+  departments,
   sectionals,
+    cityOptions,
   onChangeSectional,
+  onChangeDepartment,
   groupOptions,
 }: {
   form: CreateEventForm;
@@ -19,9 +22,11 @@ export function LocationSection({
     key: K,
     value: CreateEventForm[K],
   ) => void;
-  cities: CityOption[];
+  departments: Department[];
+  cityOptions: CityOption[];
   sectionals: SectionalNode[];
   onChangeSectional: (value: string) => void;
+    onChangeDepartment: (value: string) => void;
   groupOptions: GroupNode[];
 }) {
   return (
@@ -31,23 +36,32 @@ export function LocationSection({
     >
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Departamento" icon={<Landmark className="w-4 h-4" />}>
-          <input
-            type="text"
+          <select
+              required
+              onChange={(e) => onChangeDepartment(e.target.value)}
             value={form.department}
-            readOnly
-            className="w-full rounded-2xl bg-gray-100 px-2 py-2 text-sm focus:outline-none"
-          />
+            className="w-full rounded-2xl  px-2 py-2 text-sm focus:outline-none"
+          >
+              <option value="">Seleccione…</option>
+              {departments.map((m) => (
+                  <option key={m.id} value={m.id}>
+                      {m.name}
+                  </option>
+              ))}
+          </select>
+
         </Field>
 
         <Field label="Municipio" icon={<Building2 className="w-4 h-4" />}>
           <select
             required
             value={form.city}
+            disabled={!form.department}
             onChange={(e) => onChange("city", e.target.value)}
             className="w-full rounded-2xl bg-white px-2 py-2 text-sm focus:outline-none"
           >
             <option value="">Seleccione…</option>
-            {cities.map((m) => (
+            {cityOptions.map((m) => (
               <option key={m.id} value={m.id}>
                 {m.name}
               </option>

@@ -179,8 +179,8 @@ export async function getSkillsPerson() {
 
 export async function startEventService(id: string) {
     try {
-        const response = await axios.put(
-            `${process.env.NEXT_PUBLIC_API_URL}/event/start/${id}`,{},
+        const response = await axios.post(
+            `${process.env.NEXT_PUBLIC_API_URL}/event-enrollment/canceled-enrollment`,{},
             {
                 headers: {
                     "content-type": "application/json",
@@ -198,6 +198,23 @@ export async function endEventService(id: string) {
         const response = await axios.put(
             `${process.env.NEXT_PUBLIC_API_URL}/event/end/${id}`,
             {},
+            {
+                headers: {
+                    Authorization: `Bearer ${session?.access_token}`,
+                },
+            },
+        );
+        return response.data;
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+export async function updateEventService(id: string, payload: any) {
+    try {
+        const response = await axios.put(
+            `${process.env.NEXT_PUBLIC_API_URL}/event/update/${id}`,
+            payload,
             {
                 headers: {
                     Authorization: `Bearer ${session?.access_token}`,
