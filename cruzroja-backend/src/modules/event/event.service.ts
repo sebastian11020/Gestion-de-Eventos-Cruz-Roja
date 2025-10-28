@@ -143,6 +143,7 @@ export class EventService {
         },
       });
       await this.changeSkillQuota(manager, id, dto.skill_quota);
+      return { success: true, message: 'El evento se edito correctamente.' };
     });
   }
 
