@@ -242,7 +242,7 @@ export class EventService {
       dto.streetAddress = row.street_address;
       dto.location = FormatNamesString(row.location.name);
       dto.leader = {
-        id: row.person.id,
+        id: row.person.document,
         name:
           FormatNamesString(row.person.name) +
           ' ' +
