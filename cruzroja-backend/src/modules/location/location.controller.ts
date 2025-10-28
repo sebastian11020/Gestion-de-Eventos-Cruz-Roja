@@ -26,7 +26,13 @@ export class LocationController {
     return this.locationService.getAllDto();
   }
 
-  @Get(':id')
+  @Get('/departmentsWithMunicipalities')
+  @HttpCode(HttpStatus.OK)
+  getDepartmentsWithMunicipalities() {
+    return this.locationService.getAllDepartmentWithMunicipalities();
+  }
+
+  @Get('/:id')
   @HttpCode(HttpStatus.OK)
   getById(@Param('id', ParseIntPipe) id: number) {
     return this.locationService.getByIdDto(id);
@@ -38,13 +44,13 @@ export class LocationController {
     return this.locationService.getMunicipalitiesByDepartmentDto(id);
   }
 
-  @Post('create')
+  @Post('/create')
   @HttpCode(HttpStatus.CREATED)
   create(@Body() createLocationDto: CreateLocationDto) {
     return this.locationService.create(createLocationDto);
   }
 
-  @Put('update/:id')
+  @Put('/update/:id')
   @HttpCode(HttpStatus.OK)
   update(
     @Param('id', ParseIntPipe) id: number,
