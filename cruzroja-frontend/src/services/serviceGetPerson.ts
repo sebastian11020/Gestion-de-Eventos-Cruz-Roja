@@ -74,3 +74,41 @@ export async function getPersonEvent() {
     console.error(error);
   }
 }
+
+export async function getAssistEvent(id:string) {
+    try {
+        const response = await axios.get(
+            `${process.env.NEXT_PUBLIC_API_URL}/event-enrollment/get-participantst-table/${id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${session?.access_token}`,
+                },
+            },
+        );
+        return response.data;
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+export async function removeAssistEvent(id_event:string,id_user:string) {
+    try {
+        const payload = {
+            id_event:id_event,
+            id_user:id_user,
+        }
+        const response = await axios.put(
+            `${process.env.NEXT_PUBLIC_API_URL}/event/enrollment/get-participants-event`,payload,
+            {
+                headers: {
+                    Authorization: `Bearer ${session?.access_token}`,
+                },
+            },
+        );
+        return response.data;
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+
