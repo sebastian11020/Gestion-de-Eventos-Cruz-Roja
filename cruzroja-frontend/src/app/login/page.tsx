@@ -23,15 +23,19 @@ export default function LoginCR() {
     e.preventDefault();
     setLoading(true);
     setErr(null);
+
     try {
       const sb = supabase();
-      const { error } = await sb.auth.signInWithPassword({
+      const { data, error } = await sb.auth.signInWithPassword({
         email: loginData.email,
         password: loginData.password,
       });
+
       if (error) throw error;
-      const id = localStorage.getItem("supabase_uid");
-      const userData: user = await getPersonData(id ?? "");
+      const id = data.user?.id;
+      if (!id) throw new Error("No se pudo obtener el usuario.");
+      localStorage.setItem("supabase_uid", id);
+      const userData: user = await getPersonData(id);
       await fetch("/api/session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

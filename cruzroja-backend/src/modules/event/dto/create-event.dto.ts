@@ -1,4 +1,5 @@
 import {
+  IsArray,
   IsBoolean,
   IsDate,
   IsNotEmpty,
@@ -54,8 +55,11 @@ export class CreateEventForm {
   isPrivate: boolean;
   @IsBoolean()
   isAdult: boolean;
+  @IsOptional()
+  @IsArray()
   participants?: string[];
-  skillsQuotasList?: SkillQuota[];
+  @IsArray()
+  skillsQuotasList: SkillQuota[];
 }
 
 export class SkillQuota {

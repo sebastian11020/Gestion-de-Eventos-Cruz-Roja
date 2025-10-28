@@ -1,4 +1,4 @@
-export class SendEmail {
+export class SendEmailRegister {
   password: string;
   email: string;
 }

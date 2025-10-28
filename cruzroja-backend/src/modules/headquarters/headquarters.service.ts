@@ -325,24 +325,24 @@ export class HeadquartersService {
             person: true,
           },
         });
-        console.log(dto);
-        assertFound(personRol, 'No se encontro un lider activo en esta sede');
-        await manager.update(PersonRole, personRol.id, {
-          end_date: new Date(),
-        });
-        await manager.save(
-          manager.create(PersonRole, {
-            person: {
-              id: personRol.person.id,
-            },
-            headquarters: {
-              id: dto.idSectional,
-            },
-            role: {
-              id: 5,
-            },
-          }),
-        );
+        if (personRol) {
+          await manager.update(PersonRole, personRol.id, {
+            end_date: new Date(),
+          });
+          await manager.save(
+            manager.create(PersonRole, {
+              person: {
+                id: personRol.person.id,
+              },
+              headquarters: {
+                id: dto.idSectional,
+              },
+              role: {
+                id: 5,
+              },
+            }),
+          );
+        }
         const headquarters = await this.getById(dto.idSectional);
         if (headquarters.type === HeadquartersTypeEnum.SEDE_SECCIONAL) {
           await this.assignLeader(manager, dto.leader, dto.idSectional, true);

@@ -30,7 +30,7 @@ import toast from "react-hot-toast";
 import { deleteGroup, updateGroup } from "@/services/serviceCreateGroups";
 import { getProgramTable } from "@/services/serviceCreateProgram";
 import { getPersonId } from "@/services/serviceGetPerson";
-import {deleteSectional} from "@/services/serviceCreateSectional";
+import { deleteSectional } from "@/services/serviceCreateSectional";
 
 type SectionalCardProps = {
   sectional?: TSectional;
@@ -65,24 +65,24 @@ export function GroupCard({ group, users, onDeleted }: SectionalCardProps) {
     if (!next) return;
     setLocalName(next);
     setEditing(false);
-      await toast.promise(
-          updateGroup(id,nameDraft).then((res) => {
-              if (!res.success) {
-                  return Promise.reject(res);
-              }
-              return res;
-          }),
-          {
-              loading: "Eliminando...",
-              success: (res: { message?: string }) => {
-                  return <b>{res.message ?? "Eliminado correctamente"}</b>;
-              },
-              error: (res: { message?: string }) => (
-                  <b>{res.message ?? "No se pudo eliminar"}</b>
-              ),
-          }
-      );
-      await onDeleted?.();
+    await toast.promise(
+      updateGroup(id, nameDraft).then((res) => {
+        if (!res.success) {
+          return Promise.reject(res);
+        }
+        return res;
+      }),
+      {
+        loading: "Editando...",
+        success: (res: { message?: string }) => {
+          return <b>{res.message ?? "Edirado correctamente"}</b>;
+        },
+        error: (res: { message?: string }) => (
+          <b>{res.message ?? "No se pudo editar"}</b>
+        ),
+      },
+    );
+    await onDeleted?.();
   }
 
   async function onView(id: string) {
@@ -102,25 +102,25 @@ export function GroupCard({ group, users, onDeleted }: SectionalCardProps) {
 
   async function handleDelete() {
     try {
-        await toast.promise(
-            deleteGroup(deleteGroupId,deleteSectionalId).then((res) => {
-                if (!res.success) {
-                    return Promise.reject(res);
-                }
-                return res;
-            }),
-            {
-                loading: "Eliminando...",
-                success: (res: { message?: string }) => {
-                    return <b>{res.message ?? "Eliminado correctamente"}</b>;
-                },
-                error: (res: { message?: string }) => (
-                    <b>{res.message ?? "No se pudo eliminar"}</b>
-                ),
-            }
-        );
-        await onDeleted?.();
-        setConfirmOpen(false);
+      await toast.promise(
+        deleteGroup(deleteGroupId, deleteSectionalId).then((res) => {
+          if (!res.success) {
+            return Promise.reject(res);
+          }
+          return res;
+        }),
+        {
+          loading: "Eliminando...",
+          success: (res: { message?: string }) => {
+            return <b>{res.message ?? "Eliminado correctamente"}</b>;
+          },
+          error: (res: { message?: string }) => (
+            <b>{res.message ?? "No se pudo eliminar"}</b>
+          ),
+        },
+      );
+      await onDeleted?.();
+      setConfirmOpen(false);
     } catch (error) {
       console.error(error);
     }

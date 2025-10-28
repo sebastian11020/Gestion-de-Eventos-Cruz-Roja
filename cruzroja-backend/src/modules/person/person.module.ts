@@ -9,6 +9,8 @@ import { ProgramStatusModule } from '../program-status/program-status.module';
 import { EmailModule } from '../email/email.module';
 import { PersonSkillModule } from '../person-skill/person-skill.module';
 import { PersonRoleModule } from '../person-role/person-role.module';
+import { SupabaseAuthModule } from '../../common/config/guards/supabase-auth.module';
+import { SupabaseModule } from '../../common/config/supabase/supabase.module';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { PersonRoleModule } from '../person-role/person-role.module';
     EmailModule,
     PersonSkillModule,
     PersonRoleModule,
+    SupabaseModule,
+    SupabaseAuthModule,
   ],
   providers: [PersonService],
   controllers: [PersonController],

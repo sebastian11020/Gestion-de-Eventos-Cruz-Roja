@@ -5,12 +5,18 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Event } from './entity/event.entity';
 import { GroupHeadquartersModule } from '../group-headquarters/group-headquarters.module';
 import { PersonModule } from '../person/person.module';
+import { EventStatusModule } from '../event-status/event-status.module';
+import { SupabaseAuthModule } from '../../common/config/guards/supabase-auth.module';
+import { SupabaseModule } from '../../common/config/supabase/supabase.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Event]),
     GroupHeadquartersModule,
     PersonModule,
+    EventStatusModule,
+    SupabaseModule,
+    SupabaseAuthModule,
   ],
   controllers: [EventController],
   providers: [EventService],

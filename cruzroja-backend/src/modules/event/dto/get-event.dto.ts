@@ -11,5 +11,15 @@ export class GetEventCardDDto {
     id: string;
     name: string;
   };
+  state: string;
   startAt: Date;
+  skill_quota: GetSkillQuota[];
+  is_leader: boolean;
+  is_participant: boolean;
+}
+
+export class GetSkillQuota {
+  id: string;
+  name: string;
+  quantity: string;
 }

@@ -4,6 +4,7 @@ import { PersonStatus } from '../../person-status/entity/person-status.entity';
 import { HeadquartersStatus } from '../../headquarters-status/entity/headquarters-status.entity';
 import { GroupStatus } from '../../group-status/entity/group-status.entity';
 import { ProgramStatus } from '../../program-status/entity/program-status.entity';
+import { EventStatus } from '../../event-status/entity/event-status.entity';
 
 @Entity()
 export class State {
@@ -20,5 +21,7 @@ export class State {
   @OneToMany(() => GroupStatus, (gs) => gs.state)
   group_status: GroupStatus[];
   @OneToMany(() => ProgramStatus, (ps) => ps.state)
-  program_status: GroupStatus[];
+  program_status: ProgramStatus[];
+  @OneToMany(() => EventStatus, (es) => es.state)
+  event_status: EventStatus[];
 }

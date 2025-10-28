@@ -7,7 +7,7 @@ import { type_affiliation } from '../eps-person/enum/eps-person.enum';
 import { CreateEpsPersonDTO } from '../eps-person/dto/create-eps-person.dto';
 import { EpsPerson } from '../eps-person/entity/eps-person.entity';
 import { PersonRole } from '../person-role/entity/person-role.entity';
-import { assertFound, conflict } from '../../common/utils/assert';
+import { assertFound } from '../../common/utils/assert';
 import { PersonStatus } from '../person-status/entity/person-status.entity';
 import { GetPersonTableDto } from './dto/get-person-table.dto';
 import {
@@ -19,13 +19,14 @@ import { ProgramStatusService } from '../program-status/program-status.service';
 import { UpdatePersonDto } from './dto/update-person.dto';
 import { EpsPersonService } from '../eps-person/eps-person.service';
 import { EmailService } from '../email/email.service';
-import { SendEmail } from '../email/dto/send-email.dto';
+import { SendEmailRegister } from '../email/dto/send-email.dto';
 import { GetPersons } from './dto/get-person.dto';
 import { GetLoginPersonDto } from './dto/get-login-person.dto';
 import { PersonSkillService } from '../person-skill/person-skill.service';
 import { PersonSkill } from '../person-skill/entity/person-skill.entity';
 import { PersonRoleService } from '../person-role/person-role.service';
 import { GetTableSpecialEvent } from './dto/get-table-special-event';
+import { GetEventCardDDto } from '../event/dto/get-event.dto';
 
 @Injectable()
 export class PersonService {
@@ -194,7 +195,7 @@ export class PersonService {
   }
 
   async sendEmail(email: string, password: string): Promise<void> {
-    const send = new SendEmail();
+    const send = new SendEmailRegister();
     send.email = email;
     send.password = password;
     await this.nodeEmailerService.sendEmailRegister(send);
@@ -227,15 +228,16 @@ export class PersonService {
           id: dto.id_location,
         },
       });
+      await this.associateStatus(manager, id, dto.id_state);
       await this.checkCurrentRolePerson(
         manager,
         id,
         dto.id_headquarters,
+        dto.id_state,
         dto.id_group,
         dto.id_program,
       );
       await this.associateEps(manager, id, dto.id_eps, dto.type_affiliation);
-      await this.associateStatus(manager, id, dto.id_state);
       await this.associateSkills(manager, dto.skills, id);
       return { success: true, message: 'Persona actualizada exitosamente.' };
     });
@@ -386,6 +388,7 @@ export class PersonService {
     manager: EntityManager,
     id_person: string,
     id_headquarters: number,
+    id_state: number,
     id_group?: number,
     id_program?: number,
   ) {
@@ -405,24 +408,19 @@ export class PersonService {
       const samePlacement =
         currentRole.headquarters.id === id_headquarters &&
         norm(currentRole.group?.id) === norm(id_group) &&
-        norm(currentRole.group?.id) === norm(id_program);
+        norm(currentRole.group?.id) === norm(id_program) &&
+        id_state != 3;
       if (!samePlacement) {
-        if (currentRole.role.id === 5) {
-          await manager.update(PersonRole, currentRole.id, {
-            end_date: new Date(),
-          });
-          await this.associateRole(
-            manager,
-            id_person,
-            id_headquarters,
-            id_group,
-            id_program,
-          );
-        } else {
-          conflict(
-            'No se puede cambiar la sede, agrupacion o programa de una persona que tenga un rol diferente a voluntario',
-          );
-        }
+        await manager.update(PersonRole, currentRole.id, {
+          end_date: new Date(),
+        });
+        await this.associateRole(
+          manager,
+          id_person,
+          id_headquarters,
+          id_group,
+          id_program,
+        );
       }
     }
   }
@@ -515,12 +513,6 @@ export class PersonService {
   async getTableSpecialEvent() {
     const rows = await this.personRepository.find({
       where: {
-        person_roles: {
-          role: {
-            id: 5,
-          },
-          end_date: IsNull(),
-        },
         person_status: {
           state: {
             id: 3,
@@ -545,10 +537,65 @@ export class PersonService {
     return rows.map((row) => {
       const dto = new GetTableSpecialEvent();
       dto.id = String(row.id);
-      dto.name = FormatNamesString(row.name);
+      dto.name =
+        FormatNamesString(row.name) + ' ' + FormatNamesString(row.last_name);
       dto.document = row.document;
       dto.email = FormatNamesString(row.email);
       return dto;
+    });
+  }
+
+  async sendNotification(id_headquarters: number, event: GetEventCardDDto) {
+    const persons = await this.personRepository.find({
+      where: {
+        person_roles: {
+          end_date: IsNull(),
+          headquarters: {
+            id: id_headquarters,
+          },
+          role: {
+            id: 5,
+          },
+        },
+        person_status: {
+          state: {
+            id: 3,
+          },
+          end_date: IsNull(),
+        },
+      },
+      select: {
+        email: true,
+      },
+    });
+    const emails = Array.from(
+      new Set(
+        persons
+          .map((p) => (p.email ?? '').trim())
+          .filter((e) => e && e.includes('@')),
+      ),
+    );
+    await this.nodeEmailerService.sendEmailNewEventMany(emails, event);
+  }
+
+  async getSkills(id_user: string) {
+    const person = await this.personRepository.findOne({
+      where: {
+        id: id_user,
+        person_skills: {
+          state: true,
+        },
+      },
+      relations: {
+        person_skills: {
+          skill: true,
+        },
+      },
+    });
+    assertFound(person, 'No se encontro a la persona especificada');
+    const skills = person.person_skills;
+    return skills?.map((skill) => {
+      return skill.skill.id;
     });
   }
 }

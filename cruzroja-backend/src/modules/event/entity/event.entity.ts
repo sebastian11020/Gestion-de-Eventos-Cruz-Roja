@@ -3,6 +3,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Location } from '../../location/entity/location.entity';
@@ -12,6 +13,9 @@ import { EventFrame } from '../../event-frame/entity/event-frame';
 import { Person } from '../../person/entity/person.entity';
 import { Headquarters } from '../../headquarters/entity/headquarters.entity';
 import { GroupHeadquarters } from '../../group-headquarters/entity/group-headquarters.entity';
+import { EventStatus } from '../../event-status/entity/event-status.entity';
+import { EventQuota } from '../../event-quota/entity/event-quota.entity';
+import { EventEnrollment } from '../../event-enrollment/entity/event-enrollment.entity';
 
 @Entity()
 export class Event {
@@ -64,4 +68,10 @@ export class Event {
   })
   @JoinColumn({ name: 'id_group' })
   groupHeadquarters: GroupHeadquarters;
+  @OneToMany(() => EventStatus, (es) => es.event)
+  eventStatus: EventStatus[];
+  @OneToMany(() => EventQuota, (eq) => eq.event)
+  event_quotas: EventQuota[];
+  @OneToMany(() => EventEnrollment, (e) => e.event)
+  event_enrollment: EventEnrollment[];
 }

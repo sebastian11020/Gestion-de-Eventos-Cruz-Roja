@@ -1,8 +1,10 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { ScopeService } from './scope.service';
 import { CreateScopeDto } from './dto/create-scope.dto';
+import { SupabaseAuthGuard } from '../../common/config/guards/supabase-auth.guard';
 
 @Controller('scope')
+@UseGuards(SupabaseAuthGuard)
 export class ScopeController {
   constructor(private readonly scopeService: ScopeService) {}
 

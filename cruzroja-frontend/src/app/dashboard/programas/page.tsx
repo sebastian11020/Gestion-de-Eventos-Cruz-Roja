@@ -20,7 +20,7 @@ import { PageBtn } from "@/components/buttons/pageButton";
 import { CreateProgramForm } from "@/components/forms/createProgramForm";
 import { AssociateProgramForm } from "@/components/forms/associateProgramForm";
 import { Loading } from "@/components/ui/loading";
-import {deleteSectional} from "@/services/serviceCreateSectional";
+import { deleteSectional } from "@/services/serviceCreateSectional";
 
 export default function Programas() {
   const [open, setOpen] = useState(false);
@@ -62,24 +62,24 @@ export default function Programas() {
     setOpen(false);
     setQuery("");
     setPage(1);
-      await toast.promise(
-         createProgramService(payload).then((res) => {
-              if (!res.success) {
-                  return Promise.reject(res);
-              }
-              return res;
-          }),
-          {
-              loading: "Creando...",
-              success: (res: { message?: string }) => {
-                  return <b>{res.message ?? "Creando correctamente"}</b>;
-              },
-              error: (res: { message?: string }) => (
-                  <b>{res.message ?? "No se pudo crear"}</b>
-              ),
-          }
-      );
-      await reload();
+    await toast.promise(
+      createProgramService(payload).then((res) => {
+        if (!res.success) {
+          return Promise.reject(res);
+        }
+        return res;
+      }),
+      {
+        loading: "Creando...",
+        success: (res: { message?: string }) => {
+          return <b>{res.message ?? "Creando correctamente"}</b>;
+        },
+        error: (res: { message?: string }) => (
+          <b>{res.message ?? "No se pudo crear"}</b>
+        ),
+      },
+    );
+    await reload();
   }
   async function handleAssociateCatalog(payload: createProgram) {
     const newPayload = { ...payload, leader: documentSelected };
@@ -87,24 +87,24 @@ export default function Programas() {
     setOpen(false);
     setQuery("");
     setPage(1);
-      await toast.promise(
-          associateProgramService(newPayload).then((res) => {
-              if (!res.success) {
-                  return Promise.reject(res);
-              }
-              return res;
-          }),
-          {
-              loading: "Asociando...",
-              success: (res: { message?: string }) => {
-                  return <b>{res.message ?? "Asociando correctamente"}</b>;
-              },
-              error: (res: { message?: string }) => (
-                  <b>{res.message ?? "No se pudo asociar"}</b>
-              ),
-          }
-      );
-      await reload();
+    await toast.promise(
+      associateProgramService(newPayload).then((res) => {
+        if (!res.success) {
+          return Promise.reject(res);
+        }
+        return res;
+      }),
+      {
+        loading: "Asociando...",
+        success: (res: { message?: string }) => {
+          return <b>{res.message ?? "Asociando correctamente"}</b>;
+        },
+        error: (res: { message?: string }) => (
+          <b>{res.message ?? "No se pudo asociar"}</b>
+        ),
+      },
+    );
+    await reload();
   }
 
   return (

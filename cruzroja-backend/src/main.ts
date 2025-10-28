@@ -16,14 +16,22 @@ async function bootstrap() {
   );
   const allowedOrigins = process.env.ALLOWED_ORIGINS;
 
-  app.useGlobalFilters(new GlobalHttpExceptionFilter());
+ // app.useGlobalFilters(new GlobalHttpExceptionFilter());
 
   app.enableCors({
     origin: allowedOrigins,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'apikey',
+      'x-client-info',
+      'x-supabase-authorization',
+    ],
     credentials: true,
+    maxAge: 86400,
   });
+
   await app.listen(process.env.PORT ?? 8080);
 }
 bootstrap();

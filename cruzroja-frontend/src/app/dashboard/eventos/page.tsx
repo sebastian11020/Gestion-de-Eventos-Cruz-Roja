@@ -3,43 +3,109 @@
 import { useMemo, useState } from "react";
 import { EventCard } from "@/components/cards/eventCard";
 import Modal from "@/components/layout/modal";
-import Podium from "@/components/layout/podium";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, History, PlusCircle } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  History,
+  PlusCircle,
+  Loader2,
+  ScanLine,
+} from "lucide-react";
 import type { event as EventType } from "@/types/usertType";
 import CreateEventForm from "@/components/forms/createEventForm";
 import { PAGE_SIZE } from "@/const/consts";
-import {useSectionalsNode} from "@/hooks/useSectionalsNode";
+import { useSectionalsNode } from "@/hooks/useSectionalsNode";
+import { useEventData } from "@/hooks/useEventData";
+import toast from "react-hot-toast";
+import { inscribeEvent } from "@/services/serviceGetEvent";
+import { ReadQrDialog } from "@/components/layout/readQrDialog";
 
 function asDateRange(e: Pick<EventType, "startDate" | "endDate">) {
   if (e.startDate && e.endDate) return `${e.startDate} – ${e.endDate}`;
   return e.startDate ?? e.endDate ?? "";
 }
-function isPast(startAt?: string) {
-  if (!startAt) return false;
-  const now = new Date();
-  return new Date(startAt).getTime() < now.getTime();
+
+function normalizeStatus(raw: unknown): string {
+  const s =
+    (typeof raw === "string" && raw) ||
+    (raw && typeof (raw as any).name === "string" && (raw as any).name) ||
+    (raw && typeof (raw as any).code === "string" && (raw as any).code) ||
+    "";
+  return s.toString().trim().toUpperCase();
+}
+function getEventStatus(e: any): string {
+  return normalizeStatus(
+    e?.state ??
+      e?.eventStatus?.state ??
+      e?.eventStatus ??
+      e?.event_status?.state ??
+      e?.event_status,
+  );
+}
+function getEndAt(e: any): string | undefined {
+  return (
+    e?.startAt || e?.endAt || e?.endDate || e?.end_date || e?.estimated_end_date
+  );
+}
+function isDatePast(iso?: string) {
+  if (!iso) return false;
+  const t = new Date(iso).getTime();
+  if (Number.isNaN(t)) return false;
+  return t < Date.now();
+}
+function isHistoryEvent(e: any) {
+  const status = getEventStatus(e);
+  const endAt = getEndAt(e);
+  const FINISHED = ["FINALIZADO", "FINALIZED"];
+  const CANCELED = ["CANCELADO", "CANCELED", "CANCELLED"];
+  const ONGOING = ["EN CURSO", "ONGOING", "IN_PROGRESS", "EN_CURSO"];
+  if (FINISHED.includes(status) || CANCELED.includes(status)) return true;
+  const endedByTime = isDatePast(endAt);
+  const isOngoing = ONGOING.includes(status);
+  if (endedByTime && !isOngoing) return true;
+  return false;
+}
+
+function EventCardSkeleton() {
+  return (
+    <div className="w-full max-w-sm bg-white rounded-2xl border border-gray-100 shadow-sm p-4 animate-pulse">
+      <div className="h-4 w-24 rounded bg-gray-200 mb-3" />
+      <div className="h-5 w-3/4 rounded bg-gray-200 mb-2" />
+      <div className="h-4 w-1/2 rounded bg-gray-200 mb-4" />
+      <div className="h-3 w-full rounded bg-gray-200 mb-2" />
+      <div className="h-3 w-5/6 rounded bg-gray-200 mb-2" />
+      <div className="h-3 w-4/6 rounded bg-gray-200 mb-6" />
+      <div className="flex gap-2">
+        <div className="h-9 w-24 rounded-xl bg-gray-200" />
+        <div className="h-9 w-28 rounded-xl bg-gray-200" />
+      </div>
+    </div>
+  );
 }
 
 export default function EventosPage() {
-  const events: EventType[] = [];
-  const {sectionals,cities,loading,reload} = useSectionalsNode()
+  const { sectionals, cities } = useSectionalsNode();
   const [page, setPage] = useState(1);
   const [showHistory, setShowHistory] = useState(false);
-
   const [openCreate, setOpenCreate] = useState(false);
+  const [qrOpen, setQrOpen] = useState(false);
+
+  const { events, reload, skills, loading } = useEventData();
 
   const filtered = useMemo(
     () =>
       events.filter((e) =>
-        showHistory ? isPast((e as any).startAt) : !isPast((e as any).startAt),
+        showHistory ? isHistoryEvent(e) : !isHistoryEvent(e),
       ),
     [events, showHistory],
   );
+
   const totalPages = useMemo(
     () => Math.max(1, Math.ceil(filtered.length / PAGE_SIZE)),
     [filtered.length],
   );
+
   const pageSlice = useMemo(() => {
     const start = (page - 1) * PAGE_SIZE;
     const end = start + PAGE_SIZE;
@@ -55,69 +121,138 @@ export default function EventosPage() {
     [filtered.length, page],
   );
 
-  const handleSubscribe = (eventId: string) => {
-    console.log("Inscrito en evento", eventId);
-  };
+  async function handleSubscribe(eventId: string, idSkill: string) {
+    try {
+      await toast.promise(
+        inscribeEvent(eventId, idSkill).then((res) => {
+          if (!res.success) return Promise.reject(res);
+          return res;
+        }),
+        {
+          loading: "Inscribiendo a evento...",
+          success: (res: { message?: string }) => (
+            <b>{res.message ?? "Inscrito correctamente"}</b>
+          ),
+          error: (res: { message?: string }) => (
+            <b>{res.message ?? "No se pudo inscribir"}</b>
+          ),
+        },
+      );
+      await reload();
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   return (
     <div className="p-6 space-y-6">
+      {/* Barra superior */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-xl md:text-2xl font-bold text-gray-800 tracking-tight">
           Eventos
         </h1>
+
         <div className="flex items-center gap-2">
+          {/* 🟨 Botón Leer QR */}
+          <Button
+            type="button"
+            onClick={() => setQrOpen(true)}
+            disabled={loading}
+            className="
+              flex items-center gap-2 rounded-xl
+              bg-indigo-600 text-white font-medium
+              hover:bg-indigo-700 hover:shadow-md
+              transition-all duration-200 ease-in-out
+              focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2
+            "
+            title="Leer QR para registrar asistencia"
+          >
+            {loading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <ScanLine className="w-4 h-4" />
+            )}
+            Leer QR
+          </Button>
+
           <Button
             type="button"
             variant="outline"
             onClick={() => setShowHistory((v) => !v)}
+            disabled={loading}
             className={`
-    flex items-center gap-2 rounded-xl border-2 
-    border-gray-300 text-gray-700 font-medium
-    hover:bg-gray-100 hover:text-blue-700 hover:border-blue-400
-    active:scale-[0.97]
-    transition-all duration-200 ease-in-out
-    focus:ring-2 focus:ring-blue-400 focus:ring-offset-2
-  `}
+              flex items-center gap-2 rounded-xl border-2 
+              border-gray-300 text-gray-700 font-medium
+              hover:bg-gray-100 hover:text-blue-700 hover:border-blue-400
+              active:scale-[0.97]
+              transition-all duration-200 ease-in-out
+              focus:ring-2 focus:ring-blue-400 focus:ring-offset-2
+            `}
           >
-            <History className="w-4 h-4" />
+            {loading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <History className="w-4 h-4" />
+            )}
             {showHistory ? "Ver próximos" : "Ver historial"}
           </Button>
 
           <Button
             type="button"
             onClick={() => setOpenCreate(true)}
+            disabled={loading}
             className="
-    flex items-center gap-2 rounded-xl
-    bg-blue-600 text-white font-medium
-    hover:bg-blue-700 hover:shadow-md
-    transition-all duration-200 ease-in-out
-    focus:ring-2 focus:ring-blue-400 focus:ring-offset-2
-  "
+              flex items-center gap-2 rounded-xl
+              bg-blue-600 text-white font-medium
+              hover:bg-blue-700 hover:shadow-md
+              transition-all duration-200 ease-in-out
+              focus:ring-2 focus:ring-blue-400 focus:ring-offset-2
+            "
           >
-            <PlusCircle className="w-4 h-4" />
+            {loading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <PlusCircle className="w-4 h-4" />
+            )}
             Crear evento
           </Button>
         </div>
       </div>
+
+      {/* Tarjetas */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {pageSlice.map((e, idx) => {
-          const composedDate = (e as any).date ?? asDateRange(e);
-          const id = (e as any).id ?? String((page - 1) * PAGE_SIZE + idx);
-          return (
-            <EventCard
-              key={id}
-              title={e.title}
-              description={e.description}
-              date={composedDate}
-              location={e.location}
-              capacity={e.capacity as any}
-              showSuscribe={!showHistory}
-              onSubscribe={() => handleSubscribe(id)}
-              onViewEnrolled={() => console.log("Ver inscritos de", id)}
-            />
-          );
-        })}
-        {pageSlice.length === 0 && (
+        {loading
+          ? Array.from({ length: PAGE_SIZE }).map((_, i) => (
+              <EventCardSkeleton key={`skeleton-${i}`} />
+            ))
+          : pageSlice.map((e, idx) => {
+              const composedDate = (e as any).date ?? asDateRange(e);
+              const id = (e as any).id ?? String((page - 1) * PAGE_SIZE + idx);
+              return (
+                <EventCard
+                  id={e.id ?? ""}
+                  key={e.id}
+                  title={e.title}
+                  streetAddress={e.streetAddress}
+                  leader={e.leader}
+                  description={e.description}
+                  date={composedDate}
+                  location={e.location}
+                  capacity={e.capacity as any}
+                  isInscrit={e.is_participant}
+                  isLeader={e.is_leader}
+                  state={e.state}
+                  skillQuotas={e.skill_quota}
+                  skillsUser={skills}
+                  showSuscribe={!showHistory}
+                  onDelete={reload}
+                  onSubscribe={(skillId) => handleSubscribe(id, skillId)}
+                  onViewEnrolled={() => console.log("Ver inscritos de", id)}
+                />
+              );
+            })}
+
+        {!loading && pageSlice.length === 0 && (
           <div className="col-span-full text-sm text-gray-600">
             {showHistory
               ? "No hay eventos en el historial."
@@ -125,10 +260,11 @@ export default function EventosPage() {
           </div>
         )}
       </div>
-
       <div className="mt-2 flex items-center justify-between">
         <span className="text-sm text-gray-600">
-          Mostrando {showingFrom}–{showingTo} de {filtered.length}
+          {loading
+            ? "Cargando eventos…"
+            : `Mostrando ${showingFrom}–${showingTo} de ${filtered.length}`}
         </span>
         <div className="flex items-center gap-2">
           <Button
@@ -136,7 +272,7 @@ export default function EventosPage() {
             variant="outline"
             className="flex items-center gap-2 rounded-xl"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page === 1}
+            disabled={loading || page === 1}
           >
             <ChevronLeft className="w-4 h-4" />
             Anterior
@@ -149,7 +285,7 @@ export default function EventosPage() {
             variant="outline"
             className="flex items-center gap-2 rounded-xl"
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-            disabled={page === totalPages}
+            disabled={loading || page === totalPages}
           >
             Siguiente
             <ChevronRight className="w-4 h-4" />
@@ -157,6 +293,7 @@ export default function EventosPage() {
         </div>
       </div>
 
+      {/* Modal crear */}
       <Modal
         open={openCreate}
         onClose={() => setOpenCreate(false)}
@@ -164,13 +301,18 @@ export default function EventosPage() {
       >
         <CreateEventForm
           onCancel={() => setOpenCreate(false)}
-          onSuccess={() => {
-            setOpenCreate(false);
-          }}
+          onSuccess={() => setOpenCreate(false)}
           cities={cities}
+          onReload={reload}
           sectionals={sectionals}
         />
       </Modal>
+
+      <ReadQrDialog
+        open={qrOpen}
+        onClose={() => setQrOpen(false)}
+        apiBase={process.env.NEXT_PUBLIC_API_URL || ""}
+      />
     </div>
   );
 }

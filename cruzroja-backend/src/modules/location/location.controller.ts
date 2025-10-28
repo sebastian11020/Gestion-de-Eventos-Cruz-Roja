@@ -8,11 +8,14 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { LocationService } from './location.service';
 import { CreateLocationDto } from './dto/create-location.dto';
 import { UpdateLocationDto } from './dto/update-location.dto';
+import { SupabaseAuthGuard } from '../../common/config/guards/supabase-auth.guard';
 
+@UseGuards(SupabaseAuthGuard)
 @Controller('location')
 export class LocationController {
   constructor(private readonly locationService: LocationService) {}
