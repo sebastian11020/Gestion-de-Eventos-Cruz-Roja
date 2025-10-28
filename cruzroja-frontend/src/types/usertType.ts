@@ -151,7 +151,14 @@ export type event = {
   description: string;
   startDate: string;
   endDate: string;
-  location: string;
+    department: {
+        id: string;
+        name: string;
+    };
+    city: {
+        id: string;
+        name:string;
+    };
   capacity: string;
   is_leader: boolean;
   is_participant: boolean;

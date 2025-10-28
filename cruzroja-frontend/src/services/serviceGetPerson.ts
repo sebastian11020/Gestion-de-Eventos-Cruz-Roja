@@ -78,7 +78,7 @@ export async function getPersonEvent() {
 export async function getAssistEvent(id:string) {
     try {
         const response = await axios.get(
-            `${process.env.NEXT_PUBLIC_API_URL}/event-enrollment/get-participantst-table/${id}`,
+            `${process.env.NEXT_PUBLIC_API_URL}/event-enrollment/get-participants-table/${id}`,
             {
                 headers: {
                     Authorization: `Bearer ${session?.access_token}`,
@@ -95,10 +95,10 @@ export async function removeAssistEvent(id_event:string,id_user:string) {
     try {
         const payload = {
             id_event:id_event,
-            id_user:id_user,
+            id_person:id_user,
         }
-        const response = await axios.put(
-            `${process.env.NEXT_PUBLIC_API_URL}/event/enrollment/get-participants-event`,payload,
+        const response = await axios.post(
+            `${process.env.NEXT_PUBLIC_API_URL}/event-enrollment/canceled-enrollment`,payload,
             {
                 headers: {
                     Authorization: `Bearer ${session?.access_token}`,
