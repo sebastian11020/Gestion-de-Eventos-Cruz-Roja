@@ -214,7 +214,9 @@ export class EventService {
     dayjs.locale('es');
     const rows: EventEntity[] = await this.eventRepository.find({
       relations: {
-        location: true,
+        location: {
+          parent: true,
+        },
         person: true,
         eventStatus: {
           state: true,
@@ -240,7 +242,14 @@ export class EventService {
         .format('D MMMM YYYY, hh:mm A');
       dto.capacity = String(row.max_volunteers);
       dto.streetAddress = row.street_address;
-      dto.location = FormatNamesString(row.location.name);
+      dto.city = {
+        id: String(row.location.id),
+        name: FormatNamesString(row.location.name),
+      };
+      dto.department = {
+        id: String(row.location.parent?.id),
+        name: FormatNamesString(row.location.parent?.name ?? ''),
+      };
       dto.leader = {
         id: row.person.document,
         name:
@@ -308,55 +317,47 @@ export class EventService {
     id_event: number,
     skill_quotas: SkillQuota[],
   ) {
-    let currentSkillQuotas = await manager.find(EventQuota, {
-      where: {
-        event: {
-          id: id_event,
-        },
-      },
+    const repo = manager.getRepository(EventQuota);
+
+    const current = await repo.find({
+      where: { event: { id: id_event } },
+      relations: { skill: true },
     });
-    for (const skillQuota of skill_quotas) {
-      const currentSkill = await manager.findOne(EventQuota, {
-        where: {
-          event: {
-            id: skillQuota.id,
-          },
-          skill: {
-            id: skillQuota.id,
-          },
-        },
-      });
-      if (currentSkill) {
-        currentSkillQuotas = currentSkillQuotas.filter(
-          (eq) => eq.skill.id === currentSkill.id,
-        );
-        await manager.update(EventQuota, currentSkill.id, {
-          quota: skillQuota.qty,
-        });
+
+    const currentBySkillId = new Map<number, EventQuota>(
+      current.map((eq) => [Number(eq.skill.id), eq]),
+    );
+    new Set<number>(skill_quotas.map((sq) => Number(sq.id)));
+    for (const { id: skillId, qty } of skill_quotas) {
+      const safeQty = Math.max(0, Number(qty) || 0);
+      const existing = currentBySkillId.get(Number(skillId));
+
+      if (existing) {
+        if (existing.quota !== safeQty) {
+          await repo.update(existing.id, { quota: safeQty });
+        }
+        currentBySkillId.delete(Number(skillId));
       } else {
-        await manager.save(EventQuota, {
-          skill: {
-            id: skillQuota.id,
-          },
-          event: {
-            id: id_event,
-          },
-          quota: skillQuota.qty,
-        });
+        await repo.save(
+          repo.create({
+            event: { id: id_event },
+            skill: { id: Number(skillId) },
+            quota: safeQty,
+          }),
+        );
       }
     }
-    if (currentSkillQuotas.length > 0)
-      await this.deactivateQuota(manager, currentSkillQuotas);
-  }
 
-  private async deactivateQuota(
-    manager: EntityManager,
-    event_quotas: EventQuota[],
-  ) {
-    for (const event_quota of event_quotas) {
-      await manager.update(EventQuota, event_quota.id, {
-        quota: 0,
-      });
+    if (currentBySkillId.size > 0) {
+      const toZeroIds = Array.from(currentBySkillId.values()).map(
+        (eq) => eq.id,
+      );
+      await repo
+        .createQueryBuilder()
+        .update(EventQuota)
+        .set({ quota: 0 })
+        .whereInIds(toZeroIds)
+        .execute();
     }
   }
 
@@ -370,7 +371,9 @@ export class EventService {
         id: id_event,
       },
       relations: {
-        location: true,
+        location: {
+          parent: true,
+        },
         person: true,
         eventStatus: {
           state: true,
@@ -396,7 +399,14 @@ export class EventService {
       .format('D MMMM YYYY, hh:mm A');
     dto.capacity = String(event.max_volunteers);
     dto.streetAddress = event.street_address;
-    dto.location = FormatNamesString(event.location.name);
+    dto.city = {
+      id: String(event.location.id),
+      name: FormatNamesString(event.location.name),
+    };
+    dto.department = {
+      id: String(event.location.parent?.id),
+      name: FormatNamesString(event.location.parent?.name ?? ''),
+    };
     dto.leader = {
       id: event.person.id,
       name:
