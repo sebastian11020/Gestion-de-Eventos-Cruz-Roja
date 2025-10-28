@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Event as EventEntity } from './entity/event.entity';
+import { Event, Event as EventEntity } from './entity/event.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateEventForm, SkillQuota } from './dto/create-event.dto';
 import {
@@ -14,11 +14,14 @@ import timezone from 'dayjs/plugin/timezone';
 import 'dayjs/locale/es';
 import { EntityManager, Repository } from 'typeorm';
 import { Person } from '../person/entity/person.entity';
-import { assertFound } from '../../common/utils/assert';
+import { assert, assertFound, conflict } from '../../common/utils/assert';
 import { EventStatusService } from '../event-status/event-status.service';
 import { EventStatus } from '../event-status/entity/event-status.entity';
 import { EventQuota } from '../event-quota/entity/event-quota.entity';
 import { PersonService } from '../person/person.service';
+import { EventEnrollment } from '../event-enrollment/entity/event-enrollment.entity';
+import { EventAttendance } from '../event_attendance/entity/event_attendance.entity';
+import { EditEventDto } from './dto/edit-event.dto';
 
 @Injectable()
 export class EventService {
@@ -32,6 +35,7 @@ export class EventService {
 
   async create(eventForm: CreateEventForm) {
     return this.eventRepository.manager.transaction(async (manager) => {
+      let state = 8;
       const idGroupHeadquarters =
         await this.groupHeadquartersService.findOneById(
           eventForm.sectionalId,
@@ -52,8 +56,9 @@ export class EventService {
         decree_1809_applies: eventForm.applyDecreet,
         is_private: eventForm.isPrivate,
         is_adult: eventForm.isAdult,
+        is_emergency: eventForm.isEmergency,
         max_volunteers: eventForm.capacity,
-        street_address: eventForm.streetAddress,
+        street_address: NormalizeString(eventForm.streetAddress),
         location: {
           id: eventForm.city,
         },
@@ -77,14 +82,104 @@ export class EventService {
         },
       });
       newEvent = await manager.save(EventEntity, newEvent);
-      await this.assignStatus(manager, newEvent.id, 8);
-      await this.assignSkillQuota(
-        manager,
-        newEvent.id,
-        eventForm.skillsQuotasList,
-      );
+      if (newEvent.is_private) {
+        const participants = eventForm.participants;
+        assert(
+          participants,
+          'Para crear un evento privado, tienes que agregar los participantes',
+        );
+        if (participants.length > eventForm.capacity) {
+          conflict(
+            'No se pueden registrar mas voluntarios de los indicados en el formulario.',
+          );
+        }
+
+        await this.assignSkillQuota(manager, newEvent.id, [
+          {
+            id: 3,
+            qty: eventForm.capacity,
+          },
+        ]);
+        await this.privateEvent(
+          manager,
+          newEvent.id,
+          participants,
+          newEvent.start_date,
+          newEvent.estimated_end_date,
+        );
+        state = 10;
+      } else {
+        await this.assignSkillQuota(
+          manager,
+          newEvent.id,
+          eventForm.skillsQuotasList,
+        );
+      }
+      await this.assignStatus(manager, newEvent.id, state);
       //await this.sendNotification(manager, eventForm.sectionalId, newEvent.id);
       return { success: true, message: 'Evento creado exitosamente.' };
+    });
+  }
+
+  async edit(id: number, dto: EditEventDto) {
+    return this.eventRepository.manager.transaction(async (manager) => {
+      const coordinatorEvent = await manager.findOne(Person, {
+        where: {
+          document: dto.attendant,
+        },
+      });
+      assertFound(coordinatorEvent, 'No se encontro el encargado especificado');
+      await manager.update(EventEntity, id, {
+        name: NormalizeString(dto.title),
+        description: NormalizeString(dto.description),
+        start_date: dto.startDate,
+        estimated_end_date: dto.endDate,
+        location: {
+          id: dto.location,
+        },
+        street_address: NormalizeString(dto.streetAddress),
+        person: {
+          id: coordinatorEvent.id,
+        },
+      });
+      await this.changeSkillQuota(manager, id, dto.skill_quota);
+    });
+  }
+
+  private async privateEvent(
+    manager: EntityManager,
+    id_event: number,
+    participants: string[],
+    start_date: Date,
+    end_date: Date,
+  ) {
+    for (const participant of participants) {
+      let enrollment = manager.create(EventEnrollment, {
+        event: {
+          id: id_event,
+        },
+        person: {
+          document: participant,
+        },
+        skill: {
+          id: 3,
+        },
+      });
+      enrollment = await manager.save(enrollment);
+      await manager.save(EventAttendance, {
+        enrollment: {
+          id: enrollment.id,
+        },
+        check_in: start_date,
+        check_out: end_date,
+        total_hours: this.calculateApproximateHours(
+          start_date.toISOString(),
+          end_date.toISOString(),
+        ),
+      });
+    }
+    await manager.update(Event, id_event, {
+      end_date: end_date,
     });
   }
 
@@ -208,6 +303,63 @@ export class EventService {
     }
   }
 
+  private async changeSkillQuota(
+    manager: EntityManager,
+    id_event: number,
+    skill_quotas: SkillQuota[],
+  ) {
+    let currentSkillQuotas = await manager.find(EventQuota, {
+      where: {
+        event: {
+          id: id_event,
+        },
+      },
+    });
+    for (const skillQuota of skill_quotas) {
+      const currentSkill = await manager.findOne(EventQuota, {
+        where: {
+          event: {
+            id: skillQuota.id,
+          },
+          skill: {
+            id: skillQuota.id,
+          },
+        },
+      });
+      if (currentSkill) {
+        currentSkillQuotas = currentSkillQuotas.filter(
+          (eq) => eq.skill.id === currentSkill.id,
+        );
+        await manager.update(EventQuota, currentSkill.id, {
+          quota: skillQuota.qty,
+        });
+      } else {
+        await manager.save(EventQuota, {
+          skill: {
+            id: skillQuota.id,
+          },
+          event: {
+            id: id_event,
+          },
+          quota: skillQuota.qty,
+        });
+      }
+    }
+    if (currentSkillQuotas.length > 0)
+      await this.deactivateQuota(manager, currentSkillQuotas);
+  }
+
+  private async deactivateQuota(
+    manager: EntityManager,
+    event_quotas: EventQuota[],
+  ) {
+    for (const event_quota of event_quotas) {
+      await manager.update(EventQuota, event_quota.id, {
+        quota: 0,
+      });
+    }
+  }
+
   private async sendNotification(
     manager: EntityManager,
     id_headquarters: number,
@@ -290,5 +442,12 @@ export class EventService {
       await this.assignStatus(manager, id_event, 10);
       return { success: true, message: 'Evento finalizado exitosamente.' };
     });
+  }
+
+  private calculateApproximateHours(start: string, end: string): number {
+    const diffMin = dayjs(end).diff(dayjs(start), 'minute');
+    const hours = Math.floor(diffMin / 60);
+    const minutes = diffMin % 60;
+    return minutes >= 40 ? hours + 1 : hours;
   }
 }

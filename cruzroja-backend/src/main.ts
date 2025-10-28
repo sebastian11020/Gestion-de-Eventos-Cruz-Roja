@@ -16,7 +16,7 @@ async function bootstrap() {
   );
   const allowedOrigins = process.env.ALLOWED_ORIGINS;
 
- // app.useGlobalFilters(new GlobalHttpExceptionFilter());
+  // app.useGlobalFilters(new GlobalHttpExceptionFilter());
 
   app.enableCors({
     origin: allowedOrigins,

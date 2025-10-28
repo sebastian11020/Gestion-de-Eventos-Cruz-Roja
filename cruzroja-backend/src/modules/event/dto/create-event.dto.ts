@@ -60,6 +60,8 @@ export class CreateEventForm {
   participants?: string[];
   @IsArray()
   skillsQuotasList: SkillQuota[];
+  @IsBoolean()
+  isEmergency: boolean;
 }
 
 export class SkillQuota {
