@@ -1,0 +1,292 @@
+"use client";
+import { useState } from "react";
+import {
+  Users,
+  MapPin,
+  Eye,
+  ArrowLeftRight,
+  User,
+  Trash2,
+  Pencil,
+  Check,
+  X,
+  Hospital,
+} from "lucide-react";
+import Modal from "@/components/layout/modal";
+import ViewUser from "@/components/cards/viewUser";
+import ChangeLeaderTable from "@/components/tables/changeLeaderTable";
+import { ConfirmDialog } from "@/components/cards/confitmDialog";
+import type {
+  FormState,
+  leaderDataTable,
+  program as TProgram,
+} from "@/types/usertType";
+import { deleteProgram, updateProgram } from "@/services/serviceCreateProgram";
+import toast from "react-hot-toast";
+import { getPersonId } from "@/services/serviceGetPerson";
+
+type SectionalCardProps = {
+  program?: TProgram;
+  users: leaderDataTable[];
+  onDeleted?: () => Promise<void> | void;
+};
+
+export function ProgramCard({ program, users, onDeleted }: SectionalCardProps) {
+  const [openChangeLeader, setOpenChangeLeader] = useState(false);
+  const [viewUser, setViewUser] = useState<FormState | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [openView, setOpenView] = useState(false);
+
+  const [localName, setLocalName] = useState(program?.name ?? "");
+  const [editing, setEditing] = useState(false);
+  const [deleteProgramId, setDeleteProgramId] = useState<string>("");
+  const [nameDraft, setNameDraft] = useState(localName);
+
+  function startEdit() {
+    setNameDraft(localName);
+    setEditing(true);
+  }
+  function cancelEdit() {
+    setEditing(false);
+    setNameDraft(localName);
+  }
+  async function handleSaveName(id: string) {
+    try {
+      const next = nameDraft.trim();
+      if (!next) return;
+      setLocalName(next);
+      await toast.promise(
+        updateProgram(id, nameDraft).then((res) => {
+          if (!res.success) {
+            return Promise.reject(res);
+          }
+          return res;
+        }),
+        {
+          loading: "Editando programa...",
+          success: (res: { message?: string }) => {
+            return <b>{res.message ?? "Editado correctamente"}</b>;
+          },
+          error: (res: { message?: string }) => (
+            <b>{res.message ?? "No se pudo editar"}</b>
+          ),
+        },
+      );
+      await onDeleted?.();
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async function onView(id: string) {
+    try {
+      const response = await getPersonId(id);
+      console.log(response.leader);
+      if (response.success) {
+        setOpenView(true);
+        setViewUser(response.leader);
+      } else {
+        toast.error(response.message);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async function handleDelete() {
+    try {
+      await toast.promise(
+        deleteProgram(deleteProgramId).then((res) => {
+          if (!res.success) {
+            return Promise.reject(res);
+          }
+          return res;
+        }),
+        {
+          loading: "Eliminando programa...",
+          success: (res: { message?: string }) => {
+            return <b>{res.message ?? "Eliminado correctamente"}</b>;
+          },
+          error: (res: { message?: string }) => (
+            <b>{res.message ?? "No se pudo eliminar"}</b>
+          ),
+        },
+      );
+      await onDeleted?.();
+      setConfirmOpen(false);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  return (
+    <div
+      className="
+        group rounded-2xl border border-gray-200 bg-white p-4 md:p-5
+        shadow-sm transition-all duration-200
+        hover:shadow-md hover:-translate-y-0.5
+        focus-within:ring-2 focus-within:ring-red-200
+        flex flex-col
+      "
+      role="article"
+      aria-label={localName}
+    >
+      <div className="mb-3 flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          {!editing ? (
+            <div className="flex items-center gap-2">
+              <h3 className="truncate text-base md:text-lg font-semibold text-gray-900 leading-snug">
+                {localName}
+              </h3>
+              <button
+                type="button"
+                onClick={startEdit}
+                className="
+                  inline-flex items-center justify-center rounded-full p-1.5
+                  text-gray-600 hover:text-gray-800 hover:bg-gray-100
+                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/30
+                "
+                title="Editar nombre"
+                aria-label="Editar nombre de la agrupación"
+              >
+                <Pencil className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <input
+                value={nameDraft}
+                onChange={(e) => setNameDraft(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter")
+                    handleSaveName(program?.id_program ?? "");
+                  if (e.key === "Escape") cancelEdit();
+                }}
+                required={true}
+                className="
+                  w-full min-w-0 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm
+                  text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20
+                "
+                placeholder="Nombre de la agrupación"
+                autoFocus
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  handleSaveName(program?.id_program ?? "");
+                }}
+                className="inline-flex items-center justify-center rounded-md bg-green-600 text-white p-1.5 hover:bg-green-700 active:bg-green-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500/30"
+                title="Guardar"
+                aria-label="Guardar nombre"
+              >
+                <Check className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={cancelEdit}
+                className="inline-flex items-center justify-center rounded-md bg-gray-200 text-gray-700 p-1.5 hover:bg-gray-300 active:bg-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/30"
+                title="Cancelar"
+                aria-label="Cancelar edición"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          )}
+        </div>
+        <button
+          type="button"
+          aria-label="Eliminar"
+          title="Eliminar"
+          onClick={() => {
+            (setConfirmOpen(true), setDeleteProgramId(program?.id ?? ""));
+          }}
+          className="
+            inline-flex items-center justify-center
+            rounded-full p-2
+            text-red-600 bg-red-50
+            hover:bg-red-100 hover:text-red-700
+            active:bg-red-200
+            shadow-sm transition
+            focus-visible:outline-none
+            focus-visible:ring-2 focus-visible:ring-red-500/30 focus-visible:ring-offset-2 focus-visible:ring-offset-white
+          "
+        >
+          <Trash2 className="size-4" />
+        </button>
+      </div>
+      <div className="space-y-2 text-sm text-gray-600 flex-1">
+        <div className="flex items-center gap-2">
+          <MapPin className="h-4 w-4 text-gray-400" />
+          <span className="truncate">
+            <span className="font-medium text-gray-700">Seccional:</span>{" "}
+            {program?.sectional?.name}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Hospital className="h-4 w-4 text-gray-400" />
+          <span className="truncate">
+            <span className="font-medium text-gray-700">Agrupacion:</span>{" "}
+            {program?.group}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Users className="h-4 w-4 text-gray-400" />
+          <span className="truncate">
+            <span className="font-medium text-gray-700">N° Voluntarios:</span>{" "}
+            {program?.numberVolunteers}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <User className="h-4 w-4 text-gray-400" />
+          <span className="truncate">
+            <span className="font-medium text-gray-700">Líder:</span>{" "}
+            {program?.leader?.name}
+          </span>
+        </div>
+      </div>
+      <div className="mt-4 h-px w-full bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+      <div className="pt-4 grid grid-cols-2 gap-2">
+        <button
+          onClick={() => setOpenChangeLeader(true)}
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-red-600 px-3 py-2 text-white text-sm font-medium hover:bg-red-700 active:bg-red-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-300 transition-colors"
+          aria-label="Cambiar líder"
+        >
+          <ArrowLeftRight className="w-4 h-4" />
+          Cambiar
+        </button>
+        {program?.leader?.document && (
+          <button
+            onClick={() => onView(program?.leader?.document ?? "")}
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-white text-sm font-medium hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 transition-colors"
+            aria-label="Ver líder"
+          >
+            <Eye className="w-4 h-4" />
+            Ver líder
+          </button>
+        )}
+      </div>
+      <Modal
+        open={openChangeLeader}
+        onClose={() => setOpenChangeLeader(false)}
+        title={`Voluntarios - ${localName}`}
+      >
+        <ChangeLeaderTable
+          users={users}
+          sectional={program?.sectional?.id}
+          group={program?.id}
+          onCancel={() => setOpenChangeLeader(false)}
+          isChange={true}
+          isProgram={true}
+        />
+      </Modal>
+      <ViewUser infUser={viewUser} onClose={() => setViewUser(null)} />
+
+      <ConfirmDialog
+        open={confirmOpen}
+        onCancel={() => setConfirmOpen(false)}
+        onConfirm={handleDelete}
+      />
+    </div>
+  );
+}

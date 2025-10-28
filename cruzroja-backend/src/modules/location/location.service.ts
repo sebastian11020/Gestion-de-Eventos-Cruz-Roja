@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Location } from './entity/location.entity';
@@ -25,17 +25,17 @@ export class LocationService {
     private locationRepository: Repository<Location>,
   ) {}
 
-  async getAll(): Promise<GetLocationDto[]> {
+  async getAllDto(): Promise<GetLocationDto[]> {
     const entities = await this.locationRepository.find();
     return entities.map((entity) => {
       const dto = new GetLocationDto();
-      dto.id = entity.id;
+      dto.id = String(entity.id);
       dto.name = FormatNamesString(entity.name);
       return dto;
     });
   }
 
-  async getById(id: number): Promise<GetLocationDto | null> {
+  async getByIdDto(id: number): Promise<GetLocationDto | null> {
     const entity = await this.locationRepository.findOne({
       where: {
         id: id,
@@ -46,7 +46,7 @@ export class LocationService {
       `No se encontro una ubicaion asociada al sigueinte id: ${id}`,
     );
     const dto = new GetLocationDto();
-    dto.id = id;
+    dto.id = String(id);
     dto.name = FormatNamesString(entity.name);
     return dto;
   }
@@ -60,6 +60,35 @@ export class LocationService {
         name: NormalizeString(name),
         type: type,
       },
+    });
+  }
+
+  async getById(id: number): Promise<Location | null> {
+    return this.locationRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+  }
+
+  async getMunicipalitiesByDepartmentDto(
+    id: number,
+  ): Promise<GetLocationDto[] | null> {
+    const parent = await this.getById(id);
+    assertFound(
+      parent,
+      `No se encontro una ubicacion relacionada al sigueinte id: ${id}`,
+    );
+    const municipalities = await this.locationRepository.find({
+      where: {
+        parent: parent,
+      },
+    });
+    return municipalities.map((n: Location): GetLocationDto => {
+      const dto = new GetLocationDto();
+      dto.id = String(n.id);
+      dto.name = FormatNamesString(n.name);
+      return dto;
     });
   }
 
@@ -83,7 +112,7 @@ export class LocationService {
         `Ya se encuentra una ubicacion registrada con el siguiente nombre: ${location.name}`,
       );
     await this.locationRepository.save(location);
-    return (HttpStatus.CREATED, { success: true });
+    return { success: true };
   }
 
   async update(id: number, dto: UpdateLocationDto) {
@@ -106,7 +135,7 @@ export class LocationService {
     location.name = NormalizeString(dto.name);
 
     await this.locationRepository.update(dto.id, location);
-    return (HttpStatus.OK, { success: true });
+    return { success: true };
   }
 
   private async validateDependence(
@@ -138,5 +167,24 @@ export class LocationService {
       return parent;
     }
     return null;
+  }
+
+  async getAllDepartmentWithMunicipalities() {
+    return await this.locationRepository.find({
+      where: {
+        type: LocationTypeEnum.DEPARTAMENTO,
+      },
+      relations: {
+        children: true,
+      },
+      select: {
+        id: true,
+        name: true,
+        children: {
+          id: true,
+          name: true,
+        },
+      },
+    });
   }
 }
