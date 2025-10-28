@@ -223,6 +223,13 @@ export type user = {
   role: string;
 };
 
+export type assistantEvent = {
+    name: string;
+    licence: string;
+    document: string;
+    phone: string;
+}
+
 export type skill = {
   id: string;
   name?: string;

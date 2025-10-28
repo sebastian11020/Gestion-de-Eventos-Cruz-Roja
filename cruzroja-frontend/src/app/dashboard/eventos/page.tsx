@@ -12,7 +12,7 @@ import {
   Loader2,
   ScanLine,
 } from "lucide-react";
-import type { event as EventType } from "@/types/usertType";
+import type {assistantEvent, event as EventType} from "@/types/usertType";
 import CreateEventForm from "@/components/forms/createEventForm";
 import { PAGE_SIZE } from "@/const/consts";
 import { useSectionalsNode } from "@/hooks/useSectionalsNode";
@@ -20,6 +20,8 @@ import { useEventData } from "@/hooks/useEventData";
 import toast from "react-hot-toast";
 import { inscribeEvent } from "@/services/serviceGetEvent";
 import { ReadQrDialog } from "@/components/layout/readQrDialog";
+import {getAssistEvent, removeAssistEvent} from "@/services/serviceGetPerson";
+import AssistantsDialog from "@/components/tables/assistantsDialog";
 
 function asDateRange(e: Pick<EventType, "startDate" | "endDate">) {
   if (e.startDate && e.endDate) return `${e.startDate} – ${e.endDate}`;
@@ -90,8 +92,13 @@ export default function EventosPage() {
   const [showHistory, setShowHistory] = useState(false);
   const [openCreate, setOpenCreate] = useState(false);
   const [qrOpen, setQrOpen] = useState(false);
+  const [assistant,setAssistant] = useState<assistantEvent[]>([]);
+    const [assistOpen, setAssistOpen] = useState(false);
+    const [assistLoading, setAssistLoading] = useState(false);
+    const [currentEventId, setCurrentEventId] = useState<string | null>(null);
 
-  const { events, reload, skills, loading } = useEventData();
+
+    const { events, reload, skills, loading } = useEventData();
 
   const filtered = useMemo(
     () =>
@@ -143,6 +150,28 @@ export default function EventosPage() {
       console.error(error);
     }
   }
+
+    async function hanleViewEnrolled(id: string) {
+        try {
+            setAssistLoading(true);
+            setCurrentEventId(id);
+            const response = await getAssistEvent(id);
+            setAssistant(response);
+            setAssistOpen(true);
+        } catch (e) {
+            console.error(e);
+            toast.error("No se pudieron cargar los asistentes");
+        } finally {
+            setAssistLoading(false);
+        }
+    }
+
+    async function handleRemoveAssistant(document: string) {
+        if (!currentEventId) return;
+        const res = await removeAssistEvent(currentEventId, document);
+        if (!res?.success) throw new Error(res?.message ?? "Error");
+        setAssistant((prev) => prev.filter((a) => a.document !== document));
+    }
 
   return (
     <div className="p-6 space-y-6">
@@ -247,7 +276,7 @@ export default function EventosPage() {
                   showSuscribe={!showHistory}
                   onDelete={reload}
                   onSubscribe={(skillId) => handleSubscribe(id, skillId)}
-                  onViewEnrolled={() => console.log("Ver inscritos de", id)}
+                  onViewEnrolled={() => hanleViewEnrolled(e.id ?? '')}
                 />
               );
             })}
@@ -313,6 +342,16 @@ export default function EventosPage() {
         onClose={() => setQrOpen(false)}
         apiBase={process.env.NEXT_PUBLIC_API_URL || ""}
       />
+
+        <AssistantsDialog
+            open={assistOpen}
+            onClose={() => setAssistOpen(false)}
+            assistants={assistant}
+            loading={assistLoading}
+            onRemove={handleRemoveAssistant}
+            title="Asistentes del evento"
+        />
+
     </div>
   );
 }

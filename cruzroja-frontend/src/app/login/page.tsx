@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Eye, EyeOff, Loader2 } from "lucide-react"; // 👈 1) importar spinner
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabase-browser";
 import { useRouter } from "next/navigation";
 import { getPersonData } from "@/services/serviceGetPerson";
@@ -36,11 +36,12 @@ export default function LoginCR() {
       if (!id) throw new Error("No se pudo obtener el usuario.");
       localStorage.setItem("supabase_uid", id);
       const userData: user = await getPersonData(id);
-      await fetch("/api/session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role: userData.role }),
-      });
+        await fetch("/api/session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "same-origin",
+            body: JSON.stringify({ role: userData.role }),
+        });
       localStorage.setItem("role", userData.role);
       router.replace("/dashboard");
     } catch (e: any) {
