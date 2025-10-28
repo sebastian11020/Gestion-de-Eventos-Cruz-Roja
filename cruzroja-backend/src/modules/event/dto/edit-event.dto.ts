@@ -32,7 +32,7 @@ export class EditEventDto {
   location: number;
   @IsNumber()
   @Min(1)
-  capacity: string;
+  capacity: number;
   @IsNotEmpty()
   @IsString()
   @MaxLength(120)
