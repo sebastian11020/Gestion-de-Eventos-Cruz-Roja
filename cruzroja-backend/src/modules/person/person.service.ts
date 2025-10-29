@@ -28,6 +28,7 @@ import { PersonRoleService } from '../person-role/person-role.service';
 import { GetTableSpecialEvent } from './dto/get-table-special-event';
 import { GetEventCardDDto } from '../event/dto/get-event.dto';
 import { type_document } from './enum/person.enums';
+import { UpdateProfilePersonDto } from './dto/update-profile-person.dto';
 
 @Injectable()
 export class PersonService {
@@ -258,6 +259,33 @@ export class PersonService {
       );
       await this.associateEps(manager, id, dto.id_eps, dto.type_affiliation);
       await this.associateSkills(manager, dto.skills, id);
+      return { success: true, message: 'Persona actualizada exitosamente.' };
+    });
+  }
+
+  async updateProfile(id_person: string, dto: UpdateProfilePersonDto) {
+    return this.personRepository.manager.transaction(async (manager) => {
+      await manager.update(Person, id_person, {
+        phone: dto.phone,
+        emergency_contact: {
+          name: NormalizeString(dto.emergencyContact.name),
+          relationShip: NormalizeString(dto.emergencyContact.relationShip),
+          phone: dto.emergencyContact.phone,
+        },
+        address: {
+          streetAddress: NormalizeString(dto.address.streetAddress),
+          zone: NormalizeString(dto.address.zone),
+        },
+        location: {
+          id: dto.id_location,
+        },
+      });
+      await this.associateEps(
+        manager,
+        id_person,
+        dto.id_eps,
+        dto.type_affiliation,
+      );
       return { success: true, message: 'Persona actualizada exitosamente.' };
     });
   }

@@ -13,6 +13,7 @@ import { EventService } from './event.service';
 import { CreateEventForm } from './dto/create-event.dto';
 import { SupabaseAuthGuard } from '../../common/config/guards/supabase-auth.guard';
 import { EditEventDto } from './dto/edit-event.dto';
+import { UserId } from '../../common/decorators/user.decorator';
 
 @Controller('event')
 @UseGuards(SupabaseAuthGuard)
@@ -35,8 +36,8 @@ export class EventController {
   }
 
   @Put('/start/:id')
-  async start(@Param('id', ParseIntPipe) id_event: number) {
-    return this.eventService.startEvent(id_event);
+  async start(@Param('id', ParseIntPipe) id_event: number, @UserId() userId: string) {
+    return this.eventService.startEvent(id_event, userId);
   }
 
   @Put('/end/:id')

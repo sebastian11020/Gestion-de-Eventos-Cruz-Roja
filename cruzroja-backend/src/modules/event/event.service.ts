@@ -82,13 +82,18 @@ export class EventService {
         },
       });
       newEvent = await manager.save(EventEntity, newEvent);
+      this.enrollmentCoordinatorEvent(
+        manager,
+        newEvent.id,
+        coordinatorEvent.id,
+      );
       if (newEvent.is_private) {
         const participants = eventForm.participants;
         assert(
           participants,
           'Para crear un evento privado, tienes que agregar los participantes',
         );
-        if (participants.length > eventForm.capacity) {
+        if (participants.length > eventForm.capacity - 1) {
           conflict(
             'No se pueden registrar mas voluntarios de los indicados en el formulario.',
           );
@@ -155,7 +160,6 @@ export class EventService {
     end_date: Date,
   ) {
     for (const participant of participants) {
-      console.log(participant);
       let enrollment = manager.create(EventEnrollment, {
         event: {
           id: id_event,
@@ -431,7 +435,7 @@ export class EventService {
     await this.personService.sendNotification(id_headquarters, dto);
   }
 
-  async startEvent(id_event: number) {
+  async startEvent(id_event: number, userId: string) {
     return this.eventRepository.manager.transaction(async (manager) => {
       const currentEvent = this.eventRepository.findOne({
         where: {
@@ -489,5 +493,47 @@ export class EventService {
     const currentState = event.eventStatus.find((e) => !e.end_date);
     assertFound(currentState, 'El evento no tiene un estado activo');
     return currentState.state.id === 8;
+  }
+
+  async CancellableEnrollment(id_event: number) {
+    const event = await this.eventRepository.findOne({
+      where: {
+        id: id_event,
+      },
+    });
+    assertFound(event, 'No se encontro el evento especificado');
+    return dayjs(event.start_date).diff(dayjs(), 'hour', true) > 8;
+  }
+
+  private async enrollmentCoordinatorEvent(
+    manager: EntityManager,
+    id_event: number,
+    id_person: string,
+  ) {
+    await manager.query(
+      `
+      UPDATE public.event_quota
+         SET taken = taken + 1
+       WHERE id_event = $1
+         AND id_skill = $2
+         AND taken < quota
+      RETURNING id;
+      `,
+      [id_event, 3],
+    );
+    await manager.save(
+      manager.create(EventEnrollment, {
+        event: {
+          id: id_event,
+        },
+        person: {
+          id: id_person,
+        },
+        skill: {
+          id: 3,
+        },
+        state: true,
+      }),
+    );
   }
 }

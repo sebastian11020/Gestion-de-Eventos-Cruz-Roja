@@ -14,6 +14,7 @@ import { GetPersonTableDto } from './dto/get-person-table.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
 import { SupabaseAuthGuard } from '../../common/config/guards/supabase-auth.guard';
 import { UserId } from '../../common/decorators/user.decorator';
+import { UpdateProfilePersonDto } from './dto/update-profile-person.dto';
 
 @Controller('person')
 export class PersonController {
@@ -37,7 +38,7 @@ export class PersonController {
   @UseGuards(SupabaseAuthGuard)
   @Get('/profile/')
   async getProfileInfo(@UserId() userId: string) {
-    return this.personService.findByDocumentDto(userId);
+    return this.personService.findById(userId);
   }
   @UseGuards(SupabaseAuthGuard)
   @Get('/table/all')
@@ -53,6 +54,14 @@ export class PersonController {
   @Post('/create')
   async create(@Body() personDto: CreatePersonDto) {
     return this.personService.create(personDto);
+  }
+  @UseGuards(SupabaseAuthGuard)
+  @Put('/update-profile')
+  async updateProfile(
+    @UserId() id_user: string,
+    @Body() personDto: UpdateProfilePersonDto,
+  ) {
+    return this.personService.updateProfile(id_user, personDto);
   }
   @UseGuards(SupabaseAuthGuard)
   @Put('/update/:id')

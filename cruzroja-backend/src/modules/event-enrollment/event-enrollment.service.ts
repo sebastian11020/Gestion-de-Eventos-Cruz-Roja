@@ -134,6 +134,11 @@ export class EventEnrollmentService {
   async canceledEnrollment(dto: CanceledEventEnrollmentDto) {
     return await this.enrollmentRepository.manager.transaction(
       async (manager) => {
+        if (!(await this.eventService.CancellableEnrollment(dto.id_event))) {
+          conflict(
+            'Ya no puedes cancelar la incripcion por que el evento inicia en menos de 8 horas, contacta al lider de tu sede',
+          );
+        }
         if (!(await this.eventService.eventIsProgrammed(dto.id_event))) {
           conflict(
             'Ya no puedes cancelar tu inscripcion xq el evento ya cambio de estado',
