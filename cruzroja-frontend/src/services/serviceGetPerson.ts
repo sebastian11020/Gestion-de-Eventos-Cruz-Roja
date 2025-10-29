@@ -37,8 +37,16 @@ export async function getPersonId(document: string) {
     return data;
 }
 
+export async function getPersonUpdate() {
+    const token = await getAccessToken();
+    const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/person/profile/`,
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+    );
+    return data;
+}
+
 export async function getPersonData(id: string) {
-    // Si este endpoint está protegido, también necesita el header:
     const token = await getAccessToken();
     const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/person/login/${id}`,

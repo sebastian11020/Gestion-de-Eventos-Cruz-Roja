@@ -1,9 +1,9 @@
 "use client";
 
-import {useEffect, useMemo, useState} from "react";
+import { useEffect, useMemo, useState } from "react";
 import { EventCard } from "@/components/cards/eventCard";
 import Modal from "@/components/layout/modal";
-import type {  event as EventType } from "@/types/usertType";
+import type { event as EventType } from "@/types/usertType";
 import CreateEventForm from "@/components/forms/createEventForm";
 import { PAGE_SIZE } from "@/const/consts";
 import { useSectionalsNode } from "@/hooks/useSectionalsNode";
@@ -18,6 +18,7 @@ import { PaginationBar } from "@/components/events/PaginationBar";
 import { EventCardSkeleton } from "@/components/events/EventCardSkeleton";
 import { useAssistants } from "@/hooks/useAssistants";
 
+/** Helpers originales **/
 function asDateRange(e: Pick<EventType, "startDate" | "endDate">) {
     if (e.startDate && e.endDate) return `${e.startDate} – ${e.endDate}`;
     return e.startDate ?? e.endDate ?? "";
@@ -36,7 +37,7 @@ function getEventStatus(e: any): string {
         e?.eventStatus?.state ??
         e?.eventStatus ??
         e?.event_status?.state ??
-        e?.event_status,
+        e?.event_status
     );
 }
 function getEndAt(e: any): string | undefined {
@@ -61,6 +62,9 @@ function isHistoryEvent(e: any) {
     return false;
 }
 
+/** Filtro nuevo */
+type RoleFilter = "ALL" | "PARTICIPANT" | "LEADER";
+
 export default function EventosPage() {
     const { sectionals, cities } = useSectionalsNode();
     const [page, setPage] = useState(1);
@@ -68,40 +72,23 @@ export default function EventosPage() {
     const [openCreate, setOpenCreate] = useState(false);
     const [qrOpen, setQrOpen] = useState(false);
     const [role, setRole] = useState<string | null>(null);
+
+    /** NUEVO: filtro de rol */
+    const [roleFilter, setRoleFilter] = useState<RoleFilter>("ALL");
+
     const { events, reload, skills, loading } = useEventData();
     const assistants = useAssistants();
 
-
-    const filtered = useMemo(
-        () =>
-            events.filter((e) => (showHistory ? isHistoryEvent(e) : !isHistoryEvent(e))),
-        [events, showHistory],
-    );
-
-    const totalPages = useMemo(
-        () => Math.max(1, Math.ceil(filtered.length / PAGE_SIZE)),
-        [filtered.length],
-    );
-
-    const pageSlice = useMemo(() => {
-        const start = (page - 1) * PAGE_SIZE;
-        const end = start + PAGE_SIZE;
-        return filtered.slice(start, end);
-    }, [filtered, page]);
-
-    const showingFrom = useMemo(
-        () => (filtered.length === 0 ? 0 : (page - 1) * PAGE_SIZE + 1),
-        [filtered.length, page],
-    );
-    const showingTo = useMemo(
-        () => Math.min(page * PAGE_SIZE, filtered.length),
-        [filtered.length, page],
-    );
+    /** Cargar rol desde localStorage (sin return temprano) */
     useEffect(() => {
         const storedRole = localStorage.getItem("role");
         setRole(storedRole);
     }, []);
-    if (!role) return null;
+
+    /** Resetear página al cambiar filtros */
+    useEffect(() => {
+        setPage(1);
+    }, [showHistory, roleFilter]);
 
     function isLeader() {
         const leaderRoles = ["LIDER SECCIONAL", "LIDER SEDE", "ADMINISTRADOR"];
@@ -109,7 +96,13 @@ export default function EventosPage() {
     }
 
     function isCreate() {
-        const leaderRoles = ["LIDER SECCIONAL", "LIDER SEDE", "ADMINISTRADOR","COORDINADOR AGRUPACION","COORDINADOR PROGRAMA"];
+        const leaderRoles = [
+            "LIDER SECCIONAL",
+            "LIDER SEDE",
+            "ADMINISTRADOR",
+            "COORDINADOR AGRUPACION",
+            "COORDINADOR PROGRAMA",
+        ];
         return leaderRoles.includes(role ?? "");
     }
 
@@ -122,15 +115,52 @@ export default function EventosPage() {
                 }),
                 {
                     loading: "Inscribiendo a evento...",
-                    success: (res: { message?: string }) => <b>{res.message ?? "Inscrito correctamente"}</b>,
-                    error: (res: { message?: string }) => <b>{res.message ?? "No se pudo inscribir"}</b>,
-                },
+                    success: (res: { message?: string }) => (
+                        <b>{res.message ?? "Inscrito correctamente"}</b>
+                    ),
+                    error: (res: { message?: string }) => (
+                        <b>{res.message ?? "No se pudo inscribir"}</b>
+                    ),
+                }
             );
             await reload();
         } catch (error) {
             console.error(error);
         }
     }
+
+    const filtered = useMemo(
+        () =>
+            events
+                .filter((e) => (showHistory ? isHistoryEvent(e) : !isHistoryEvent(e)))
+                .filter((e) => {
+                    if (roleFilter === "ALL") return true;
+                    if (roleFilter === "PARTICIPANT") return (e as any).is_participant;
+                    if (roleFilter === "LEADER") return (e as any).is_leader;
+                    return true;
+                }),
+        [events, showHistory, roleFilter]
+    );
+
+    const totalPages = useMemo(
+        () => Math.max(1, Math.ceil(filtered.length / PAGE_SIZE)),
+        [filtered.length]
+    );
+
+    const pageSlice = useMemo(() => {
+        const start = (page - 1) * PAGE_SIZE;
+        const end = start + PAGE_SIZE;
+        return filtered.slice(start, end);
+    }, [filtered, page]);
+
+    const showingFrom = useMemo(
+        () => (filtered.length === 0 ? 0 : (page - 1) * PAGE_SIZE + 1),
+        [filtered.length, page]
+    );
+    const showingTo = useMemo(
+        () => Math.min(page * PAGE_SIZE, filtered.length),
+        [filtered.length, page]
+    );
 
     return (
         <div className="p-6 space-y-6">
@@ -144,60 +174,89 @@ export default function EventosPage() {
                 onOpenQrReader={() => setQrOpen(true)}
             />
 
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {loading
-                    ? Array.from({ length: PAGE_SIZE }).map((_, i) => (
-                        <EventCardSkeleton key={`skeleton-${i}`} />
-                    ))
-                    : pageSlice.map((e, idx) => {
-                        const composedDate = (e as any).date ?? asDateRange(e);
-                        const id = (e as any).id ?? String((page - 1) * PAGE_SIZE + idx);
-
-                        return (
-                            <EventCard
-                                id={e.id ?? ""}
-                                key={e.id}
-                                title={e.title}
-                                streetAddress={e.streetAddress}
-                                leader={e.leader}
-                                inHistory={showHistory}
-                                description={e.description}
-                                date={composedDate}
-                                city={e.city}
-                                department={e.department}
-                                capacity={e.capacity as any}
-                                isInscrit={e.is_participant}
-                                isLeader={e.is_leader}
-                                isEdit={isLeader()}
-                                state={e.state}
-                                skillQuotas={e.skill_quota}
-                                startDate={e.startDate}
-                                endDate={e.endDate}
-                                skillsUser={skills}
-                                showSuscribe={!showHistory}
-                                onDelete={reload}
-                                onSubscribe={(skillId) => handleSubscribe(id, skillId)}
-                                onViewEnrolled={() => assistants.openForEvent(e.id ?? "")}
-                            />
-                        );
-                    })}
-
-                {!loading && pageSlice.length === 0 && (
-                    <div className="col-span-full text-sm text-gray-600">
-                        {showHistory ? "No hay eventos en el historial." : "No hay eventos próximos."}
-                    </div>
-                )}
+            {/* Filtro por rol (Todos / Inscrito / Líder) */}
+            <div className="flex items-center gap-3 text-sm">
+                <label className="font-medium text-black ">Ver:</label>
+                <select
+                    value={roleFilter}
+                    onChange={(e) => setRoleFilter(e.target.value as RoleFilter)}
+                    className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-black shadow-sm
+             transition-all duration-150 ease-in-out hover:border-gray-400 "
+                >
+                    <option value="ALL">Todos</option>
+                    <option value="PARTICIPANT">Estoy inscrito</option>
+                    <option value="LEADER">Soy lider</option>
+                </select>
             </div>
-            <PaginationBar
-                loading={loading}
-                page={page}
-                totalPages={totalPages}
-                showingFrom={showingFrom}
-                showingTo={showingTo}
-                total={filtered.length}
-                onPrev={() => setPage((p) => Math.max(1, p - 1))}
-                onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
-            />
+
+            {role === null ? (
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    {Array.from({ length: PAGE_SIZE }).map((_, i) => (
+                        <EventCardSkeleton key={`role-skeleton-${i}`} />
+                    ))}
+                </div>
+            ) : (
+                <>
+                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        {loading
+                            ? Array.from({ length: PAGE_SIZE }).map((_, i) => (
+                                <EventCardSkeleton key={`skeleton-${i}`} />
+                            ))
+                            : pageSlice.map((e, idx) => {
+                                const composedDate = (e as any).date ?? asDateRange(e);
+                                const id = (e as any).id ?? String((page - 1) * PAGE_SIZE + idx);
+
+                                return (
+                                    <EventCard
+                                        id={e.id ?? ""}
+                                        key={e.id}
+                                        title={e.title}
+                                        streetAddress={e.streetAddress}
+                                        leader={e.leader}
+                                        inHistory={showHistory}
+                                        description={e.description}
+                                        date={composedDate}
+                                        city={e.city}
+                                        department={e.department}
+                                        capacity={e.capacity as any}
+                                        isInscrit={e.is_participant}
+                                        isLeader={e.is_leader}
+                                        isEdit={isLeader()}
+                                        state={e.state}
+                                        skillQuotas={e.skill_quota}
+                                        startDate={e.startDate}
+                                        endDate={e.endDate}
+                                        skillsUser={skills}
+                                        showSuscribe={!showHistory}
+                                        onDelete={reload}
+                                        onSubscribe={(skillId) => handleSubscribe(id, skillId)}
+                                        onViewEnrolled={() => assistants.openForEvent(e.id ?? "")}
+                                    />
+                                );
+                            })}
+
+                        {!loading && pageSlice.length === 0 && (
+                            <div className="col-span-full text-sm text-gray-600">
+                                {showHistory
+                                    ? "No hay eventos en el historial."
+                                    : "No hay eventos próximos."}
+                            </div>
+                        )}
+                    </div>
+
+                    <PaginationBar
+                        loading={loading}
+                        page={page}
+                        totalPages={totalPages}
+                        showingFrom={showingFrom}
+                        showingTo={showingTo}
+                        total={filtered.length}
+                        onPrev={() => setPage((p) => Math.max(1, p - 1))}
+                        onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    />
+                </>
+            )}
+
             <Modal open={openCreate} onClose={() => setOpenCreate(false)} title="Crear evento">
                 <CreateEventForm
                     onCancel={() => setOpenCreate(false)}
@@ -207,11 +266,13 @@ export default function EventosPage() {
                     sectionals={sectionals}
                 />
             </Modal>
+
             <ReadQrDialog
                 open={qrOpen}
                 onClose={() => setQrOpen(false)}
                 apiBase={process.env.NEXT_PUBLIC_API_URL || ""}
             />
+
             <AssistantsDialog
                 open={assistants.open}
                 onClose={() => assistants.setOpen(false)}
