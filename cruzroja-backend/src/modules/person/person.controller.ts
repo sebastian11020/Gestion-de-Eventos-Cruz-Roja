@@ -73,4 +73,9 @@ export class PersonController {
   async getSkills(@Query('id_user') id_user: string) {
     return this.personService.getSkills(id_user);
   }
+  @UseGuards(SupabaseAuthGuard)
+  @Get('/inactivity-report')
+  async getInactivityReport(@UserId() userId: string) {
+    return this.personService.reportInactivityPerson(userId);
+  }
 }
