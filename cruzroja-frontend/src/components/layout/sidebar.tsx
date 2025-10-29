@@ -10,6 +10,9 @@ import {
   LogOut,
   ChartColumnBig,
   Warehouse,
+    ChevronDown,
+    User as UserIcon,
+    KeyRound,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase-browser";
 import { useSideBarData } from "@/hooks/useSideBarData";
@@ -111,7 +114,7 @@ export function AppSidebar({
   initialRole: string | null;
 }) {
   const { user } = useSideBarData();
-
+    const [openSettings, setOpenSettings] = useState(false);
   const [role, setRole] = useState<Role | undefined>(() =>
     normalizeRole(initialRole),
   );
@@ -218,36 +221,82 @@ export function AppSidebar({
           </nav>
 
           {/* Footer */}
-          <div className="mt-auto pb-3">
-            <div className="my-3 h-px w-full bg-gradient-to-r from-transparent via-white/15 to-transparent" />
-            <Link
-              href="#"
-              onClick={() => setOpen(false)}
-              className="group relative mb-1 flex items-center gap-3 rounded-xl px-3 py-2 transition-all hover:translate-x-[2px] hover:bg-white/10 active:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/70 focus-visible:ring-offset-2 focus-visible:ring-offset-blue-950 overflow-hidden"
-            >
-              <span className="grid size-7 place-items-center rounded-lg bg-white/10 ring-1 ring-white/10 shadow-sm transition-colors group-hover:bg-white/15">
-                <Settings className="size-4 text-blue-100/90 group-hover:text-white transition-colors" />
-              </span>
-              <span className="text-[13.5px] font-medium tracking-wide text-blue-100 group-hover:text-white transition-colors">
-                Configuración
-              </span>
-            </Link>
+            {/* Footer */}
+            <div className="mt-auto pb-3">
+                <div className="my-3 h-px w-full bg-gradient-to-r from-transparent via-white/15 to-transparent" />
 
-            <button
-              onClick={() => {
-                setOpen(false);
-                handleLogout();
-              }}
-              className="group relative flex w-full items-center gap-3 rounded-xl px-3 py-2 transition-all hover:translate-x-[2px] hover:bg-white/10 active:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/70 focus-visible:ring-offset-2 focus-visible:ring-offset-blue-950 overflow-hidden"
-            >
+                {/* Configuración con submenu */}
+                <div className="space-y-1">
+                    <button
+                        onClick={() => setOpenSettings((v) => !v)}
+                        aria-expanded={openSettings}
+                        aria-controls="submenu-settings"
+                        className="group relative mb-1 flex w-full items-center gap-3 rounded-xl px-3 py-2 transition-all hover:translate-x-[2px] hover:bg-white/10 active:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/70 focus-visible:ring-offset-2 focus-visible:ring-offset-blue-950 overflow-hidden"
+                    >
+                <span className="grid size-7 place-items-center rounded-lg bg-white/10 ring-1 ring-white/10 shadow-sm transition-colors group-hover:bg-white/15">
+                  <Settings className="size-4 text-blue-100/90 group-hover:text-white transition-colors" />
+                </span>
+                        <span className="text-[13.5px] font-medium tracking-wide text-blue-100 group-hover:text-white transition-colors">
+                  Configuración
+                </span>
+                        <ChevronDown
+                            className={`ml-auto size-4 text-blue-200 transition-transform ${
+                                openSettings ? "rotate-180" : ""
+                            }`}
+                            aria-hidden
+                        />
+                    </button>
+
+                    {/* Submenu */}
+                    <div
+                        id="submenu-settings"
+                        className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ${
+                            openSettings ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                        }`}
+                    >
+                        <div className="min-h-0">
+                            <ul className="pl-10 pr-2 py-1 space-y-1">
+                                <li>
+                                    <Link
+                                        href="/dashboard/perfil"  // 🔁 ajusta si tu ruta es otra
+                                        onClick={() => setOpen(false)}
+                                        className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-[13px] text-blue-100 hover:text-white hover:bg-white/10 transition-colors"
+                                    >
+                                        <UserIcon className="size-4" />
+                                        Ver perfil
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link
+                                        href="/dashboard/change-password"
+                                        onClick={() => setOpen(false)}
+                                        className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-[13px] text-blue-100 hover:text-white hover:bg-white/10 transition-colors"
+                                    >
+                                        <KeyRound className="size-4" />
+                                        Cambiar contraseña
+                                    </Link>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Logout */}
+                <button
+                    onClick={() => {
+                        setOpen(false);
+                        handleLogout();
+                    }}
+                    className="group relative mt-2 flex w-full items-center gap-3 rounded-xl px-3 py-2 transition-all hover:translate-x-[2px] hover:bg-white/10 active:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/70 focus-visible:ring-offset-2 focus-visible:ring-offset-blue-950 overflow-hidden"
+                >
               <span className="grid size-7 place-items-center rounded-lg bg-white/10 ring-1 ring-white/10 shadow-sm transition-colors group-hover:bg-white/15">
                 <LogOut className="size-4 text-red-400 group-hover:text-red-500 transition-colors" />
               </span>
-              <span className="text-[13.5px] font-semibold tracking-wide text-red-400 group-hover:text-red-500 transition-colors">
+                    <span className="text-[13.5px] font-semibold tracking-wide text-red-400 group-hover:text-red-500 transition-colors">
                 Cerrar sesión
               </span>
-            </button>
-          </div>
+                </button>
+            </div>
         </div>
       </aside>
     </>

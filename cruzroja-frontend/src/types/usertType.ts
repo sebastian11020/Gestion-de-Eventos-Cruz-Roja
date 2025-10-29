@@ -198,7 +198,7 @@ export type CreateEventForm = {
   attendant: string;
   capacity: number;
   isVirtual: boolean;
-  isPrivate: "true" | "false";
+  isPrivate: boolean;
   isAdult: boolean;
   isEmergency: boolean;
   participants?: string[];
