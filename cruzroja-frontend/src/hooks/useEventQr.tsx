@@ -1,11 +1,16 @@
-"use client"
+"use client";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { startEventService, endEventService } from "@/services/serviceGetEvent";
 
 type Action = "start" | "end";
+type ServiceResult = { success: boolean; message?: string };
 
-export function useEventQr(eventId: string, qrBase?: string, onAfter?: () => Promise<void> | void) {
+export function useEventQr(
+    eventId: string,
+    qrBase?: string,
+    onAfter?: () => Promise<void> | void
+) {
     const [qrOpen, setQrOpen] = useState(false);
     const [qrAction, setQrAction] = useState<Action>("start");
     const [qrValue, setQrValue] = useState("");
@@ -18,33 +23,48 @@ export function useEventQr(eventId: string, qrBase?: string, onAfter?: () => Pro
         setQrValue(val);
         setQrOpen(true);
     }
+
     async function accept() {
-        const op = qrAction === "start" ? await startEventService(eventId) : await endEventService(eventId);
+        // 👇 NO usar await aquí: necesitamos la Promesa
+        const op =
+            qrAction === "start"
+                ? startEventService(eventId)
+                : endEventService(eventId);
+
         const labels =
             qrAction === "start"
-                ? { loading: "Iniciando evento...", success: "Iniciado correctamente", error: "No se pudo iniciar" }
-                : { loading: "Finalizando evento...", success: "Finalizado correctamente", error: "No se pudo finalizar" };
-
-        const promise = op.then((res: { success: boolean; message?: string }) => {
-            if (!res.success) return Promise.reject(res);
+                ? {
+                    loading: "Iniciando evento...",
+                    success: "Iniciado correctamente",
+                    error: "No se pudo iniciar",
+                }
+                : {
+                    loading: "Finalizando evento...",
+                    success: "Finalizado correctamente",
+                    error: "No se pudo finalizar",
+                };
+        const guarded = op.then((res: ServiceResult) => {
+            if (!res?.success) throw res;
             return res;
         });
-        await toast.promise(promise, {
+
+        await toast.promise(guarded, {
             loading: labels.loading,
-            success: (res: { message?: string }) => <b>{res.message ?? labels.success}</b>,
-            error:   (res: { message?: string }) => <b>{res.message ?? labels.error}</b>,
+            success: (res: ServiceResult) => <b>{res?.message ?? labels.success}</b>,
+            error:   (res: ServiceResult) => <b>{res?.message ?? labels.error}</b>,
         });
 
-        await promise;
         setQrOpen(false);
         await onAfter?.();
     }
+
     return {
-        qrOpen, setQrOpen,
+        qrOpen,
+        setQrOpen,
         qrAction,
         qrValue,
         openStart: () => open("start"),
-        openEnd:   () => open("end"),
+        openEnd: () => open("end"),
         accept,
     };
 }
