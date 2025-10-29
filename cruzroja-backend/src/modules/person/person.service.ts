@@ -660,7 +660,7 @@ export class PersonService {
 
   async reportInactivityPerson(
     user_id: string,
-  ): Promise<GetReportInactivityMonthlyDto> {
+  ): Promise<GetReportInactivityMonthlyDto[]> {
     const leader = await this.personRepository.findOne({
       where: {
         id: user_id,
@@ -680,10 +680,16 @@ export class PersonService {
     assertFound(leader, 'Esta persona no es lider de ninguna sede');
     const activeRole = leader.person_roles.find((r) => !r.end_date);
     assertFound(activeRole, 'No se encontro un rol activo para la persona');
-    return await this.personRepository.query(
-      'select * from public.get_groups_volunteer_hours($1)',
-      [activeRole.headquarters.id],
-    );
+    const rows: GetReportInactivityMonthlyDto[] =
+      await this.personRepository.query(
+        'select * from public.get_groups_volunteer_hours($1)',
+        [activeRole.headquarters.id],
+      );
+    return rows.map((r) => {
+      const row = new GetReportInactivityMonthlyDto();
+      row.groups = r.groups;
+      return row;
+    });
   }
 
   async reportUnlinkedPerson(user_id: string): Promise<GetReportUnlinked> {
