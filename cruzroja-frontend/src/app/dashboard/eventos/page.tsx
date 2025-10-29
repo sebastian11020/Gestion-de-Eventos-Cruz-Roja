@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import {useEffect, useMemo, useState} from "react";
 import { EventCard } from "@/components/cards/eventCard";
 import Modal from "@/components/layout/modal";
 import type {  event as EventType } from "@/types/usertType";
@@ -17,8 +17,6 @@ import { EventsToolbar } from "@/components/events/EventsToolbar";
 import { PaginationBar } from "@/components/events/PaginationBar";
 import { EventCardSkeleton } from "@/components/events/EventCardSkeleton";
 import { useAssistants } from "@/hooks/useAssistants";
-
-const role = localStorage.getItem("role");
 
 function asDateRange(e: Pick<EventType, "startDate" | "endDate">) {
     if (e.startDate && e.endDate) return `${e.startDate} – ${e.endDate}`;
@@ -63,27 +61,16 @@ function isHistoryEvent(e: any) {
     return false;
 }
 
-function isLeader() {
-    const leaderRoles = ["LIDER SECCIONAL", "LIDER SEDE", "ADMINISTRADOR"];
-    return leaderRoles.includes(role ?? "");
-}
-
-function isCreate() {
-    const leaderRoles = ["LIDER SECCIONAL", "LIDER SEDE", "ADMINISTRADOR","COORDINADOR AGRUPACION","COORDINADOR PROGRAMA"];
-    return leaderRoles.includes(role ?? "");
-}
-
-
 export default function EventosPage() {
     const { sectionals, cities } = useSectionalsNode();
     const [page, setPage] = useState(1);
     const [showHistory, setShowHistory] = useState(false);
     const [openCreate, setOpenCreate] = useState(false);
     const [qrOpen, setQrOpen] = useState(false);
-
+    const [role, setRole] = useState<string | null>(null);
     const { events, reload, skills, loading } = useEventData();
-
     const assistants = useAssistants();
+
 
     const filtered = useMemo(
         () =>
@@ -110,6 +97,21 @@ export default function EventosPage() {
         () => Math.min(page * PAGE_SIZE, filtered.length),
         [filtered.length, page],
     );
+    useEffect(() => {
+        const storedRole = localStorage.getItem("role");
+        setRole(storedRole);
+    }, []);
+    if (!role) return null;
+
+    function isLeader() {
+        const leaderRoles = ["LIDER SECCIONAL", "LIDER SEDE", "ADMINISTRADOR"];
+        return leaderRoles.includes(role ?? "");
+    }
+
+    function isCreate() {
+        const leaderRoles = ["LIDER SECCIONAL", "LIDER SEDE", "ADMINISTRADOR","COORDINADOR AGRUPACION","COORDINADOR PROGRAMA"];
+        return leaderRoles.includes(role ?? "");
+    }
 
     async function handleSubscribe(eventId: string, idSkill: string) {
         try {

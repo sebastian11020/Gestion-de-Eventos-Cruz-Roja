@@ -1,52 +1,58 @@
+"use client";
+
 import axios from "axios";
 import { supabase } from "@/lib/supabase-browser";
 
 const sb = supabase();
-const {
-  data: { session },
-} = await sb.auth.getSession();
 
+// 🔹 Helpers
+async function getAccessToken() {
+    const { data: { session } } = await sb.auth.getSession();
+    return session?.access_token ?? null;
+}
+function authHeaders(token: string | null) {
+    return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+// 🔹 Servicios
 export async function getGroupService() {
-  try {
-    const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/group-headquarters/all`,
-      {
-        headers: {
-          Authorization: `Bearer ${session?.access_token}`,
-        },
-      },
-    );
-    return response.data;
-  } catch (error) {
-    console.error(error);
-  }
+    try {
+        const token = await getAccessToken();
+        const { data } = await axios.get(
+            `${process.env.NEXT_PUBLIC_API_URL}/group-headquarters/all`,
+            { headers: { ...authHeaders(token) } }
+        );
+        return data;
+    } catch (error) {
+        console.error("getGroupService error:", error);
+        throw error;
+    }
 }
 
 export async function getGroup() {
-  try {
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/group/all`, {
-      headers: {
-        Authorization: `Bearer ${session?.access_token}`,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error(error);
-  }
+    try {
+        const token = await getAccessToken();
+        const { data } = await axios.get(
+            `${process.env.NEXT_PUBLIC_API_URL}/group/all`,
+            { headers: { ...authHeaders(token) } }
+        );
+        return data;
+    } catch (error) {
+        console.error("getGroup error:", error);
+        throw error;
+    }
 }
 
 export async function getGroupTable(id: string) {
-  try {
-    const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/headquarters/table/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${session?.access_token}`,
-        },
-      },
-    );
-    return response.data;
-  } catch (error) {
-    console.error(error);
-  }
+    try {
+        const token = await getAccessToken();
+        const { data } = await axios.get(
+            `${process.env.NEXT_PUBLIC_API_URL}/headquarters/table/${id}`,
+            { headers: { ...authHeaders(token) } }
+        );
+        return data;
+    } catch (error) {
+        console.error("getGroupTable error:", error);
+        throw error;
+    }
 }
