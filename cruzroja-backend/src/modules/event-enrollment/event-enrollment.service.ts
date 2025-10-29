@@ -105,6 +105,11 @@ export class EventEnrollmentService {
         },
         state: true,
       },
+      relations: {
+        event: {
+          person: true,
+        },
+      },
     });
   }
 
