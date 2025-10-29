@@ -82,3 +82,17 @@ export async function getSkills() {
         throw error;
     }
 }
+
+export async function getReportDesvinculate() {
+    try {
+        const token = await getAccessToken();
+        const { data } = await axios.get(
+            `${process.env.NEXT_PUBLIC_API_URL}/person/inactivity-report`,
+            { headers: { ...authHeaders(token) } }
+        );
+        return data;
+    } catch (error) {
+        console.error("getSkills error:", error);
+        throw error;
+    }
+}
