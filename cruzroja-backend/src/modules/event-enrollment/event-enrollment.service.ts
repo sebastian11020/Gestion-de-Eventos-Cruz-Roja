@@ -6,17 +6,28 @@ import { CreateEventEnrollmentDto } from './dto/create-event-enrollment.dto';
 import { CanceledEventEnrollmentDto } from './dto/canceled-event-enrollment.dto';
 import { GetParticipantDto } from './dto/get-participant.dto';
 import { FormatNamesString } from '../../common/utils/string.utils';
+import { PersonService } from '../person/person.service';
+import { EventService } from '../event/event.service';
+import { conflict } from '../../common/utils/assert';
 
 @Injectable()
 export class EventEnrollmentService {
   constructor(
     @InjectRepository(EventEnrollment)
     private enrollmentRepository: Repository<EventEnrollment>,
+    private personService: PersonService,
+    private eventService: EventService,
   ) {}
 
   async enrollment(dto: CreateEventEnrollmentDto) {
     return this.enrollmentRepository.manager.transaction(async (manager) => {
       const { id_event, id_person, id_skill } = dto;
+      const id_adult = await this.personService.is_adult(id_person);
+      if ((await this.eventService.requireIsAdult(id_event)) && !id_adult) {
+        conflict(
+          'No te puedes inscribir al evento xq exige que seas mayor de edad',
+        );
+      }
 
       if (await this.hasTimeOverlap(manager, dto.id_person, dto.id_event)) {
         return {
@@ -94,6 +105,11 @@ export class EventEnrollmentService {
         },
         state: true,
       },
+      relations: {
+        event: {
+          person: true,
+        },
+      },
     });
   }
 
@@ -123,6 +139,16 @@ export class EventEnrollmentService {
   async canceledEnrollment(dto: CanceledEventEnrollmentDto) {
     return await this.enrollmentRepository.manager.transaction(
       async (manager) => {
+        if (!(await this.eventService.CancellableEnrollment(dto.id_event))) {
+          conflict(
+            'Ya no puedes cancelar la incripcion por que el evento inicia en menos de 8 horas, contacta al lider de tu sede',
+          );
+        }
+        if (!(await this.eventService.eventIsProgrammed(dto.id_event))) {
+          conflict(
+            'Ya no puedes cancelar tu inscripcion xq el evento ya cambio de estado',
+          );
+        }
         const enrollment = await manager
           .getRepository(EventEnrollment)
           .createQueryBuilder('ee')

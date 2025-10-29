@@ -58,3 +58,25 @@ export async function updatePersonService(person: formCreatePerson) {
         throw error;
     }
 }
+
+export async function updatePersonProfile(person: any) {
+    try {
+        const token = await getAccessToken();
+
+        const response = await axios.put(
+            `${process.env.NEXT_PUBLIC_API_URL}/person/update-profile/`,
+            person,
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    ...authHeaders(token),
+                },
+            }
+        );
+
+        return response.data;
+    } catch (error) {
+        console.error("Error en updatePersonService:", error);
+        throw error;
+    }
+}

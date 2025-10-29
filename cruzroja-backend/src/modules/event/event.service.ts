@@ -82,13 +82,18 @@ export class EventService {
         },
       });
       newEvent = await manager.save(EventEntity, newEvent);
+      await this.enrollmentCoordinatorEvent(
+        manager,
+        newEvent.id,
+        coordinatorEvent.id,
+      );
       if (newEvent.is_private) {
         const participants = eventForm.participants;
         assert(
           participants,
           'Para crear un evento privado, tienes que agregar los participantes',
         );
-        if (participants.length > eventForm.capacity) {
+        if (participants.length > eventForm.capacity - 1) {
           conflict(
             'No se pueden registrar mas voluntarios de los indicados en el formulario.',
           );
@@ -160,7 +165,7 @@ export class EventService {
           id: id_event,
         },
         person: {
-          document: participant,
+          id: participant,
         },
         skill: {
           id: 3,
@@ -275,6 +280,7 @@ export class EventService {
         row.event_enrollment.some(
           (ee) => ee.state && String(ee.person?.id) === String(id_user),
         );
+      dto.is_adult = row.is_adult;
       return dto;
     });
   }
@@ -429,7 +435,7 @@ export class EventService {
     await this.personService.sendNotification(id_headquarters, dto);
   }
 
-  async startEvent(id_event: number) {
+  async startEvent(id_event: number, userId: string) {
     return this.eventRepository.manager.transaction(async (manager) => {
       const currentEvent = this.eventRepository.findOne({
         where: {
@@ -438,6 +444,20 @@ export class EventService {
       });
       assertFound(currentEvent, 'No se encontro el vento que deseas cancelar');
       await this.assignStatus(manager, id_event, 9);
+      await manager.save(
+        EventAttendance,
+        manager.create(EventAttendance, {
+          enrollment: {
+            event: {
+              id: id_event,
+            },
+            person: {
+              id: userId,
+            },
+          },
+          check_in: new Date(),
+        }),
+      );
       return { success: true, message: 'Evento iniciado exitosamente.' };
     });
   }
@@ -460,5 +480,74 @@ export class EventService {
     const hours = Math.floor(diffMin / 60);
     const minutes = diffMin % 60;
     return minutes >= 40 ? hours + 1 : hours;
+  }
+
+  async requireIsAdult(id_event: number) {
+    const event = await this.eventRepository.findOne({
+      where: {
+        id: id_event,
+      },
+    });
+    assertFound(event, 'No se encontro el evento especificado');
+    return event.is_adult;
+  }
+
+  async eventIsProgrammed(id_event: number) {
+    const event = await this.eventRepository.findOne({
+      where: {
+        id: id_event,
+      },
+      relations: {
+        eventStatus: {
+          state: true,
+        },
+      },
+    });
+    assertFound(event, 'No se encontro el evento especificado');
+    const currentState = event.eventStatus.find((e) => !e.end_date);
+    assertFound(currentState, 'El evento no tiene un estado activo');
+    return currentState.state.id === 8;
+  }
+
+  async CancellableEnrollment(id_event: number) {
+    const event = await this.eventRepository.findOne({
+      where: {
+        id: id_event,
+      },
+    });
+    assertFound(event, 'No se encontro el evento especificado');
+    return dayjs(event.start_date).diff(dayjs(), 'hour', true) > 8;
+  }
+
+  private async enrollmentCoordinatorEvent(
+    manager: EntityManager,
+    id_event: number,
+    id_person: string,
+  ) {
+    await manager.query(
+      `
+      UPDATE public.event_quota
+         SET taken = taken + 1
+       WHERE id_event = $1
+         AND id_skill = $2
+         AND taken < quota
+      RETURNING id;
+      `,
+      [id_event, 3],
+    );
+    await manager.save(
+      manager.create(EventEnrollment, {
+        event: {
+          id: id_event,
+        },
+        person: {
+          id: id_person,
+        },
+        skill: {
+          id: 3,
+        },
+        state: true,
+      }),
+    );
   }
 }

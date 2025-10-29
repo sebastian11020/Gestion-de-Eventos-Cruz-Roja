@@ -23,6 +23,7 @@ export class GetEventCardDDto {
   skill_quota: GetSkillQuota[];
   is_leader: boolean;
   is_participant: boolean;
+  is_adult: boolean;
 }
 
 export class GetSkillQuota {

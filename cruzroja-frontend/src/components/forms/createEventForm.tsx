@@ -62,7 +62,7 @@ export default function CreateEventForm({
     capacity: 0,
     attendant: "",
     isVirtual: false,
-    isPrivate: "false",
+    isPrivate: false,
     isEmergency: false,
     isAdult: false,
     requiresSkills: false,
@@ -125,7 +125,7 @@ export default function CreateEventForm({
       ...form,
       attendant: documentLeader,
       participants:
-        form.isPrivate === "true" ? selectedVolunteers.map((v) => v.id) : [],
+        form.isPrivate ? selectedVolunteers.map((v) => v.id) : [],
       skillsQuotasList: skillsQuotasListToSend,
     };
     console.log(payload);

@@ -35,9 +35,9 @@ export function PrivacyParticipantsSection({
           <label className="flex items-center gap-2">
             <input
               type="checkbox"
-              checked={form.isPrivate === "true"}
+              checked={form.isPrivate}
               onChange={(e) =>
-                onChange("isPrivate", e.target.checked ? "true" : "false")
+                onChange("isPrivate", e.target.checked)
               }
             />
             <span className="text-sm font-medium">Evento privado</span>
@@ -48,7 +48,7 @@ export function PrivacyParticipantsSection({
               <button
                 type="button"
                 className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-3 py-2 text-sm text-white hover:from-blue-700 hover:to-indigo-700 disabled:opacity-60"
-                disabled={form.isPrivate !== "true"}
+                disabled={!form.isPrivate}
                 onClick={onOpenPicker}
               >
                 <span className="inline-flex items-center gap-2">
@@ -94,7 +94,7 @@ export function PrivacyParticipantsSection({
           </div>
         </div>
 
-        {form.isPrivate === "true" && (
+        {form.isPrivate  && (
           <div className="space-y-2">
             <div className="text-sm text-gray-700">
               {selectedVolunteers.length === 0
