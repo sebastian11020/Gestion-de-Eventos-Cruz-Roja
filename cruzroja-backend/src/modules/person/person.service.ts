@@ -30,6 +30,7 @@ import { GetEventCardDDto } from '../event/dto/get-event.dto';
 import { type_document } from './enum/person.enums';
 import { UpdateProfilePersonDto } from './dto/update-profile-person.dto';
 import { GetReportInactivityMonthlyDto } from './dto/get-report-monthly.dto';
+import { GetReportUnlinked } from './dto/get-report-unlinked';
 
 @Injectable()
 export class PersonService {
@@ -666,7 +667,7 @@ export class PersonService {
         person_roles: {
           end_date: IsNull(),
           role: {
-            id: In([1, 2]),
+            id: In([1, 2, 6]),
           },
         },
       },
@@ -683,6 +684,36 @@ export class PersonService {
     assertFound(activeRole, 'No se encontro un rol activo para la persona');
     return await this.personRepository.query(
       'select * from public.get_groups_volunteer_hours($1)',
+      [activeRole.headquarters.id],
+    );
+  }
+
+  async reportUnlinkedPerson(
+    user_id: string,
+  ): Promise<GetReportUnlinked> {
+    const leader = await this.personRepository.findOne({
+      where: {
+        id: user_id,
+        person_roles: {
+          end_date: IsNull(),
+          role: {
+            id: In([1, 2, 6]),
+          },
+        },
+      },
+      relations: {
+        person_roles: {
+          headquarters: true,
+        },
+      },
+    });
+    assertFound(leader, 'Esta persona no es lider de ninguna sede');
+    const activeRole = leader.person_roles.find(
+      (r) => !r.end_date && (r.role?.id === 1 || r.role?.id === 2),
+    );
+    assertFound(activeRole, 'No se encontro un rol activo para la persona');
+    return await this.personRepository.query(
+      'select * from public.get_inactive_volunteers_by_headquarters($1)',
       [activeRole.headquarters.id],
     );
   }

@@ -78,4 +78,9 @@ export class PersonController {
   async getInactivityReport(@UserId() userId: string) {
     return this.personService.reportInactivityPerson(userId);
   }
+  @UseGuards(SupabaseAuthGuard)
+  @Get('/unlinked-report')
+  async getUnlinkedReport(@UserId() userId: string) {
+    return this.personService.reportUnlinkedPerson(userId);
+  }
 }
