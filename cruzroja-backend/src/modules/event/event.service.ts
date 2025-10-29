@@ -155,12 +155,13 @@ export class EventService {
     end_date: Date,
   ) {
     for (const participant of participants) {
+      console.log(participant);
       let enrollment = manager.create(EventEnrollment, {
         event: {
           id: id_event,
         },
         person: {
-          document: participant,
+          id: participant,
         },
         skill: {
           id: 3,
@@ -275,6 +276,7 @@ export class EventService {
         row.event_enrollment.some(
           (ee) => ee.state && String(ee.person?.id) === String(id_user),
         );
+      dto.is_adult = row.is_adult;
       return dto;
     });
   }
@@ -460,5 +462,32 @@ export class EventService {
     const hours = Math.floor(diffMin / 60);
     const minutes = diffMin % 60;
     return minutes >= 40 ? hours + 1 : hours;
+  }
+
+  async requireIsAdult(id_event: number) {
+    const event = await this.eventRepository.findOne({
+      where: {
+        id: id_event,
+      },
+    });
+    assertFound(event, 'No se encontro el evento especificado');
+    return event.is_adult;
+  }
+
+  async eventIsProgrammed(id_event: number) {
+    const event = await this.eventRepository.findOne({
+      where: {
+        id: id_event,
+      },
+      relations: {
+        eventStatus: {
+          state: true,
+        },
+      },
+    });
+    assertFound(event, 'No se encontro el evento especificado');
+    const currentState = event.eventStatus.find((e) => !e.end_date);
+    assertFound(currentState, 'El evento no tiene un estado activo');
+    return currentState.state.id === 8;
   }
 }

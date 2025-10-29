@@ -13,6 +13,7 @@ import { CreatePersonDto } from './dto/create-person.dto';
 import { GetPersonTableDto } from './dto/get-person-table.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
 import { SupabaseAuthGuard } from '../../common/config/guards/supabase-auth.guard';
+import { UserId } from '../../common/decorators/user.decorator';
 
 @Controller('person')
 export class PersonController {
@@ -31,7 +32,12 @@ export class PersonController {
   @UseGuards(SupabaseAuthGuard)
   @Get('/leaderinfo/:document')
   async getLeaderInfo(@Param('document') document: string) {
-    return this.personService.findByIdDto(document);
+    return this.personService.findByDocumentDto(document);
+  }
+  @UseGuards(SupabaseAuthGuard)
+  @Get('/profile/')
+  async getProfileInfo(@UserId() userId: string) {
+    return this.personService.findByDocumentDto(userId);
   }
   @UseGuards(SupabaseAuthGuard)
   @Get('/table/all')

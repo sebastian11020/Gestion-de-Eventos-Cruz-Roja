@@ -27,6 +27,7 @@ import { PersonSkill } from '../person-skill/entity/person-skill.entity';
 import { PersonRoleService } from '../person-role/person-role.service';
 import { GetTableSpecialEvent } from './dto/get-table-special-event';
 import { GetEventCardDDto } from '../event/dto/get-event.dto';
+import { type_document } from './enum/person.enums';
 
 @Injectable()
 export class PersonService {
@@ -131,10 +132,28 @@ export class PersonService {
     return rows;
   }
 
-  async findByIdDto(document: string) {
+  async findByDocumentDto(document: string) {
     const rows: GetPersons[] = await this.personRepository.query(
       'select * from public.get_person_flat_by_document($1)',
       [document],
+    );
+    return {
+      success: true,
+      message: 'Informacion cargada con exito',
+      leader: rows.at(0),
+    };
+  }
+
+  async findById(id: string) {
+    const person = await this.personRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+    assertFound(person, 'No se encontro a la persona especificada');
+    const rows: GetPersons[] = await this.personRepository.query(
+      'select * from public.get_person_flat_by_document($1)',
+      [person.document],
     );
     return {
       success: true,
@@ -597,5 +616,15 @@ export class PersonService {
     return skills?.map((skill) => {
       return skill.skill.id;
     });
+  }
+
+  async is_adult(id: string) {
+    const person = await this.personRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+    assertFound(person, 'No se encontro a la persona especificada');
+    return !(person.type_document === type_document.TI);
   }
 }
