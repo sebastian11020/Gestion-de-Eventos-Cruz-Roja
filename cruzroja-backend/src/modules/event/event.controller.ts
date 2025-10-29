@@ -36,7 +36,10 @@ export class EventController {
   }
 
   @Put('/start/:id')
-  async start(@Param('id', ParseIntPipe) id_event: number, @UserId() userId: string) {
+  async start(
+    @Param('id', ParseIntPipe) id_event: number,
+    @UserId() userId: string,
+  ) {
     return this.eventService.startEvent(id_event, userId);
   }
 

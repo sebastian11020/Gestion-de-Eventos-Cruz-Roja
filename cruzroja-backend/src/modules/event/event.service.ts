@@ -82,7 +82,7 @@ export class EventService {
         },
       });
       newEvent = await manager.save(EventEntity, newEvent);
-      this.enrollmentCoordinatorEvent(
+      await this.enrollmentCoordinatorEvent(
         manager,
         newEvent.id,
         coordinatorEvent.id,
@@ -444,6 +444,20 @@ export class EventService {
       });
       assertFound(currentEvent, 'No se encontro el vento que deseas cancelar');
       await this.assignStatus(manager, id_event, 9);
+      await manager.save(
+        EventAttendance,
+        manager.create(EventAttendance, {
+          enrollment: {
+            event: {
+              id: id_event,
+            },
+            person: {
+              id: userId,
+            },
+          },
+          check_in: new Date(),
+        }),
+      );
       return { success: true, message: 'Evento iniciado exitosamente.' };
     });
   }
