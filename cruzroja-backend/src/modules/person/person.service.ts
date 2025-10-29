@@ -27,6 +27,10 @@ import { PersonSkill } from '../person-skill/entity/person-skill.entity';
 import { PersonRoleService } from '../person-role/person-role.service';
 import { GetTableSpecialEvent } from './dto/get-table-special-event';
 import { GetEventCardDDto } from '../event/dto/get-event.dto';
+import { type_document } from './enum/person.enums';
+import { UpdateProfilePersonDto } from './dto/update-profile-person.dto';
+import { GetReportInactivityMonthlyDto } from './dto/get-report-monthly.dto';
+import { GetReportUnlinked } from './dto/get-report-unlinked';
 
 @Injectable()
 export class PersonService {
@@ -131,10 +135,28 @@ export class PersonService {
     return rows;
   }
 
-  async findByIdDto(document: string) {
+  async findByDocumentDto(document: string) {
     const rows: GetPersons[] = await this.personRepository.query(
       'select * from public.get_person_flat_by_document($1)',
       [document],
+    );
+    return {
+      success: true,
+      message: 'Informacion cargada con exito',
+      leader: rows.at(0),
+    };
+  }
+
+  async findById(id: string) {
+    const person = await this.personRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+    assertFound(person, 'No se encontro a la persona especificada');
+    const rows: GetPersons[] = await this.personRepository.query(
+      'select * from public.get_person_flat_by_document($1)',
+      [person.document],
     );
     return {
       success: true,
@@ -239,6 +261,33 @@ export class PersonService {
       );
       await this.associateEps(manager, id, dto.id_eps, dto.type_affiliation);
       await this.associateSkills(manager, dto.skills, id);
+      return { success: true, message: 'Persona actualizada exitosamente.' };
+    });
+  }
+
+  async updateProfile(id_person: string, dto: UpdateProfilePersonDto) {
+    return this.personRepository.manager.transaction(async (manager) => {
+      await manager.update(Person, id_person, {
+        phone: dto.phone,
+        emergency_contact: {
+          name: NormalizeString(dto.emergencyContact.name),
+          relationShip: NormalizeString(dto.emergencyContact.relationShip),
+          phone: dto.emergencyContact.phone,
+        },
+        address: {
+          streetAddress: NormalizeString(dto.address.streetAddress),
+          zone: NormalizeString(dto.address.zone),
+        },
+        location: {
+          id: dto.id_location,
+        },
+      });
+      await this.associateEps(
+        manager,
+        id_person,
+        dto.id_eps,
+        dto.type_affiliation,
+      );
       return { success: true, message: 'Persona actualizada exitosamente.' };
     });
   }
@@ -597,5 +646,75 @@ export class PersonService {
     return skills?.map((skill) => {
       return skill.skill.id;
     });
+  }
+
+  async is_adult(id: string) {
+    const person = await this.personRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+    assertFound(person, 'No se encontro a la persona especificada');
+    return !(person.type_document === type_document.TI);
+  }
+
+  async reportInactivityPerson(
+    user_id: string,
+  ): Promise<GetReportInactivityMonthlyDto[]> {
+    const leader = await this.personRepository.findOne({
+      where: {
+        id: user_id,
+        person_roles: {
+          end_date: IsNull(),
+          role: {
+            id: In([1, 2, 6]),
+          },
+        },
+      },
+      relations: {
+        person_roles: {
+          headquarters: true,
+        },
+      },
+    });
+    assertFound(leader, 'Esta persona no es lider de ninguna sede');
+    const activeRole = leader.person_roles.find((r) => !r.end_date);
+    assertFound(activeRole, 'No se encontro un rol activo para la persona');
+    const rows: GetReportInactivityMonthlyDto[] =
+      await this.personRepository.query(
+        'select * from public.get_groups_volunteer_hours($1)',
+        [activeRole.headquarters.id],
+      );
+    return rows.map((r) => {
+      const row = new GetReportInactivityMonthlyDto();
+      row.groups = r.groups;
+      return row;
+    });
+  }
+
+  async reportUnlinkedPerson(user_id: string): Promise<GetReportUnlinked> {
+    const leader = await this.personRepository.findOne({
+      where: {
+        id: user_id,
+        person_roles: {
+          end_date: IsNull(),
+          role: {
+            id: In([1, 2, 6]),
+          },
+        },
+      },
+      relations: {
+        person_roles: {
+          headquarters: true,
+        },
+      },
+    });
+    assertFound(leader, 'Esta persona no es lider de ninguna sede');
+    const activeRole = leader.person_roles.find((r) => !r.end_date);
+    assertFound(activeRole, 'No se encontro un rol activo para la persona');
+    return await this.personRepository.query(
+      'select * from public.get_inactive_volunteers_by_headquarters($1)',
+      [activeRole.headquarters.id],
+    );
   }
 }

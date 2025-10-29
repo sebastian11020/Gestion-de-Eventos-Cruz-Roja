@@ -1,35 +1,43 @@
 "use client";
 
-import {
-    CalendarDays,
-    MapPin,
-    Users,
-    Trash2,
-    UserCircle2,
-    QrCode,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Pencil, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import toast from "react-hot-toast";
-import {
-    cancelInscribeEvent,
-    deleteEventService,
-    startEventService,
-    endEventService,
-} from "@/services/serviceGetEvent";
 import { ConfirmDialog } from "@/components/cards/confitmDialog";
 import { SkillSelectDialog } from "@/components/events/sections/skillSelectDialog";
-import type { skillQuota } from "@/types/usertType";
 import { QrDialog } from "@/components/layout/qrDialog";
+import { deleteEventService, cancelInscribeEvent } from "@/services/serviceGetEvent";
+import type { skillQuota } from "@/types/usertType";
+import { EventStatusBadge } from "@/components/events/EventStatusBadge";
+import { EventInfo } from "@/components/events/EventInfo";
+import { EventActions } from "@/components/events/EventActions";
+import { getFlags } from "@/utils/eventStatus";
+import { useEventQr } from "@/hooks/useEventQr";
+import { useSectionalsNode } from "@/hooks/useSectionalsNode";
+import { EditEventDialog } from "@/components/events/EditEventsDialog";
+import { Button } from "@/components/ui/button";
+import {useEventData} from "@/hooks/useEventData";
+import {cities} from "@/components/volunteer/constants";
 
-type EventCardProps = {
+type Props = {
     id: string;
     title: string;
     description: string;
     date: string;
-    location: string;
+    city: {
+        id: string;
+        name: string;
+    };
+    department:{
+        id: string;
+        name: string;
+    };
     capacity: string;
     state: string;
+    isEdit: boolean;
+    startDate:string;
+    inHistory?: boolean;
+    endDate:string;
     leader: { id: string; name: string };
     isLeader: boolean;
     isInscrit: boolean;
@@ -44,54 +52,26 @@ type EventCardProps = {
 };
 
 export function EventCard({
-                              id,
-                              title,
-                              description,
-                              date,
-                              location,
-                              capacity,
-                              leader,
-                              state,
-                              streetAddress,
-                              isLeader,
-                              isInscrit,
-                              showSuscribe,
-                              onSubscribe,
-                              onViewEnrolled,
-                              onDelete,
-                              skillsUser,
-                              skillQuotas = [],
-                              qrBase,
-                          }: EventCardProps) {
-    const normalize = (s?: string) => (s ?? "").trim().toUpperCase();
-    const status = normalize(state);
-    const isOngoing = ["EN CURSO", "EN_CURSO", "ONGOING", "IN_PROGRESS"].includes(status);
-    const isFinished = ["FINALIZADO", "FINALIZED"].includes(status);
-    const isCanceled = ["CANCELADO", "CANCELED", "CANCELLED"].includes(status);
-
-    const statusStyle = (() => {
-        if (isOngoing) return "bg-amber-100 text-amber-800 ring-amber-300";
-        if (isFinished) return "bg-emerald-100 text-emerald-800 ring-emerald-300";
-        if (isCanceled) return "bg-red-100 text-red-800 ring-red-300";
-        return "bg-blue-100 text-blue-800 ring-blue-300";
-    })();
-
-    const parseQty = (q: number | string) => {
-        const n = typeof q === "string" ? parseInt(q, 10) : q;
-        return Number.isFinite(n) ? n : 0;
-    };
-
+                              id, title, description, inHistory = false, date, capacity, leader, state, streetAddress,city,department,
+                              isLeader, isInscrit, isEdit, showSuscribe, onSubscribe,startDate,endDate, onViewEnrolled, onDelete,
+                              skillsUser, skillQuotas = [], qrBase,
+                          }: Props) {
+    const flags = getFlags(state);
     const hasQuotas = Array.isArray(skillQuotas) && skillQuotas.length > 0;
 
+
+    const [editOpen, setEditOpen] = useState(false);
+    const canEdit = !inHistory && (!flags.isOngoing || (flags.isOngoing && isEdit));
+    const { users } = useEventData();
+
     const [confirmOpen, setConfirmOpen] = useState(false);
-    const [deleteEventId, setDeleteEventId] = useState<string>("");
     const [skillDialogOpen, setSkillDialogOpen] = useState(false);
     const [skillOptions, setSkillOptions] = useState<{ id: string; name: string }[]>([]);
+    const { skills } = useSectionalsNode();
 
-    // QR state
-    const [qrOpen, setQrOpen] = useState(false);
-    const [qrAction, setQrAction] = useState<"start" | "end">("start");
-    const [qrValue, setQrValue] = useState("");
+
+    const { qrOpen, setQrOpen, qrAction, qrValue, openStart, openEnd, accept } =
+        useEventQr(id, qrBase, onDelete);
 
     const matchingSkills = useMemo(() => {
         if (!hasQuotas) return [];
@@ -101,14 +81,19 @@ export function EventCard({
             .map((sq) => ({ id: String(sq.id), name: sq.name }));
     }, [hasQuotas, skillQuotas, skillsUser]);
 
+    const skillsOptions = useMemo(
+        () => (skills ?? []).map((s) => ({ id: String(s.id), name: s.name ?? "" })),
+        [skills],
+    );
+
     async function handleDelete() {
         try {
-            const op = deleteEventService(deleteEventId).then((res) => {
+            const op = deleteEventService(id).then((res) => {
                 if (!res.success) return Promise.reject(res);
                 return res;
             });
 
-            toast.promise(op, {
+            await toast.promise(op, {
                 loading: "Eliminando evento...",
                 success: (res: { message?: string }) => <b>{res.message ?? "Eliminado correctamente"}</b>,
                 error:   (res: { message?: string }) => <b>{res.message ?? "No se pudo eliminar"}</b>,
@@ -117,8 +102,8 @@ export function EventCard({
             await op;
             setConfirmOpen(false);
             await onDelete?.();
-        } catch (error) {
-            console.error(error);
+        } catch (err) {
+            console.error(err);
         }
     }
 
@@ -129,7 +114,7 @@ export function EventCard({
                 return res;
             });
 
-            toast.promise(op, {
+            await toast.promise(op, {
                 loading: "Cancelando inscripción...",
                 success: (res: { message?: string }) => <b>{res.message ?? "Cancelado correctamente"}</b>,
                 error:   (res: { message?: string }) => <b>{res.message ?? "No se pudo cancelar"}</b>,
@@ -137,30 +122,25 @@ export function EventCard({
 
             await op;
             await onDelete?.();
-        } catch (error) {
-            console.error(error);
+        } catch (err) {
+            console.error(err);
         }
     }
 
-    function handleSubscribeClick() {
-        if (isOngoing) {
-            toast.error("Este evento está en curso. No es posible inscribirse.");
-            return;
-        }
+    function handleSubscribeSlot() {
         if (!hasQuotas) {
             onSubscribe("");
             return;
         }
-        const ms = matchingSkills;
-        if (ms.length === 0) {
+        if (matchingSkills.length === 0) {
             toast.error("No cumples con las habilidades requeridas para este evento.");
             return;
         }
-        if (ms.length === 1) {
-            onSubscribe(ms[0].id);
+        if (matchingSkills.length === 1) {
+            onSubscribe(matchingSkills[0].id);
             return;
         }
-        setSkillOptions(ms);
+        setSkillOptions(matchingSkills);
         setSkillDialogOpen(true);
     }
 
@@ -169,208 +149,72 @@ export function EventCard({
         onSubscribe(skillId);
     }
 
-    function openStartQr() {
-        setQrAction("start");
-        setQrValue(qrBase ? `${qrBase.replace(/\/$/, "")}?e=${id}&a=start` : `cr-attend://?e=${id}&a=start`);
-        setQrOpen(true);
-    }
-
-    function openEndQr() {
-        setQrAction("end");
-        setQrValue(qrBase ? `${qrBase.replace(/\/$/, "")}?e=${id}&a=end` : `cr-attend://?e=${id}&a=end`);
-        setQrOpen(true);
-    }
-
-    async function handleAccept() {
-        const op =
-            qrAction === "start"
-                ? startEventService(id)
-                : endEventService(id);
-
-        const labels =
-            qrAction === "start"
-                ? { loading: "Iniciando evento...", success: "Iniciado correctamente", error: "No se pudo iniciar" }
-                : { loading: "Finalizando evento...", success: "Finalizado correctamente", error: "No se pudo finalizar" };
-
-        const promise = op.then((res: { success: boolean; message?: string }) => {
-            if (!res.success) return Promise.reject(res);
-            return res;
-        });
-
-        toast.promise(promise, {
-            loading: labels.loading,
-            success: (res: { message?: string }) => <b>{res.message ?? labels.success}</b>,
-            error:   (res: { message?: string }) => <b>{res.message ?? labels.error}</b>,
-        });
-
-        await promise;
-        setQrOpen(false);
-        await onDelete?.();
-    }
-
     return (
         <div className="relative w-full max-w-sm bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-200 overflow-hidden flex flex-col border border-gray-100">
-            {/* Botón eliminar */}
-            <button
-                onClick={() => {
-                    setConfirmOpen(true);
-                    setDeleteEventId(id);
-                }}
-                className="absolute top-3 right-3 rounded-full p-1.5 text-red-500 hover:bg-red-50 hover:text-red-600 transition"
-                title="Eliminar evento"
-            >
-                <Trash2 className="w-4 h-4" />
-            </button>
-
-            {/* Cabecera */}
+            {/* editar + eliminar */}
             <div className="p-4 pb-0">
-                <div className="flex items-start justify-between gap-3 pr-8">
-                    <h3 className="text-lg font-semibold text-gray-800 leading-tight">{title}</h3>
-                    <span
-                        className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${statusStyle}`}
-                        title={`Estado: ${state}`}
-                    >
-            {state}
-          </span>
+                <div className="flex items-start justify-between gap-3">
+                    <h3 className="text-lg font-semibold text-gray-800 leading-tight line-clamp-2">
+                        {title}
+                    </h3>
+
+                    {/* Badge + acciones alineadas, sin superposición */}
+                    <div className="flex items-center gap-2 shrink-0">
+                        <EventStatusBadge state={state} />
+
+                        {canEdit && (<Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => setEditOpen(true)}
+                            className={`rounded-full p-1.5 h-8 w-8 ${
+                                canEdit
+                                    ? "border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300"
+                                    : "border-gray-200 text-gray-400 cursor-not-allowed"
+                            }`}
+                            title={canEdit ? "Editar evento" : "Solo el líder puede editar cuando está en curso"}
+                        >
+                            <Pencil className="w-4 h-4" />
+                        </Button>
+                        )
+                        }
+                        { canEdit && (<button
+                            onClick={() => setConfirmOpen(true)}
+                            className="rounded-full p-1.5 h-8 w-8 text-red-500 hover:bg-red-50 hover:text-red-600 transition"
+                            title="Eliminar evento"
+                        >
+                            <Trash2 className="w-4 h-4 mx-auto" />
+                        </button>)
+                        }
+                    </div>
                 </div>
                 <p className="text-sm text-gray-600 line-clamp-2 mt-1">{description}</p>
             </div>
-
-            {/* Contenido */}
-            <div className="flex flex-col p-4 gap-3 flex-1">
-                <div className="flex items-center gap-2 text-sm text-gray-700">
-                    <UserCircle2 className="w-4 h-4 text-blue-600" />
-                    <span className="font-medium">{leader.name}</span>
-                </div>
-
-                <div className="flex flex-col gap-2 text-sm text-gray-500">
-                    <div className="flex items-center gap-2">
-                        <CalendarDays className="w-4 h-4 text-blue-500" />
-                        <span>{date}</span>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        <MapPin className="w-4 h-4 text-red-500" />
-                        <span>
-              {location} – <span className="text-gray-700">{streetAddress}</span>
-            </span>
-                    </div>
-
-                    {capacity && (
-                        <div className="flex items-center gap-2">
-                            <Users className="w-4 h-4 text-green-600" />
-                            <span className="text-gray-700">
-                Cupo total: <span className="font-medium">{capacity}</span>
-              </span>
-                        </div>
-                    )}
-
-                    {Array.isArray(skillQuotas) && skillQuotas.length > 0 ? (
-                        <div className="mt-1">
-                            <span className="block text-xs text-gray-500 mb-1">Cupos por habilidad:</span>
-                            <div className="flex flex-wrap gap-2">
-                                {skillQuotas.map((sq) => (
-                                    <span
-                                        key={String(sq.id)}
-                                        className="px-2 py-1 text-xs rounded-full border border-gray-200 bg-gray-50 text-gray-700"
-                                        title={`${sq.name}: ${parseQty(sq.quantity)} cupos`}
-                                    >
-                    {sq.name} <span className="font-semibold">{parseQty(sq.quantity)}</span>
-                  </span>
-                                ))}
-                            </div>
-                        </div>
-                    ) : (
-                        <span className="block text-xs text-gray-500 mb-1">
-              No se requieren habilidades especiales
-            </span>
-                    )}
-                </div>
-            </div>
+            {/* Info */}
+            <EventInfo
+                leaderName={leader.name}
+                date={date}
+                city={city.name}
+                department={department.name}
+                streetAddress={streetAddress}
+                capacity={capacity}
+                skillQuotas={skillQuotas}
+            />
 
             {/* Acciones */}
-            <div className="p-4 pt-0 flex flex-col gap-2">
-                {showSuscribe && (
-                    <>
-                        {isLeader ? (
-                            isOngoing ? (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                    {/* Ver QR de registro (inicio) */}
-                                    <Button
-                                        onClick={openStartQr}
-                                        className="w-full rounded-xl font-medium text-white bg-blue-600 hover:bg-blue-700 flex items-center justify-center gap-2"
-                                        title="Mostrar QR de registro (inicio)"
-                                    >
-                                        <QrCode className="w-4 h-4" />
-                                        Ver QR de registro
-                                    </Button>
-
-                                    {/* Finalizar evento (QR) */}
-                                    <Button
-                                        onClick={openEndQr}
-                                        className="w-full rounded-xl font-medium text-white bg-amber-600 hover:bg-amber-700 flex items-center justify-center gap-2"
-                                        title="Finalizar evento"
-                                    >
-                                        <QrCode className="w-4 h-4" />
-                                        Finalizar evento (QR)
-                                    </Button>
-                                </div>
-                            ) : (
-                                <Button
-                                    onClick={openStartQr}
-                                    className="w-full rounded-xl font-medium text-white bg-emerald-600 hover:bg-emerald-700 flex items-center justify-center gap-2"
-                                    title="Iniciar evento"
-                                >
-                                    <QrCode className="w-4 h-4" />
-                                    Iniciar evento (QR)
-                                </Button>
-                            )
-                        ) : isInscrit ? (
-                            isOngoing ? (
-                                <Button
-                                    className="w-full rounded-xl font-medium bg-gray-300 text-gray-600 cursor-not-allowed"
-                                    title="No puedes cancelar mientras el evento está en curso"
-                                    disabled
-                                >
-                                    No disponible durante el evento
-                                </Button>
-                            ) : (
-                                <Button
-                                    onClick={handleCancel}
-                                    className="w-full rounded-xl font-medium bg-red-600 hover:bg-red-700 text-white"
-                                    title="Cancelar inscripción"
-                                >
-                                    Cancelar inscripción
-                                </Button>
-                            )
-                        ) : (
-                            <Button
-                                onClick={handleSubscribeClick}
-                                className={`w-full rounded-xl font-medium text-white ${isOngoing ? "bg-gray-300 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
-                                title={isOngoing ? "Evento en curso" : "Inscribirme"}
-                                disabled={isOngoing}
-                            >
-                                {isOngoing ? "En curso" : "Inscribirme"}
-                            </Button>
-                        )}
-                    </>
-                )}
-
-                <Button
-                    onClick={onViewEnrolled}
-                    variant="outline"
-                    className="w-full rounded-xl border-gray-300 hover:bg-gray-100 text-gray-700 font-medium"
-                >
-                    Ver inscritos
-                </Button>
-            </div>
+            <EventActions
+                isLeader={isLeader}
+                isInscrit={isInscrit}
+                flags={{ isOngoing: flags.isOngoing }}
+                showSuscribe={showSuscribe}
+                onSubscribe={handleSubscribeSlot}
+                onCancel={handleCancel}
+                onViewEnrolled={onViewEnrolled}
+                openStartQr={openStart}
+                openEndQr={openEnd}
+            />
 
             {/* Diálogos */}
-            <ConfirmDialog
-                open={confirmOpen}
-                onCancel={() => setConfirmOpen(false)}
-                onConfirm={handleDelete}
-            />
+            <ConfirmDialog open={confirmOpen} onCancel={() => setConfirmOpen(false)} onConfirm={handleDelete} />
 
             <SkillSelectDialog
                 open={skillDialogOpen}
@@ -382,11 +226,34 @@ export function EventCard({
             <QrDialog
                 open={qrOpen}
                 onClose={() => setQrOpen(false)}
-                title={qrAction === "start" ? "QR de registro (inicio)" : "QR de finalización"}
+                title={flags.isOngoing ? "QR de registro (inicio)" : qrAction === "start" ? "QR de registro (inicio)" : "QR de finalización"}
                 value={qrValue}
                 variant={qrAction}
-                onlyClose={qrAction === "start" && isOngoing} // en curso: el QR de registro solo se oculta
-                onAccept={handleAccept}
+                onlyClose={qrAction === "start" && flags.isOngoing}
+                onAccept={accept}
+            />
+            <EditEventDialog
+                open={editOpen}
+                onClose={() => setEditOpen(false)}
+                eventId={id}
+                users={users}
+                initial={{
+                    title,
+                    description,
+                    startDate: startDate,
+                    endDate: endDate,
+                    city: city.id,
+                    department:department.id,
+                    capacity,
+                    streetAddress,
+                    attendant: leader?.id ?? "",
+                    skill_quota:
+                        skillQuotas?.map((q) => ({ id: String(q.id), name: q.name, quantity: Number(q.quantity) })) ?? [],
+                }}
+
+                skills={skillsOptions}
+                onUpdated={onDelete}
+                disabled={!canEdit}
             />
         </div>
     );

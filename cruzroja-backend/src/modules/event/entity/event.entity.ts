@@ -39,12 +39,12 @@ export class Event {
   decree_1809_applies: boolean;
   @Column()
   street_address: string;
-  @Column({ nullable: true })
-  total_hours: number;
   @Column()
   is_private: boolean;
   @Column()
   is_adult: boolean;
+  @Column()
+  is_emergency: boolean;
   @ManyToOne(() => Location, (l) => l.events)
   @JoinColumn({ name: 'id_location' })
   location: Location;

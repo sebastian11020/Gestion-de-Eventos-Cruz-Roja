@@ -168,4 +168,23 @@ export class LocationService {
     }
     return null;
   }
+
+  async getAllDepartmentWithMunicipalities() {
+    return await this.locationRepository.find({
+      where: {
+        type: LocationTypeEnum.DEPARTAMENTO,
+      },
+      relations: {
+        children: true,
+      },
+      select: {
+        id: true,
+        name: true,
+        children: {
+          id: true,
+          name: true,
+        },
+      },
+    });
+  }
 }

@@ -151,7 +151,14 @@ export type event = {
   description: string;
   startDate: string;
   endDate: string;
-  location: string;
+    department: {
+        id: string;
+        name: string;
+    };
+    city: {
+        id: string;
+        name:string;
+    };
   capacity: string;
   is_leader: boolean;
   is_participant: boolean;
@@ -191,7 +198,7 @@ export type CreateEventForm = {
   attendant: string;
   capacity: number;
   isVirtual: boolean;
-  isPrivate: "true" | "false";
+  isPrivate: boolean;
   isAdult: boolean;
   isEmergency: boolean;
   participants?: string[];
@@ -222,6 +229,13 @@ export type user = {
   lastName: string;
   role: string;
 };
+
+export type assistantEvent = {
+    name: string;
+    licence: string;
+    document: string;
+    phone: string;
+}
 
 export type skill = {
   id: string;

@@ -73,7 +73,7 @@ export const TemplateNewEvent = (event: GetEventCardDDto) => {
                 <table style="width:100%; border-collapse:collapse;">
                   <tr>
                     <td style="padding:8px 0; font-weight:bold;">📍 Municipio:</td>
-                    <td style="padding:8px 0;">${event.location}</td>
+                    <td style="padding:8px 0;">${event.city.name}</td>
                   </tr>
                   <tr>
                     <td style="padding:8px 0; font-weight:bold;">🏠 Dirección:</td>

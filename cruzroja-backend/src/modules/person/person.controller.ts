@@ -13,6 +13,8 @@ import { CreatePersonDto } from './dto/create-person.dto';
 import { GetPersonTableDto } from './dto/get-person-table.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
 import { SupabaseAuthGuard } from '../../common/config/guards/supabase-auth.guard';
+import { UserId } from '../../common/decorators/user.decorator';
+import { UpdateProfilePersonDto } from './dto/update-profile-person.dto';
 
 @Controller('person')
 export class PersonController {
@@ -31,7 +33,12 @@ export class PersonController {
   @UseGuards(SupabaseAuthGuard)
   @Get('/leaderinfo/:document')
   async getLeaderInfo(@Param('document') document: string) {
-    return this.personService.findByIdDto(document);
+    return this.personService.findByDocumentDto(document);
+  }
+  @UseGuards(SupabaseAuthGuard)
+  @Get('/profile/')
+  async getProfileInfo(@UserId() userId: string) {
+    return this.personService.findById(userId);
   }
   @UseGuards(SupabaseAuthGuard)
   @Get('/table/all')
@@ -49,6 +56,14 @@ export class PersonController {
     return this.personService.create(personDto);
   }
   @UseGuards(SupabaseAuthGuard)
+  @Put('/update-profile')
+  async updateProfile(
+    @UserId() id_user: string,
+    @Body() personDto: UpdateProfilePersonDto,
+  ) {
+    return this.personService.updateProfile(id_user, personDto);
+  }
+  @UseGuards(SupabaseAuthGuard)
   @Put('/update/:id')
   async update(@Param('id') id: string, @Body() personDto: UpdatePersonDto) {
     return this.personService.update(id, personDto);
@@ -57,5 +72,15 @@ export class PersonController {
   @Get('/skills')
   async getSkills(@Query('id_user') id_user: string) {
     return this.personService.getSkills(id_user);
+  }
+  @UseGuards(SupabaseAuthGuard)
+  @Get('/inactivity-report')
+  async getInactivityReport(@UserId() userId: string) {
+    return this.personService.reportInactivityPerson(userId);
+  }
+  @UseGuards(SupabaseAuthGuard)
+  @Get('/unlinked-report')
+  async getUnlinkedReport(@UserId() userId: string) {
+    return this.personService.reportUnlinkedPerson(userId);
   }
 }

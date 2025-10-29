@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { EventAttendance } from './entity/event_attendance.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Not, Repository } from 'typeorm';
 import { EventEnrollmentService } from '../event-enrollment/event-enrollment.service';
 import { assertFound } from '../../common/utils/assert';
 import { CheckInOutDto } from './dto/check-in-out.dto';
 import { ActionEnum } from './enum/action.enum';
 import dayjs from 'dayjs';
+import { Event } from '../event/entity/event.entity';
 
 @Injectable()
 export class EventAttendanceService {
@@ -55,8 +56,67 @@ export class EventAttendanceService {
         total_hours: hours,
       });
       message = `Registro de salida exitoso, se te sumaron ${hours} horas.`;
+      await this.maybeCheckoutCoordinatorAt50(enrollment.event);
     }
     return { success: true, message: message };
+  }
+
+  private async maybeCheckoutCoordinatorAt50(event: Event): Promise<void> {
+    if (!event) return;
+
+    const coordinatorId = event.person.id;
+
+    const checkedIn = await this.eventAttendanceRepository.count({
+      where: {
+        enrollment: {
+          event: { id: event.id },
+          state: true,
+          person: { id: Not(coordinatorId) },
+        },
+        check_in: Not(IsNull()),
+      },
+    });
+
+    if (checkedIn === 0) return;
+
+    const checkedOut = await this.eventAttendanceRepository.count({
+      where: {
+        enrollment: {
+          event: { id: event.id },
+          state: true,
+          person: { id: Not(coordinatorId) },
+        },
+        check_out: Not(IsNull()),
+      },
+    });
+
+    const halfExited = checkedOut > checkedIn / 2;
+    if (!halfExited) return;
+
+    const coordinatorOpen = await this.eventAttendanceRepository.findOne({
+      where: {
+        enrollment: {
+          event: { id: event.id },
+          person: { id: coordinatorId },
+          state: true,
+        },
+        check_out: IsNull(),
+      },
+      relations: { enrollment: true },
+    });
+
+    if (!coordinatorOpen) return;
+
+    const now = new Date();
+    const hours = this.calculateApproximateHours(
+      coordinatorOpen.check_in.toISOString(),
+      now.toISOString(),
+    );
+
+    await this.eventAttendanceRepository.update(coordinatorOpen.id, {
+      check_out: now,
+      total_hours: hours,
+    });
   }
 
   private calculateApproximateHours(start: string, end: string): number {

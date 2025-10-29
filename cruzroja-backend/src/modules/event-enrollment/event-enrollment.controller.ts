@@ -29,7 +29,7 @@ export class EventEnrollmentController {
     return this.eventEnrollmentService.canceledEnrollment(dto);
   }
 
-  @Get('/get-participantst-table/:id')
+  @Get('/get-participants-table/:id')
   async getParticipantsTable(@Param('id', ParseIntPipe) id: number) {
     return this.eventEnrollmentService.getParticipants(id);
   }

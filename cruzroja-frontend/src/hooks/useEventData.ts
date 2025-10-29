@@ -10,6 +10,8 @@ import {
 } from "@/services/serviceGetEvent";
 import { event, leaderDataTable, Volunteer } from "@/types/usertType";
 import { getPersonEvent } from "@/services/serviceGetPerson";
+import {Department} from "@/types/sedesType";
+import {getDepartments} from "@/services/serviceSelect";
 
 export function useEventData() {
   const [scopes, setScopes] = useState<scope[]>([]);
@@ -21,6 +23,7 @@ export function useEventData() {
   const [person, setPerson] = useState<Volunteer[]>([]);
   const [users, setUsers] = useState<leaderDataTable[]>([]);
   const [skills, setSkills] = useState<string[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   async function loadAll() {
@@ -34,6 +37,7 @@ export function useEventData() {
         personData,
         userData,
         skillsData,
+          departmentsData,
       ] = await Promise.all([
         getAmbitService(),
         getClassificationService(),
@@ -42,6 +46,7 @@ export function useEventData() {
         getPersonEvent(),
         getLeaderEvent(),
         getSkillsPerson(),
+          getDepartments(),
       ]);
       setScopes(scopesData);
       setClassificationEvent(classificationData);
@@ -50,7 +55,8 @@ export function useEventData() {
       setPerson(personData);
       setUsers(userData);
       setSkills(skillsData);
-      console.log(eventData);
+      setDepartments(departmentsData);
+      console.log(departmentsData);
     } finally {
       setLoading(false);
     }
@@ -67,6 +73,7 @@ export function useEventData() {
     person,
     skills,
     loading,
+      departments,
     reload: loadAll,
   };
 }
