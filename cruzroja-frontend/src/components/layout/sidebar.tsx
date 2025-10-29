@@ -258,7 +258,7 @@ export function AppSidebar({
                             <ul className="pl-10 pr-2 py-1 space-y-1">
                                 <li>
                                     <Link
-                                        href="/dashboard/perfil"  // 🔁 ajusta si tu ruta es otra
+                                        href="/dashboard/person"
                                         onClick={() => setOpen(false)}
                                         className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-[13px] text-blue-100 hover:text-white hover:bg-white/10 transition-colors"
                                     >
