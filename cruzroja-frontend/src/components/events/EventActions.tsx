@@ -1,13 +1,14 @@
-// components/events/EventActions.tsx
+
 "use client";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { QrCode } from "lucide-react";
+import { QrCode, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 
 export function EventActions({
                                  isLeader,
                                  isInscrit,
-                                 flags, // { isOngoing, ... }
+                                 flags,
                                  showSuscribe,
                                  onSubscribe,
                                  onCancel,
@@ -21,11 +22,12 @@ export function EventActions({
     showSuscribe: boolean;
     onSubscribe: () => void;
     onCancel: () => Promise<void> | void;
-    onViewEnrolled: () => void;
+    onViewEnrolled: () => void; // soportado como sync o async
     openStartQr: () => void;
     openEndQr: () => void;
 }) {
     const { isOngoing } = flags;
+    const [loadingEnrolled, setLoadingEnrolled] = useState(false); // ⬅️ nuevo
 
     function handleSubscribeClick() {
         if (isOngoing) {
@@ -33,6 +35,19 @@ export function EventActions({
             return;
         }
         onSubscribe();
+    }
+
+    // ⬅️ nuevo: wrapper que muestra el loading mientras se obtiene la lista
+    async function handleViewEnrolledClick() {
+        try {
+            setLoadingEnrolled(true);
+            await Promise.resolve(onViewEnrolled());
+        } catch (e) {
+            console.error(e);
+            toast.error("No se pudo cargar la lista de inscritos.");
+        } finally {
+            setLoadingEnrolled(false);
+        }
     }
 
     return (
@@ -103,11 +118,20 @@ export function EventActions({
             )}
 
             <Button
-                onClick={onViewEnrolled}
+                onClick={handleViewEnrolledClick}
                 variant="outline"
-                className="w-full rounded-xl border-gray-300 hover:bg-gray-100 text-gray-700 font-medium"
+                className="w-full rounded-xl border-gray-300 hover:bg-gray-100 text-gray-700 font-medium flex items-center justify-center gap-2"
+                disabled={loadingEnrolled}
+                aria-busy={loadingEnrolled}
             >
-                Ver inscritos
+                {loadingEnrolled ? (
+                    <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Cargando...
+                    </>
+                ) : (
+                    "Ver inscritos"
+                )}
             </Button>
         </div>
     );
