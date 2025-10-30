@@ -22,6 +22,7 @@ import { PersonService } from '../person/person.service';
 import { EventEnrollment } from '../event-enrollment/entity/event-enrollment.entity';
 import { EventAttendance } from '../event_attendance/entity/event_attendance.entity';
 import { EditEventDto } from './dto/edit-event.dto';
+import { GetEventCalendarDto } from './dto/get-event-calendar';
 
 @Injectable()
 export class EventService {
@@ -549,5 +550,19 @@ export class EventService {
         state: true,
       }),
     );
+  }
+
+  async getEventCalendar() {
+    const events = await this.eventRepository.find();
+    return events.map((event) => {
+      const dto = new GetEventCalendarDto();
+      dto.id = String(event.id);
+      dto.title = event.name;
+      dto.start = event.start_date;
+      dto.end = event.estimated_end_date;
+      dto.color = '#2563eb';
+      dto.textColor = '#ffffff';
+      return dto;
+    });
   }
 }
