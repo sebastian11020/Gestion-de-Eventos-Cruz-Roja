@@ -665,17 +665,10 @@ export class PersonService {
     assertFound(leader, 'Esta persona no es lider de ninguna sede');
     const activeRole = leader.person_roles.find((r) => !r.end_date);
     assertFound(activeRole, 'No se encontro un rol activo para la persona');
-    const rows: GetReportInactivityMonthlyDto[] =
-      await this.personRepository.query(
-        'select * from public.get_report_inactivity_monthly($1)',
-        [activeRole.headquarters.id],
-      );
-    return rows.map((r) => {
-      const row = new GetReportInactivityMonthlyDto();
-      row.name = FormatNamesString(r.name);
-      row.volunteers = r.volunteers;
-      return row;
-    });
+    return await this.personRepository.query(
+      'select * from public.get_report_inactivity_monthly($1)',
+      [activeRole.headquarters.id],
+    );
   }
 
   async reportUnlinkedPerson(user_id: string): Promise<GetReportUnlinked> {
