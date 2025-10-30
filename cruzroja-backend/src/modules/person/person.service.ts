@@ -661,39 +661,42 @@ export class PersonService {
   async reportInactivityPerson(
     user_id: string,
   ): Promise<GetReportInactivityMonthlyDto[]> {
-    const leader = await this.personRepository.findOne({
-      where: {
-        id: user_id,
-        person_roles: {
-          end_date: IsNull(),
-          role: {
-            id: In([1, 2, 6]),
-          },
-        },
-      },
-      relations: {
-        person_roles: {
-          headquarters: true,
-        },
-      },
-    });
+    const leader = await this.findPersonReport(user_id);
     assertFound(leader, 'Esta persona no es lider de ninguna sede');
     const activeRole = leader.person_roles.find((r) => !r.end_date);
     assertFound(activeRole, 'No se encontro un rol activo para la persona');
     const rows: GetReportInactivityMonthlyDto[] =
       await this.personRepository.query(
-        'select * from public.get_groups_volunteer_hours($1)',
+        'select * from public.get_report_inactivity_monthly($1)',
         [activeRole.headquarters.id],
       );
     return rows.map((r) => {
       const row = new GetReportInactivityMonthlyDto();
-      row.groups = r.groups;
+      row.name = FormatNamesString(r.name);
+      row.volunteers = r.volunteers;
       return row;
     });
   }
 
   async reportUnlinkedPerson(user_id: string): Promise<GetReportUnlinked> {
-    const leader = await this.personRepository.findOne({
+    const leader = await this.findPersonReport(user_id);
+    assertFound(leader, 'Esta persona no es lider de ninguna sede');
+    const activeRole = leader.person_roles.find((r) => !r.end_date);
+    assertFound(activeRole, 'No se encontro un rol activo para la persona');
+    console.log(
+      await this.personRepository.query(
+        'select * from public.get_inactive_volunteers_by_headquarters($1)',
+        [activeRole.headquarters.id],
+      ),
+    );
+    return await this.personRepository.query(
+      'select * from public.get_inactive_volunteers_by_headquarters($1)',
+      [activeRole.headquarters.id],
+    );
+  }
+
+  async findPersonReport(user_id: string): Promise<Person | null> {
+    return await this.personRepository.findOne({
       where: {
         id: user_id,
         person_roles: {
@@ -709,12 +712,5 @@ export class PersonService {
         },
       },
     });
-    assertFound(leader, 'Esta persona no es lider de ninguna sede');
-    const activeRole = leader.person_roles.find((r) => !r.end_date);
-    assertFound(activeRole, 'No se encontro un rol activo para la persona');
-    return await this.personRepository.query(
-      'select * from public.get_inactive_volunteers_by_headquarters($1)',
-      [activeRole.headquarters.id],
-    );
   }
 }
