@@ -83,4 +83,14 @@ export class PersonController {
   async getUnlinkedReport(@UserId() userId: string) {
     return this.personService.reportUnlinkedPerson(userId);
   }
+
+  @Get('/dashboard-card')
+  async getDashboardCard() {
+    return this.personService.getDashboardCards();
+  }
+
+  @Get('/dashboard-podium')
+  async getDashboardPodium(@UserId() userId: string) {
+    return this.personService.getDashBoardVolunteer(userId);
+  }
 }
