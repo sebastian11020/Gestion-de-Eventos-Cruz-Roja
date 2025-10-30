@@ -676,12 +676,6 @@ export class PersonService {
     assertFound(leader, 'Esta persona no es lider de ninguna sede');
     const activeRole = leader.person_roles.find((r) => !r.end_date);
     assertFound(activeRole, 'No se encontro un rol activo para la persona');
-    console.log(
-      await this.personRepository.query(
-        'select * from public.get_inactive_volunteers_by_headquarters($1)',
-        [activeRole.headquarters.id],
-      ),
-    );
     return await this.personRepository.query(
       'select * from public.get_inactive_volunteers_by_headquarters($1)',
       [activeRole.headquarters.id],
