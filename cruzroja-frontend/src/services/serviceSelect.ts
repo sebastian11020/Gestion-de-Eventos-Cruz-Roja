@@ -110,3 +110,47 @@ export async function getReportInactivate() {
         throw error;
     }
 }
+
+export async function getEventsCalendar() {
+    try {
+        const token = await getAccessToken();
+        const { data } = await axios.get(
+            `${process.env.NEXT_PUBLIC_API_URL}/event/calendar`,
+            { headers: { ...authHeaders(token) } }
+        );
+        return data;
+    } catch (error) {
+        console.error("getReport error:", error);
+        throw error;
+    }
+}
+
+export async function getPersonDashboard() {
+    try {
+        const token = await getAccessToken();
+        const { data } = await axios.get(
+            `${process.env.NEXT_PUBLIC_API_URL}/person/dashboard-card`,
+            { headers: { ...authHeaders(token) } }
+        );
+        return data;
+    } catch (error) {
+        console.error("getReport error:", error);
+        throw error;
+    }
+}
+
+export async function getPersonPodium() {
+    try {
+        const token = await getAccessToken();
+        const { data } = await axios.get(
+            `${process.env.NEXT_PUBLIC_API_URL}/person/dashboard-podium`,
+            { headers: { ...authHeaders(token) } }
+        );
+        return data;
+    } catch (error) {
+        console.error("getReport error:", error);
+        throw error;
+    }
+}
+
+
