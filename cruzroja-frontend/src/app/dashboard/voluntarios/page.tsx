@@ -38,7 +38,7 @@ function badgeClass(state: string) {
   return "inline-flex rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-700";
 }
 
-export default function voluntarios() {
+export default function Voluntarios() {
   const [filtro, setFiltro] = useState("");
   const [page, setPage] = useState(1);
   const [openWizard, setOpenWizard] = useState(false);
