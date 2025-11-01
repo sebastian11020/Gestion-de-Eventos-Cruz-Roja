@@ -4,11 +4,20 @@ export type groupReport = {
         volunteers: {
             document: string;
             name: string;
-            license: string;
+            licence: string;
             months: {
                 name: string;
                 hours: string;
             }[];
         }[];
+    }[];
+};
+export type volunteers = {
+    document: string;
+    name: string;
+    licence: string;
+    months: {
+        name: string;
+        hours: string;
     }[];
 };

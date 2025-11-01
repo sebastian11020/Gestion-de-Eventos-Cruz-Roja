@@ -1,8 +1,33 @@
+import { volunteers } from "@/types/reportType";
+
+function toNumberHours(value: unknown): number {
+    const n = Number(value);
+    return isNaN(n) ? 0 : n;
+}
+
+const MONTHS_ES = [
+    "", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+];
+
+function monthLabel(m: any): string {
+    // string: usa 'month' o 'name'
+    if (typeof m?.month === "string") return m.month;
+    if (typeof m?.name === "string") return m.name;
+
+    // numérico: 1–12
+    if (typeof m?.month === "number" && m.month >= 1 && m.month <= 12) {
+        return MONTHS_ES[m.month];
+    }
+
+    return "";
+}
+
 export function HoursModal({
-                        volunteer,
-                        onClose,
-                    }: {
-    volunteer: Volunteer | null;
+                               volunteer,
+                               onClose,
+                           }: {
+    volunteer: volunteers | null;
     onClose: () => void;
 }) {
     if (!volunteer) return null;
@@ -11,24 +36,14 @@ export function HoursModal({
 
     return (
         <>
-            {/* Overlay */}
-            <div
-                className="fixed inset-0 z-50 bg-black/40"
-                onClick={onClose}
-                aria-hidden
-            />
-            {/* Panel */}
-            <div
-                role="dialog"
-                aria-modal="true"
-                className="fixed inset-0 z-50 grid place-items-center"
-            >
+            <div className="fixed inset-0 z-50 bg-black/40" onClick={onClose} aria-hidden />
+            <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 grid place-items-center">
                 <div className="w-full max-w-lg rounded-xl bg-white shadow-lg ring-1 ring-gray-200">
                     <div className="flex items-center justify-between border-b border-gray-200 px-5 py-3">
                         <div>
                             <h3 className="text-base font-semibold text-gray-900">Reporte de horas</h3>
                             <p className="text-xs text-gray-500">
-                                {volunteer.name} • Doc: {volunteer.document} • Carnet: {volunteer.license}
+                                {volunteer.name} • Doc: {volunteer.document} • Carnet: {volunteer.licence}
                             </p>
                         </div>
                         <button
@@ -56,11 +71,9 @@ export function HoursModal({
                                 </tr>
                             ) : (
                                 volunteer.months.map((m, idx) => (
-                                    <tr key={`${m.name}-${idx}`} className="border-t border-gray-100">
-                                        <td className="px-3 py-2 text-gray-800">{m.name}</td>
-                                        <td className="px-3 py-2 font-medium text-gray-900">
-                                            {toNumberHours(m.hours)}
-                                        </td>
+                                    <tr key={`${monthLabel(m) || idx}`} className="border-t border-gray-100">
+                                        <td className="px-3 py-2 text-gray-800">{monthLabel(m)}</td>
+                                        <td className="px-3 py-2 font-medium text-gray-900">{toNumberHours(m.hours)}</td>
                                     </tr>
                                 ))
                             )}
