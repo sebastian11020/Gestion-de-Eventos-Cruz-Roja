@@ -31,6 +31,9 @@ import { type_document } from './enum/person.enums';
 import { UpdateProfilePersonDto } from './dto/update-profile-person.dto';
 import { GetReportInactivityMonthlyDto } from './dto/get-report-monthly.dto';
 import { GetReportUnlinked } from './dto/get-report-unlinked';
+import { async } from 'rxjs';
+import { GetDashboardCards } from './dto/get-dashboard-cards';
+import { Event } from '../event/entity/event.entity';
 
 @Injectable()
 export class PersonService {
@@ -661,54 +664,18 @@ export class PersonService {
   async reportInactivityPerson(
     user_id: string,
   ): Promise<GetReportInactivityMonthlyDto[]> {
-    const leader = await this.personRepository.findOne({
-      where: {
-        id: user_id,
-        person_roles: {
-          end_date: IsNull(),
-          role: {
-            id: In([1, 2, 6]),
-          },
-        },
-      },
-      relations: {
-        person_roles: {
-          headquarters: true,
-        },
-      },
-    });
+    const leader = await this.findPersonReport(user_id);
     assertFound(leader, 'Esta persona no es lider de ninguna sede');
     const activeRole = leader.person_roles.find((r) => !r.end_date);
     assertFound(activeRole, 'No se encontro un rol activo para la persona');
-    const rows: GetReportInactivityMonthlyDto[] =
-      await this.personRepository.query(
-        'select * from public.get_groups_volunteer_hours($1)',
-        [activeRole.headquarters.id],
-      );
-    return rows.map((r) => {
-      const row = new GetReportInactivityMonthlyDto();
-      row.groups = r.groups;
-      return row;
-    });
+    return await this.personRepository.query(
+      'select * from public.get_report_inactivity_monthly($1)',
+      [activeRole.headquarters.id],
+    );
   }
 
   async reportUnlinkedPerson(user_id: string): Promise<GetReportUnlinked> {
-    const leader = await this.personRepository.findOne({
-      where: {
-        id: user_id,
-        person_roles: {
-          end_date: IsNull(),
-          role: {
-            id: In([1, 2, 6]),
-          },
-        },
-      },
-      relations: {
-        person_roles: {
-          headquarters: true,
-        },
-      },
-    });
+    const leader = await this.findPersonReport(user_id);
     assertFound(leader, 'Esta persona no es lider de ninguna sede');
     const activeRole = leader.person_roles.find((r) => !r.end_date);
     assertFound(activeRole, 'No se encontro un rol activo para la persona');
@@ -716,5 +683,146 @@ export class PersonService {
       'select * from public.get_inactive_volunteers_by_headquarters($1)',
       [activeRole.headquarters.id],
     );
+  }
+
+  async findPersonReport(user_id: string): Promise<Person | null> {
+    return await this.personRepository.findOne({
+      where: {
+        id: user_id,
+        person_roles: {
+          end_date: IsNull(),
+          role: {
+            id: In([1, 2, 6]),
+          },
+        },
+      },
+      relations: {
+        person_roles: {
+          headquarters: true,
+        },
+      },
+    });
+  }
+  async searchLeaderSectionalById() {
+    return await this.personRepository.findOne({
+      where: {
+        person_roles: {
+          role: {
+            id: 1,
+          },
+          end_date: IsNull(),
+        },
+      },
+    });
+  }
+
+  async getDashboardCards() {
+    return await this.personRepository.manager.transaction(async (manager) => {
+      const users = await manager.find(Person, {
+        where: {
+          person_status: {
+            state: {
+              id: 3,
+            },
+            end_date: IsNull(),
+          },
+        },
+      });
+      const leader = await this.searchLeaderSectionalById();
+      const coordinatorsGroups = await manager.find(Person, {
+        where: {
+          person_status: {
+            state: {
+              id: 3,
+            },
+            end_date: IsNull(),
+          },
+          person_roles: {
+            role: {
+              id: 3,
+            },
+            end_date: IsNull(),
+          },
+        },
+      });
+      const coordinatorsPrograms = await manager.find(Person, {
+        where: {
+          person_status: {
+            state: {
+              id: 3,
+            },
+            end_date: IsNull(),
+          },
+          person_roles: {
+            role: {
+              id: 4,
+            },
+            end_date: IsNull(),
+          },
+        },
+      });
+      const volunteers = await manager.find(Person, {
+        where: {
+          person_status: {
+            state: {
+              id: 3,
+            },
+            end_date: IsNull(),
+          },
+          person_roles: {
+            role: {
+              id: 5,
+            },
+            end_date: IsNull(),
+          },
+        },
+      });
+      const activeEvents = await manager.find(Event, {
+        where: {
+          eventStatus: {
+            state: {
+              id: In([8, 9]),
+            },
+            end_date: IsNull(),
+          },
+        },
+      });
+      assertFound(leader, 'No se encontro lider de seccional');
+      const dto = new GetDashboardCards();
+      dto.total_user = String(users.length);
+      dto.leader =
+        FormatNamesString(leader.name) +
+        ' ' +
+        FormatNamesString(leader.last_name);
+      dto.total_coordinators_group = String(coordinatorsGroups.length);
+      dto.total_coordinators_program = String(coordinatorsPrograms.length);
+      dto.total_volunteers = String(volunteers.length);
+      dto.active_events = String(activeEvents.length);
+      return dto;
+    });
+  }
+
+  async getDashBoardVolunteer(user_id: string) {
+    const user = await this.personRepository.findOne({
+      where: {
+        id: user_id,
+      },
+      relations: {
+        person_roles: {
+          headquarters: true,
+        },
+      },
+    });
+    assertFound(user, 'No se encontro la persona indicada');
+    const activeRole = user.person_roles.find((r) => !r.end_date);
+    assertFound(activeRole, 'No se encontro un rol activo para la persona');
+    const dto: {
+      name: string;
+      hours_month: string;
+    } = await this.personRepository.query(
+      'select * from public.top10_volunteers_hours_month($1)',
+      [activeRole.headquarters.id],
+    );
+    return dto;
   }
 }

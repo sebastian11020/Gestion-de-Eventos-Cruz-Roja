@@ -55,4 +55,9 @@ export class EventController {
   ) {
     return this.eventService.edit(id, dto);
   }
+
+  @Get('/calendar')
+  async getCalendar() {
+    return this.eventService.getEventCalendar();
+  }
 }

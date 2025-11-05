@@ -213,6 +213,13 @@ export type Volunteer = {
   email?: string;
 };
 
+export type desvinculate = {
+    document:string
+    name: string;
+    license:string;
+    Inactivation_date:string;
+}
+
 export type eps = {
   id: string;
   name: string;
