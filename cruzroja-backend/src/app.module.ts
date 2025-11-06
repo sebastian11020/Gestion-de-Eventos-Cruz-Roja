@@ -34,6 +34,8 @@ import configuration from './common/config/configuration';
 import { SupabaseModule } from './common/config/supabase/supabase.module';
 import { SupabaseAuthModule } from './common/config/guards/supabase-auth.module';
 import { EventAttendanceModule } from './modules/event_attendance/event_attendance.module';
+import { NotificationModule } from './modules/notification/notification.module';
+import { NotificationPersonModule } from './modules/notification-person/notification-person.module';
 
 @Module({
   imports: [
@@ -76,6 +78,8 @@ import { EventAttendanceModule } from './modules/event_attendance/event_attendan
     EventQuotaModule,
     EventEnrollmentModule,
     EventAttendanceModule,
+    NotificationModule,
+    NotificationPersonModule,
   ],
   controllers: [AppController],
   providers: [AppService],

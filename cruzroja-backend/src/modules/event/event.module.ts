@@ -8,6 +8,7 @@ import { PersonModule } from '../person/person.module';
 import { EventStatusModule } from '../event-status/event-status.module';
 import { SupabaseAuthModule } from '../../common/config/guards/supabase-auth.module';
 import { SupabaseModule } from '../../common/config/supabase/supabase.module';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { SupabaseModule } from '../../common/config/supabase/supabase.module';
     EventStatusModule,
     SupabaseModule,
     SupabaseAuthModule,
+    NotificationModule,
   ],
   controllers: [EventController],
   providers: [EventService],

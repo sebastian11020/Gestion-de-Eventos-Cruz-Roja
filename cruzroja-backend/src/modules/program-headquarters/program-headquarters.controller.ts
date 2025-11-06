@@ -14,14 +14,15 @@ import { ProgramHeadquartersService } from './program-headquarters.service';
 import { AssociateProgramHeadquarters } from './dto/associate-program-headquarters';
 import { ChangeCoordinatorProgramsDto } from './dto/change-coordinator-program-headquarters.dto';
 import { SupabaseAuthGuard } from '../../common/config/guards/supabase-auth.guard';
+import { UserId } from '../../common/decorators/user.decorator';
 
 @Controller('program-headquarters')
 @UseGuards(SupabaseAuthGuard)
 export class ProgramHeadquartersController {
   constructor(private programHeadquartersService: ProgramHeadquartersService) {}
   @Get('/all')
-  async getAll() {
-    return this.programHeadquartersService.getAllProgramHeadquartersDto();
+  async getAll(@UserId() userId: string) {
+    return this.programHeadquartersService.getAllProgramHeadquartersDto(userId);
   }
 
   @Post('associate')

@@ -31,9 +31,9 @@ import { type_document } from './enum/person.enums';
 import { UpdateProfilePersonDto } from './dto/update-profile-person.dto';
 import { GetReportInactivityMonthlyDto } from './dto/get-report-monthly.dto';
 import { GetReportUnlinked } from './dto/get-report-unlinked';
-import { async } from 'rxjs';
 import { GetDashboardCards } from './dto/get-dashboard-cards';
 import { Event } from '../event/entity/event.entity';
+import { NotificationPersonService } from '../notification-person/notification-person.service';
 
 @Injectable()
 export class PersonService {
@@ -46,31 +46,29 @@ export class PersonService {
     private nodeEmailerService: EmailService,
     private personSkillService: PersonSkillService,
     private personRoleService: PersonRoleService,
+    private notificationPersonService: NotificationPersonService,
   ) {}
 
   async getLoginPerson(id: string): Promise<GetLoginPersonDto> {
-    const person = await this.personRepository.findOne({
-      where: {
-        id: id,
-        person_roles: {
-          end_date: IsNull(),
-        },
-        person_status: {
-          end_date: IsNull(),
-        },
-      },
-      relations: {
-        person_roles: {
-          role: true,
-        },
-        person_status: {
-          state: true,
-        },
-      },
-    });
+    const person = await this.personRepository
+      .createQueryBuilder('p')
+      .leftJoinAndSelect(
+        'p.person_roles',
+        'current_role',
+        'current_role.end_date IS NULL',
+      )
+      .leftJoinAndSelect(
+        'p.person_status',
+        'current_status',
+        'current_status.end_date IS NULL',
+      )
+      .leftJoinAndSelect('current_status.state', 'state')
+      .leftJoinAndSelect('current_role.role', 'role')
+      .where('p.id = :id', { id })
+      .getOne();
     assertFound(person, 'No se encontro ninguna persona con ese id');
-    const current_state = person.person_status.at(0)?.state.name;
-    const current_role = person.person_roles.at(0)?.role.name ?? '';
+    const current_state = person.person_status[0].state.name;
+    const current_role = person.person_roles[0].role.name;
     const role =
       !current_role ||
       current_state === 'INACTIVO' ||
@@ -131,11 +129,188 @@ export class PersonService {
     });
   }
 
-  async findAllDto() {
-    const rows: GetPersons[] = await this.personRepository.query(
-      'select * from public.list_people_form_state()',
+  async findPersonById(id: string): Promise<Person | null> {
+    return await this.personRepository.findOne({
+      where: {
+        id: id,
+      },
+      relations: {
+        person_roles: {
+          role: true,
+        },
+      },
+    });
+  }
+
+  async findAllDto(user_id: string): Promise<GetPersons[]> {
+    const person = await this.personRepository
+      .createQueryBuilder('p')
+      .leftJoinAndSelect(
+        'p.person_roles',
+        'person_roles',
+        'person_roles.end_date IS NULL',
+      )
+      .leftJoinAndSelect('person_roles.headquarters', 'headquarters')
+      .leftJoinAndSelect('person_roles.role', 'role')
+      .where('p.id = :id', { id: user_id })
+      .getOne();
+    assertFound(person, 'No se encontro ninguna persona con ese id');
+    const persons = this.personRepository
+      .createQueryBuilder('p')
+      .leftJoinAndSelect('p.location', 'location')
+      .leftJoinAndSelect('location.parent', 'parent_location')
+      .leftJoinAndSelect(
+        'p.person_status',
+        'current_status',
+        'current_status.end_date IS NULL',
+      )
+      .leftJoinAndSelect('current_status.state', 'state')
+      .leftJoinAndSelect(
+        'p.person_roles',
+        'current_role',
+        'current_role.end_date IS NULL',
+      )
+      .leftJoinAndSelect('current_role.headquarters', 'headquarters')
+      .leftJoinAndSelect('headquarters.location', 'city')
+      .leftJoinAndSelect('current_role.group', 'groups')
+      .leftJoinAndSelect('current_role.program', 'programs')
+      .leftJoinAndSelect(
+        'p.eps_person',
+        'eps_person',
+        'eps_person.state = true',
+      )
+      .leftJoinAndSelect('eps_person.eps', 'eps')
+      .leftJoinAndSelect('p.person_skills', 'skills', 'skills.state = true')
+      .leftJoinAndSelect('skills.skill', 'skill')
+      .leftJoinAndSelect('groups.group', 'group')
+      .leftJoinAndSelect('programs.program', 'program');
+    if (2 === person.person_roles[0].role.id) {
+      persons.where('headquarters.id = :id', {
+        id: person.person_roles[0].headquarters.id,
+      });
+    }
+    const aux = await persons.getMany();
+    return this.mapEntityToDto(aux);
+  }
+
+  mapEntityToDto(persons: Person[]): Promise<GetPersons[]> {
+    return Promise.all(
+      persons.map(async (p) => {
+        const dto = new GetPersons();
+        dto.id = p.id;
+        dto.typeDocument = p.type_document;
+        dto.document = p.document;
+        dto.carnet = p.license ?? '';
+        dto.name = FormatNamesString(p.name);
+        dto.lastName = FormatNamesString(p.last_name);
+        dto.bloodType = FormatNamesString(p.type_blood);
+        dto.sex = FormatNamesString(p.sex);
+        dto.gender = FormatNamesString(p.gender);
+        dto.state = {
+          id: String(p.person_status[0].state.id),
+          name: FormatNamesString(p.person_status[0].state.name),
+        };
+        dto.bornDate = p.birth_date.toISOString().split('T')[0];
+        dto.department = FormatNamesString(p.location.parent?.name ?? '');
+        dto.city = {
+          id: String(p.location.id),
+          name: FormatNamesString(p.location.name),
+        };
+        dto.zone = FormatNamesString(p.address.zone);
+        dto.address = FormatNamesString(p.address.streetAddress);
+        dto.cellphone = String(p.phone);
+        dto.emergencyContact = {
+          name: FormatNamesString(p.emergency_contact.name),
+          relationShip: FormatNamesString(p.emergency_contact.relationShip),
+          phone: String(p.emergency_contact.phone),
+        };
+        dto.sectional = {
+          id: String(p.person_roles[0].headquarters.id),
+          city: FormatNamesString(p.person_roles[0].headquarters.location.name),
+        };
+        dto.eps = {
+          id: String(p.eps_person[0]?.eps.id ?? ''),
+          name: FormatNamesString(p.eps_person[0]?.eps.name ?? ''),
+          type: FormatNamesString(p.eps_person[0]?.affiliation ?? ''),
+        };
+        dto.skills = p.person_skills.map((s) => ({
+          id: String(s.skill.id),
+          name: FormatNamesString(s.skill.name),
+        }));
+        dto.group = {
+          id: String(p.person_roles[0].group?.group.id ?? ''),
+          name: FormatNamesString(p.person_roles[0].group?.group.name ?? ''),
+          program: {
+            id: String(p.person_roles[0]?.program?.program.id ?? ''),
+            name: FormatNamesString(
+              p.person_roles[0].program?.program.name ?? '',
+            ),
+          },
+        };
+        dto.email = FormatNamesString(p.email);
+        const { totalHours, monthHours } =
+          await this.getHoursSummaryForPersonFromPersonRepo(p.id);
+        dto.totalHours = String(totalHours);
+        dto.monthHours = String(monthHours);
+        return dto;
+      }),
     );
-    return rows;
+  }
+
+  private getMonthRange(year: number, month: number) {
+    const start = new Date(year, month - 1, 1, 0, 0, 0, 0);
+    const end = new Date(year, month, 0, 23, 59, 59, 999);
+    return { start, end };
+  }
+
+  private async getHoursSummaryForPersonFromPersonRepo(
+    personId: string,
+    month?: number,
+    year?: number,
+  ): Promise<{ totalHours: number; monthHours: number }> {
+    const now = new Date();
+    const m = month ?? now.getMonth() + 1;
+    const y = year ?? now.getFullYear();
+
+    const { start, end } = this.getMonthRange(y, m);
+
+    const qb = this.personRepository
+      .createQueryBuilder('p')
+      .leftJoin('p.event_enrollment', 'enrollment')
+      .leftJoin('enrollment.event_attendances', 'att')
+      .where('p.id = :personId', { personId })
+      .andWhere('att.check_out IS NOT NULL')
+      .select('COALESCE(SUM(att.total_hours), 0)', 'totalHours')
+      .addSelect(
+        `
+      COALESCE(
+        SUM(
+          CASE
+            WHEN att.check_in >= :startOfMonth
+             AND att.check_in <= :endOfMonth
+            THEN att.total_hours
+            ELSE 0
+          END
+        ),
+        0
+      )
+      `,
+        'monthHours',
+      )
+      .setParameters({
+        startOfMonth: start,
+        endOfMonth: end,
+      });
+
+    const raw = await qb.getRawOne<{
+      totalHours: string;
+      monthHours: string;
+    }>();
+
+    return {
+      totalHours: Number(raw?.totalHours ?? 0),
+      monthHours: Number(raw?.monthHours ?? 0),
+    };
   }
 
   async findByDocumentDto(document: string) {
@@ -597,7 +772,11 @@ export class PersonService {
     });
   }
 
-  async sendNotification(id_headquarters: number, event: GetEventCardDDto) {
+  async sendNotification(
+    id_headquarters: number,
+    event: GetEventCardDDto,
+    id_notification: number,
+  ) {
     const persons = await this.personRepository.find({
       where: {
         person_roles: {
@@ -627,7 +806,12 @@ export class PersonService {
           .filter((e) => e && e.includes('@')),
       ),
     );
-    await this.nodeEmailerService.sendEmailNewEventMany(emails, event);
+    const ids = Array.from(new Set(persons.map((p) => p.id.trim())));
+    await this.notificationPersonService.createNotificationPerson(
+      ids,
+      id_notification,
+    );
+    //await this.nodeEmailerService.sendEmailNewEventMany(emails, event);
   }
 
   async getSkills(id_user: string) {
