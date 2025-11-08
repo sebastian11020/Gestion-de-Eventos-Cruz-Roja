@@ -61,7 +61,7 @@ export class EventService {
         is_adult: eventForm.isAdult,
         is_emergency: eventForm.isEmergency,
         max_volunteers: eventForm.capacity,
-        street_address: eventForm.streetAddress,
+        street_address: NormalizeString(eventForm.streetAddress),
         location: {
           id: eventForm.city,
         },
@@ -212,7 +212,6 @@ export class EventService {
       await manager.update(EventStatus, currentStatus.id, {
         end_date: new Date(),
       });
-      console.log('Cerrando estado actual');
     }
     currentStatus = manager.create(EventStatus, {
       event: {
