@@ -8,6 +8,6 @@ export class CreateGroupHeadquarters {
   @Min(1)
   idGroup: number;
   @IsString()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'El coordinador es obligatorio' })
   leader: string;
 }
