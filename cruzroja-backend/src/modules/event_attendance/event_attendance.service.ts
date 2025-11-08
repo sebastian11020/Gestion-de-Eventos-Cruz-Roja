@@ -18,12 +18,12 @@ export class EventAttendanceService {
   ) {}
 
   async checkInAndCheckOut(id_user: string, dto: CheckInOutDto) {
+    console.log(id_user);
     let message: string = '';
     const enrollment = await this.eventEnrollmentService.findEnrollmentInEvent(
       id_user,
       dto.id_event,
     );
-    console.log(id_user);
     console.log(dto);
     assertFound(enrollment, 'No te encuentras inscrito en este evento');
     let attendance: EventAttendance | null;

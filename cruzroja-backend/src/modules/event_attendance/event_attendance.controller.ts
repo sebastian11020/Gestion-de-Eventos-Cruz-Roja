@@ -9,6 +9,7 @@ export class EventAttendanceController {
 
   @Post('/attendance')
   async checkIn(@UserId() id_user: string, @Body() dto: CheckInOutDto) {
+    console.log(id_user);
     return this.event_attendanceService.checkInAndCheckOut(id_user, dto);
   }
 }
