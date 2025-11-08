@@ -465,26 +465,28 @@ export class EventService {
           },
         },
       });
+      console.log('Current event');
+      console.log(currentEvent);
       assertFound(
         currentEvent,
         'No puedes iniciar un evento que no este a tu cargo',
       );
       await this.assignStatus(manager, id_event, 9);
-      await manager.save(
-        EventAttendance,
-        manager.create(EventAttendance, {
-          enrollment: {
-            event: {
-              id: id_event,
-            },
-            person: {
-              id: userId,
-            },
-            state: true,
+      const enrollmentCoordinator = manager.create(EventAttendance, {
+        enrollment: {
+          event: {
+            id: id_event,
           },
-          check_in: new Date(),
-        }),
-      );
+          person: {
+            id: userId,
+          },
+          state: true,
+        },
+        check_in: new Date(),
+      });
+      console.log('Enrrolment coordinator');
+      console.log(enrollmentCoordinator);
+      await manager.save(EventAttendance, enrollmentCoordinator);
       return { success: true, message: 'Evento iniciado exitosamente.' };
     });
   }
