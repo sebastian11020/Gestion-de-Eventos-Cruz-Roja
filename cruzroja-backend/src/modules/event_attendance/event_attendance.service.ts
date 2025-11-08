@@ -31,8 +31,9 @@ export class EventAttendanceService {
         },
       },
     });
+    console.log(attendance);
     if (dto.action === ActionEnum.start) {
-      if (!attendance) {
+      if (attendance != null) {
         conflict('Ya habias registrado tu ingreso en este evento.');
       } else {
         attendance = this.eventAttendanceRepository.create({
