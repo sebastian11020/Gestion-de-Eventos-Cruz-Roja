@@ -23,7 +23,7 @@ export function PrivacyParticipantsSection({
   leader: string;
   onRemoveVolunteer: (id: string) => void;
 }) {
-  const hasLeader = typeof leader === "string" && leader.trim().length > 0;
+  const hasLeader = leader.trim().length > 0;
 
   return (
     <FancyCard

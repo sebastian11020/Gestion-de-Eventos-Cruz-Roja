@@ -29,7 +29,6 @@ export function OperationSection({
   const setQty = (id: string, nextRaw: string) => {
     const parsed =
       nextRaw === "" ? 0 : Math.max(0, Math.floor(Number(nextRaw) || 0));
-    const current = getQty(id);
     const assignedWithoutThis = quotas.reduce(
       (sum, q) =>
         q.id === id ? sum : sum + (Number.isFinite(q.qty) ? q.qty : 0),

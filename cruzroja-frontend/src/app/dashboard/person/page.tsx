@@ -10,6 +10,7 @@ import { getPersonUpdate } from "@/services/serviceGetPerson";
 import { updatePersonProfile } from "@/services/serviceCreatePerson";
 import { ReadOnly } from "@/components/layout/ReadOnly";
 import {usePageTitle} from "@/hooks/usePageTittle";
+import {EPS_TYPES} from "@/const/consts";
 
 function toNumberHours(v: unknown) {
   const n = parseInt(String(v ?? "").trim(), 10);
@@ -106,7 +107,7 @@ export default function ProfilePage() {
         },
         id_location: Number(cityId),
         id_eps: Number(epsId),
-        type_affiliation: typeAffiliation, // si tienes catálogo fijo, reemplázalo por un select.
+        type_affiliation: typeAffiliation,
       };
       const response = await updatePersonProfile(payload);
       if (response.success) {
@@ -242,16 +243,21 @@ export default function ProfilePage() {
           </Field>
 
           {/* Tipo afiliación */}
-          <Field label="Tipo de afiliación" htmlFor="typeAff">
-            <input
-              id="typeAff"
-              type="text"
-              value={typeAffiliation}
-              onChange={(e) => setTypeAffiliation(e.target.value)}
-              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 shadow-sm transition
+          <Field label="Regimen" htmlFor="typeAff">
+              <select
+                  id="typeAff"
+                  value={typeAffiliation}
+                  onChange={(e) => setTypeAffiliation(e.target.value)}
+                  className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 shadow-sm transition
                        hover:border-gray-400 focus:border-red-600 focus:ring-2 focus:ring-red-200"
-              placeholder="Contributivo, Subsidiado, etc."
-            />
+              >
+                  <option value="">Seleccione Regimen</option>
+                  {EPS_TYPES.map((e) => (
+                      <option key={e} value={e}>
+                          {e}
+                      </option>
+                  ))}
+              </select>
           </Field>
 
           {/* Dirección */}
