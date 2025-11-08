@@ -19,23 +19,31 @@ export class EventAttendanceService {
 
   async checkInAndCheckOut(dto: CheckInOutDto) {
     let message: string = '';
-    console.log(dto);
     const enrollment = await this.eventEnrollmentService.findEnrollmentInEvent(
       dto.user_id,
       dto.id_event,
     );
-    console.log(dto);
     assertFound(enrollment, 'No te encuentras inscrito en este evento');
-    let attendance: EventAttendance | null;
-    if (dto.action === ActionEnum.start) {
-      attendance = this.eventAttendanceRepository.create({
+    let attendance = await this.eventAttendanceRepository.findOne({
+      where: {
         enrollment: {
           id: enrollment.id,
         },
-        check_in: new Date(),
-      });
-      await this.eventAttendanceRepository.save(attendance);
-      message = 'Registro de ingreso exitoso';
+      },
+    });
+    if (dto.action === ActionEnum.start && !attendance) {
+      if (!attendance) {
+        message = 'Ya habias registrado tu ingreso en este evento.';
+      } else {
+        attendance = this.eventAttendanceRepository.create({
+          enrollment: {
+            id: enrollment.id,
+          },
+          check_in: new Date(),
+        });
+        await this.eventAttendanceRepository.save(attendance);
+        message = 'Registro de ingreso exitoso';
+      }
     } else {
       attendance = await this.eventAttendanceRepository.findOne({
         where: {
