@@ -1,4 +1,4 @@
-import { IsEnum, IsNumber, Min } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
 import { ActionEnum } from '../enum/action.enum';
 
 export class CheckInOutDto {
@@ -7,4 +7,7 @@ export class CheckInOutDto {
   id_event: number;
   @IsEnum(ActionEnum)
   action: ActionEnum;
+  @IsString()
+  @IsNotEmpty()
+  user_id: string;
 }

@@ -212,7 +212,6 @@ export class EventService {
       await manager.update(EventStatus, currentStatus.id, {
         end_date: new Date(),
       });
-      console.log('Cerrando estado actual');
     }
     currentStatus = manager.create(EventStatus, {
       event: {
@@ -304,7 +303,7 @@ export class EventService {
           id: id_event,
         },
       });
-      assertFound(currentEvent, 'No se encontro el vento que deseas cancelar');
+      assertFound(currentEvent, 'No se encontro el evento que deseas cancelar');
       await this.assignStatus(manager, id_event, 11);
       return { success: true, message: 'Evento cancelado exitosamente.' };
     });
@@ -454,23 +453,39 @@ export class EventService {
 
   async startEvent(id_event: number, userId: string) {
     return this.eventRepository.manager.transaction(async (manager) => {
-      const currentEvent = this.eventRepository.findOne({
+      const currentEvent = await this.eventRepository.findOne({
         where: {
           id: id_event,
+          person: {
+            id: userId,
+          },
         },
       });
-      assertFound(currentEvent, 'No se encontro el vento que deseas cancelar');
+      assertFound(
+        currentEvent,
+        'No puedes iniciar un evento que no este a tu cargo',
+      );
       await this.assignStatus(manager, id_event, 9);
+      const enrollmentCoordinator = await manager.findOne(EventEnrollment, {
+        where: {
+          person: {
+            id: userId,
+          },
+          event: {
+            id: id_event,
+          },
+          state: true,
+        },
+      });
+      assertFound(
+        enrollmentCoordinator,
+        'No se encontro el registro del encargado',
+      );
       await manager.save(
         EventAttendance,
         manager.create(EventAttendance, {
           enrollment: {
-            event: {
-              id: id_event,
-            },
-            person: {
-              id: userId,
-            },
+            id: enrollmentCoordinator.id,
           },
           check_in: new Date(),
         }),

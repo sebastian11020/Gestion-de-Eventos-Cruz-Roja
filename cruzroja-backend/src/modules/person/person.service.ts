@@ -797,21 +797,25 @@ export class PersonService {
       },
       select: {
         email: true,
+        id: true,
       },
     });
-    const emails = Array.from(
-      new Set(
-        persons
-          .map((p) => (p.email ?? '').trim())
-          .filter((e) => e && e.includes('@')),
-      ),
-    );
-    const ids = Array.from(new Set(persons.map((p) => p.id.trim())));
-    await this.notificationPersonService.createNotificationPerson(
-      ids,
-      id_notification,
-    );
-    //await this.nodeEmailerService.sendEmailNewEventMany(emails, event);
+    if (persons.length > 0) {
+      console.log(persons[0]);
+      const emails = Array.from(
+        new Set(
+          persons
+            .map((p) => (p.email ?? '').trim())
+            .filter((e) => e && e.includes('@')),
+        ),
+      );
+      const ids = Array.from(new Set(persons.map((p) => p.id)));
+      await this.notificationPersonService.createNotificationPerson(
+        ids,
+        id_notification,
+      );
+      //await this.nodeEmailerService.sendEmailNewEventMany(emails, event);
+    }
   }
 
   async getSkills(id_user: string) {
