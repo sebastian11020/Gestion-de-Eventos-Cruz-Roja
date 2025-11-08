@@ -21,7 +21,7 @@ function normalizeMessage(input: unknown, fallback: string): string {
   if (typeof input === 'string' && input.trim().length > 0) return input;
   if (Array.isArray(input)) {
     const flat = input.map((m) => String(m ?? '').trim()).filter(Boolean);
-    if (flat.length) return flat.join(' , ');
+    if (flat.length) return flat.join(', ');
   }
   return fallback;
 }
