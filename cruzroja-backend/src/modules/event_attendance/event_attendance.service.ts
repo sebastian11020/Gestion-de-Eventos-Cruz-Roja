@@ -31,7 +31,7 @@ export class EventAttendanceService {
         },
       },
     });
-    if (dto.action === ActionEnum.start && !attendance) {
+    if (dto.action === ActionEnum.start) {
       if (!attendance) {
         message = 'Ya habias registrado tu ingreso en este evento.';
       } else {
