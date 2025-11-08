@@ -74,7 +74,7 @@ export function Topbar({ onOpenSidebar }: Props) {
           {/* Imagen para móviles */}
           <span className="grid size-6 place-items-center rounded-md overflow-hidden">
             <Image
-              src="/logo-cruzroja.png"
+              src="/Emblema_Cruz_Roja.jpg"
               alt="Logo Cruz Roja"
               width={24}
               height={24}
