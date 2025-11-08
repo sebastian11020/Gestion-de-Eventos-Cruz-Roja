@@ -27,8 +27,8 @@ export class PersonController {
 
   @UseGuards(SupabaseAuthGuard)
   @Get('/all')
-  async getAll() {
-    return this.personService.findAllDto();
+  async getAll(@UserId() userId: string) {
+    return this.personService.findAllDto(userId);
   }
   @UseGuards(SupabaseAuthGuard)
   @Get('/leaderinfo/:document')

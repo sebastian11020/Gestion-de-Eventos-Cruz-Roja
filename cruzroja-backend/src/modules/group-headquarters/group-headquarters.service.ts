@@ -22,7 +22,9 @@ export class GroupHeadquartersService {
     private groupHeadquartersStatusService: GroupStatusService,
   ) {}
 
-  async getAllGroupHeadquartersDto() {
+  async getAllGroupHeadquartersDto(
+    user_id: string,
+  ): Promise<GetGroupHeadquartersDto[]> {
     const rows: {
       id: number;
       id_group: number;
@@ -38,7 +40,8 @@ export class GroupHeadquartersService {
         name: string;
       };
     }[] = await this.groupHeadquartersRepository.query(
-      'select * from public.list_groups_with_details()',
+      'select * from public.list_groups_with_details($1)',
+      [user_id],
     );
     return rows.map((row) => {
       const dto = new GetGroupHeadquartersDto();

@@ -20,16 +20,13 @@ export default function SupabaseSessionWatcher() {
 
         if (event === "SIGNED_IN") {
           if (id) localStorage.setItem("supabase_uid", id);
-          if (token) localStorage.setItem("access_token", token);
         }
 
         if (event === "TOKEN_REFRESHED" && token) {
-          localStorage.setItem("access_token", token);
         }
 
         if (event === "SIGNED_OUT") {
           localStorage.removeItem("supabase_uid");
-          localStorage.removeItem("access_token");
         }
       },
     );

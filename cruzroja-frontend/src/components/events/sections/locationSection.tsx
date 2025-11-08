@@ -4,15 +4,15 @@ import { Field } from "@/components/layout/field";
 import { Landmark, Building2, MapPin } from "lucide-react";
 import type { CreateEventForm } from "@/types/usertType";
 import type { GroupNode, SectionalNode } from "@/types/programType";
-import {Department} from "@/types/sedesType";
-import {CityOption} from "@/components/forms/createEventForm";
+import { Department } from "@/types/sedesType";
+import { CityOption } from "@/components/forms/createEventForm";
 
 export function LocationSection({
   form,
   onChange,
   departments,
   sectionals,
-    cityOptions,
+  cityOptions,
   onChangeSectional,
   onChangeDepartment,
   groupOptions,
@@ -26,7 +26,7 @@ export function LocationSection({
   cityOptions: CityOption[];
   sectionals: SectionalNode[];
   onChangeSectional: (value: string) => void;
-    onChangeDepartment: (value: string) => void;
+  onChangeDepartment: (value: string) => void;
   groupOptions: GroupNode[];
 }) {
   return (
@@ -37,19 +37,18 @@ export function LocationSection({
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Departamento" icon={<Landmark className="w-4 h-4" />}>
           <select
-              required
-              onChange={(e) => onChangeDepartment(e.target.value)}
+            required
+            onChange={(e) => onChangeDepartment(e.target.value)}
             value={form.department}
             className="w-full rounded-2xl  px-2 py-2 text-sm focus:outline-none"
           >
-              <option value="">Seleccione…</option>
-              {departments.map((m) => (
-                  <option key={m.id} value={m.id}>
-                      {m.name}
-                  </option>
-              ))}
+            <option value="">Seleccione…</option>
+            {departments.map((m) => (
+              <option key={m.id} value={m.id}>
+                {m.name}
+              </option>
+            ))}
           </select>
-
         </Field>
 
         <Field label="Municipio" icon={<Building2 className="w-4 h-4" />}>

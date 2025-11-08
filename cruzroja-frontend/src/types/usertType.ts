@@ -151,14 +151,14 @@ export type event = {
   description: string;
   startDate: string;
   endDate: string;
-    department: {
-        id: string;
-        name: string;
-    };
-    city: {
-        id: string;
-        name:string;
-    };
+  department: {
+    id: string;
+    name: string;
+  };
+  city: {
+    id: string;
+    name: string;
+  };
   capacity: string;
   is_leader: boolean;
   is_participant: boolean;
@@ -214,11 +214,11 @@ export type Volunteer = {
 };
 
 export type desvinculate = {
-    document:string
-    name: string;
-    license:string;
-    Inactivation_date:string;
-}
+  document: string;
+  name: string;
+  license: string;
+  Inactivation_date: string;
+};
 
 export type eps = {
   id: string;
@@ -238,11 +238,11 @@ export type user = {
 };
 
 export type assistantEvent = {
-    name: string;
-    licence: string;
-    document: string;
-    phone: string;
-}
+  name: string;
+  licence: string;
+  document: string;
+  phone: string;
+};
 
 export type skill = {
   id: string;
