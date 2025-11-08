@@ -1,4 +1,6 @@
 export function NormalizeString(value: string): string {
+  console.log('Normalizando');
+  console.log(value);
   return value.trim().toUpperCase();
 }
 
