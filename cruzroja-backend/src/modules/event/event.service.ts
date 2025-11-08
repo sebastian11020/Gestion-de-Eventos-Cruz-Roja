@@ -453,10 +453,6 @@ export class EventService {
 
   async startEvent(id_event: number, userId: string) {
     return this.eventRepository.manager.transaction(async (manager) => {
-      console.log('User id');
-      console.log(userId);
-      console.log('Event id');
-      console.log(id_event);
       const currentEvent = await this.eventRepository.findOne({
         where: {
           id: id_event,
@@ -465,8 +461,6 @@ export class EventService {
           },
         },
       });
-      console.log('Current event');
-      console.log(currentEvent);
       assertFound(
         currentEvent,
         'No puedes iniciar un evento que no este a tu cargo',
@@ -483,8 +477,6 @@ export class EventService {
           state: true,
         },
       });
-      console.log('Enrrolment coordinator');
-      console.log(enrollmentCoordinator);
       assertFound(
         enrollmentCoordinator,
         'No se encontro el registro del encargado',
