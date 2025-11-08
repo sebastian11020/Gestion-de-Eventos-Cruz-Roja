@@ -25,7 +25,6 @@ export function useEventQr(
   }
 
   async function accept() {
-    // 👇 NO usar await aquí: necesitamos la Promesa
     const op =
       qrAction === "start"
         ? startEventService(eventId)

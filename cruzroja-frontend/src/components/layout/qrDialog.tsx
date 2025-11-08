@@ -33,8 +33,6 @@ export function QrDialog({
     try {
       setLoading(true);
       await onAccept();
-      // en "start", cerramos aquí; en "end" también podrías cerrar aquí,
-      // pero lo controla el padre tras completar para refrescar
       if (!isFinalize) onClose();
     } finally {
       setLoading(false);
