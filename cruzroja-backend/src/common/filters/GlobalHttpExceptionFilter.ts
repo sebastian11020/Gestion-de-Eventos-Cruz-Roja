@@ -78,8 +78,6 @@ export class GlobalHttpExceptionFilter implements ExceptionFilter {
         message = payload;
       } else {
         const obj = payload as Record<string, any>;
-        console.log('Filtro global');
-        console.log(obj);
         message = normalizeMessage(obj.message, message);
       }
     } else if (exception instanceof QueryFailedError) {
