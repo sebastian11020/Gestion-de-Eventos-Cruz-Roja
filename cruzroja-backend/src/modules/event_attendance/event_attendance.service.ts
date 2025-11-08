@@ -3,7 +3,7 @@ import { EventAttendance } from './entity/event_attendance.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Not, Repository } from 'typeorm';
 import { EventEnrollmentService } from '../event-enrollment/event-enrollment.service';
-import { assertFound } from '../../common/utils/assert';
+import { assertFound, conflict } from '../../common/utils/assert';
 import { CheckInOutDto } from './dto/check-in-out.dto';
 import { ActionEnum } from './enum/action.enum';
 import dayjs from 'dayjs';
@@ -33,7 +33,7 @@ export class EventAttendanceService {
     });
     if (dto.action === ActionEnum.start) {
       if (!attendance) {
-        message = 'Ya habias registrado tu ingreso en este evento.';
+        conflict('Ya habias registrado tu ingreso en este evento.');
       } else {
         attendance = this.eventAttendanceRepository.create({
           enrollment: {
