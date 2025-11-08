@@ -10,6 +10,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Cambiar contraseña",
+};
 
 export default function ChangePasswordPage() {
   const router = useRouter();

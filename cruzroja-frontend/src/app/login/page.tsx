@@ -12,6 +12,12 @@ import { supabase } from "@/lib/supabase-browser";
 import { useRouter } from "next/navigation";
 import { getPersonData } from "@/services/serviceGetPerson";
 import { user } from "@/types/usertType";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Login",
+};
+
 
 export default function LoginCR() {
   const router = useRouter();

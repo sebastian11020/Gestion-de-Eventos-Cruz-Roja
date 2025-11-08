@@ -21,7 +21,11 @@ import type { group } from "@/types/usertType";
 import { CreateGroupForm } from "@/components/forms/createGroupForm";
 import { AssociateGroupForm } from "@/components/forms/associateGroupForm";
 import { Loading } from "@/components/ui/loading";
-import { deleteSectional } from "@/services/serviceCreateSectional";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Agrupaciones",
+};
 
 export default function Agrupaciones() {
   const [open, setOpen] = useState(false);
