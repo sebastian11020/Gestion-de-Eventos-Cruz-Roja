@@ -17,11 +17,11 @@ export class EventAttendanceService {
     private eventEnrollmentService: EventEnrollmentService,
   ) {}
 
-  async checkInAndCheckOut(id_user: string, dto: CheckInOutDto) {
-    console.log(id_user);
+  async checkInAndCheckOut(dto: CheckInOutDto) {
     let message: string = '';
+    console.log(dto);
     const enrollment = await this.eventEnrollmentService.findEnrollmentInEvent(
-      id_user,
+      dto.user_id,
       dto.id_event,
     );
     console.log(dto);
