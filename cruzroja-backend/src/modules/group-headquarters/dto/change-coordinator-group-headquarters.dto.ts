@@ -8,6 +8,6 @@ export class ChangeCoordinatorGroupHeadquartersDto {
   @Min(1)
   idGroupHeadquarters: number;
   @IsString()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'El coordinatorio es obligatorio' })
   leader: string;
 }

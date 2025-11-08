@@ -25,44 +25,46 @@ import { type_affiliation } from 'src/modules/eps-person/enum/eps-person.enum';
 export class UpdatePersonDto {
   @IsEnum(type_document)
   type_document: type_document;
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'El numero de documento es obligatorio' })
   @IsString()
   @Matches(/^[A-Z0-9-]{4,30}$/, {
     message: 'Documento inválido: use letras, números o guiones (4–30)',
   })
   document: string;
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Los nombres son obligatorios' })
   @IsString()
   @Matches(/^[A-Za-zÁÉÍÓÚÜáéíóúüñÑ\s]+$/, {
     message: 'Solo se permiten letras y espacios',
   })
   name: string;
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Los apellidos son obligatorios' })
   @IsString()
   @Matches(/^[A-Za-zÁÉÍÓÚÜáéíóúüñÑ\s]+$/, {
     message: 'Solo se permiten letras y espacios',
   })
   lastName: string;
-  @IsEmail()
+  @IsEmail({}, { message: 'Debes ingresar un correo valido' })
   email: string;
-  @IsEnum(type_sex)
+  @IsEnum(type_sex, { message: 'El sexo especificado no se puede guadar' })
   sex: type_sex;
-  @IsEnum(type_gender)
+  @IsEnum(type_gender, {
+    message: 'El genero especificado no se puede guardar',
+  })
   gender: type_gender;
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'El numero de telefono es obligatorio' })
   @IsNumber()
   phone: number;
   @IsDefined({ message: 'El contancto de emergencia es obligatorio' })
   @ValidateNested()
   @Type(() => EmergencyContact)
   emergencyContact: EmergencyContact;
-  @IsEnum(type_blood)
+  @IsEnum(type_blood, { message: 'El tipo especificado no es valido' })
   blood: type_blood;
   @Matches(/^\d{4}-\d{2}-\d{2}$/, {
     message: 'Formato de fecha inválido (YYYY-MM-DD)',
   })
   birthDate: string;
-  @IsDefined({ message: 'address es requerido' })
+  @IsDefined({ message: 'la direccion es obligatoria' })
   @ValidateNested()
   @Type(() => Address)
   address: Address;
@@ -72,26 +74,31 @@ export class UpdatePersonDto {
   @IsOptional()
   @IsNumber()
   id_program?: number;
-  @IsNumber()
+  @IsNumber({}, { message: 'El dato ingresado no es numerico' })
   @Min(1)
   id_headquarters: number;
   @IsNumber()
   @Min(1)
   id_location: number;
-  @IsNumber()
+  @IsNumber({}, { message: 'El dato ingresado no es numerico' })
   @Min(1)
   id_eps: number;
-  @IsEnum(type_affiliation)
+  @IsEnum(type_affiliation, {
+    message: 'El tipo de afiliacion seleccionado no es valido',
+  })
   type_affiliation: type_affiliation;
   @IsString()
   @IsOptional()
+  @Matches(/^[A-Za-zÁÉÍÓÚÜáéíóúüñÑ0-9\s]+$/, {
+    message: 'Solo se permiten letras, números y espacios',
+  })
   carnet: string;
-  @IsNumber()
+  @IsNumber({}, { message: 'El dato ingresado no es numerico' })
   @IsOptional()
   @Min(1)
   id_state: number;
   @IsArray()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Minimo debe tener una habilidad' })
   @Type(() => Number)
   skills: number[];
 }
