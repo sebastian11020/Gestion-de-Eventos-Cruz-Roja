@@ -24,7 +24,9 @@ export class ProgramHeadquartersService {
     private programHeadquartersStatusService: ProgramStatusService,
   ) {}
 
-  async getAllProgramHeadquartersDto() {
+  async getAllProgramHeadquartersDto(
+    user_id: string,
+  ): Promise<GetProgramHeadquartersDto[]> {
     const rows: {
       id: number;
       id_program: number;
@@ -40,7 +42,8 @@ export class ProgramHeadquartersService {
         name: string;
       };
     }[] = await this.programHeadquartersRepository.query(
-      'select * from public.list_active_programs_with_details()',
+      'select * from public.list_active_programs_with_details($1)',
+      [user_id],
     );
     return rows.map((row) => {
       const dto = new GetProgramHeadquartersDto();

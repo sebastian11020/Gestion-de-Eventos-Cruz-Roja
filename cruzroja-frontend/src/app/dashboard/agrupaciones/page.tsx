@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import Modal from "@/components/layout/modal";
@@ -21,7 +20,8 @@ import type { group } from "@/types/usertType";
 import { CreateGroupForm } from "@/components/forms/createGroupForm";
 import { AssociateGroupForm } from "@/components/forms/associateGroupForm";
 import { Loading } from "@/components/ui/loading";
-import { deleteSectional } from "@/services/serviceCreateSectional";
+import {usePageTitle} from "@/hooks/usePageTittle";
+
 
 export default function Agrupaciones() {
   const [open, setOpen] = useState(false);
@@ -50,6 +50,8 @@ export default function Agrupaciones() {
   });
 
   const pageNumbers = usePageNumbers(page, totalPages);
+
+    usePageTitle("Agrupaciones");
 
   function openCreate() {
     setIsNewGroup(false);

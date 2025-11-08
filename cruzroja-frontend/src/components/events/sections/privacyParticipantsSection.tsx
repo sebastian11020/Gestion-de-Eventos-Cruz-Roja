@@ -23,7 +23,7 @@ export function PrivacyParticipantsSection({
   leader: string;
   onRemoveVolunteer: (id: string) => void;
 }) {
-  const hasLeader = typeof leader === "string" && leader.trim().length > 0;
+  const hasLeader = leader.trim().length > 0;
 
   return (
     <FancyCard
@@ -36,9 +36,7 @@ export function PrivacyParticipantsSection({
             <input
               type="checkbox"
               checked={form.isPrivate}
-              onChange={(e) =>
-                onChange("isPrivate", e.target.checked)
-              }
+              onChange={(e) => onChange("isPrivate", e.target.checked)}
             />
             <span className="text-sm font-medium">Evento privado</span>
           </label>
@@ -94,7 +92,7 @@ export function PrivacyParticipantsSection({
           </div>
         </div>
 
-        {form.isPrivate  && (
+        {form.isPrivate && (
           <div className="space-y-2">
             <div className="text-sm text-gray-700">
               {selectedVolunteers.length === 0

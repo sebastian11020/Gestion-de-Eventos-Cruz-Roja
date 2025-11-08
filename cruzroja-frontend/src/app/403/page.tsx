@@ -1,8 +1,6 @@
-// app/403/page.tsx
+
 import Link from "next/link";
 import { ShieldAlert, LogIn, LayoutDashboard } from "lucide-react";
-// Si usas shadcn/ui:
-import { Button } from "@/components/ui/button";
 
 export const metadata = {
   title: "Acceso denegado | 403",

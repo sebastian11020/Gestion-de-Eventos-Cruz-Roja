@@ -15,10 +15,10 @@ import {
   updatePersonService,
 } from "@/services/serviceCreatePerson";
 import toast from "react-hot-toast";
-import { getSupabaseUserId } from "@/utils/getSupabaseId";
 import { usePersonData } from "@/hooks/usePersonData";
 import { Loading } from "@/components/ui/loading";
-import { associateProgramService } from "@/services/serviceCreateProgram";
+import {usePageTitle} from "@/hooks/usePageTittle";
+
 
 function normalize(v: unknown) {
   return String(v ?? "").toLowerCase();
@@ -51,7 +51,7 @@ export default function Voluntarios() {
   const handleSearch = (value: string) => {
     setFiltro(value);
   };
-
+    usePageTitle("Voluntarios");
   const cities = useMemo(() => {
     const set = new Set(users.map((u) => u.sectional.city));
     return Array.from(set).sort();
@@ -119,8 +119,8 @@ export default function Voluntarios() {
             ),
           },
         );
-        await reload();
         setOpenWizard(false);
+          await reload();
       } else {
         const reg = await register(data);
         const newData = {
@@ -145,8 +145,8 @@ export default function Voluntarios() {
             ),
           },
         );
-        await reload();
         setOpenWizard(false);
+          await reload();
       }
       setEditUser(null);
     } catch (error) {

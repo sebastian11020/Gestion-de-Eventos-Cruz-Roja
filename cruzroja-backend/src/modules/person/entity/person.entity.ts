@@ -21,6 +21,7 @@ import { PersonStatus } from '../../person-status/entity/person-status.entity';
 import { PersonSkill } from '../../person-skill/entity/person-skill.entity';
 import { Event } from '../../event/entity/event.entity';
 import { EventEnrollment } from '../../event-enrollment/entity/event-enrollment.entity';
+import { NotificationPerson } from '../../notification-person/entity/notification-person.entity';
 
 @Entity()
 export class Person {
@@ -72,4 +73,6 @@ export class Person {
   events: Event[];
   @OneToMany(() => EventEnrollment, (e) => e.person)
   event_enrollment: EventEnrollment[];
+  @OneToMany(() => NotificationPerson, (np) => np.person)
+  notification_person: NotificationPerson[];
 }

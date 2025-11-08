@@ -16,12 +16,13 @@ import { usePaginatedSearch } from "@/hooks/usePaginatedSearch";
 import { PageBtn } from "@/components/buttons/pageButton";
 import { CreateSectionalForm } from "@/components/forms/createSectionalForm";
 import { Loading } from "@/components/ui/loading";
-import { useSectionalsNode } from "@/hooks/useSectionalsNode";
+import {usePageTitle} from "@/hooks/usePageTittle";
+
+
 
 export default function Sedes() {
   const [open, setOpen] = useState(false);
   const { cities, sectionals, users, loading, reload } = useSedesData();
-  const { skills } = useSectionalsNode();
   const [query, setQuery] = useState("");
   const [openChangeLeader, setOpenChangeLeader] = useState(false);
   const [documentSelected, setDocumentSelected] = useState<string>("");
@@ -44,7 +45,7 @@ export default function Sedes() {
   });
 
   const pageNumbers = usePageNumbers(page, totalPages);
-
+    usePageTitle("Sedes");
   async function handleCreate(payload: createSectional) {
     setOpen(false);
     setQuery("");

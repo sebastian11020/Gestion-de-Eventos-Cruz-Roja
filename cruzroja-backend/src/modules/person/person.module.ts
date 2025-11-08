@@ -11,6 +11,7 @@ import { PersonSkillModule } from '../person-skill/person-skill.module';
 import { PersonRoleModule } from '../person-role/person-role.module';
 import { SupabaseAuthModule } from '../../common/config/guards/supabase-auth.module';
 import { SupabaseModule } from '../../common/config/supabase/supabase.module';
+import { NotificationPersonModule } from '../notification-person/notification-person.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { SupabaseModule } from '../../common/config/supabase/supabase.module';
     PersonRoleModule,
     SupabaseModule,
     SupabaseAuthModule,
+    NotificationPersonModule,
   ],
   providers: [PersonService],
   controllers: [PersonController],

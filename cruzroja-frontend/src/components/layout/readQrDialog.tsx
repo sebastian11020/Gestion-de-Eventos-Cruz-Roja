@@ -49,9 +49,9 @@ export function ReadQrDialog({
 }) {
   const boxRef = useRef<HTMLDivElement | null>(null);
   const scannerRef = useRef<Html5QrcodeScanner | null>(null);
-    const lastScanAtRef = useRef<number>(0);
-    const lastTextRef = useRef<string>("");
-    const isProcessingRef = useRef<boolean>(false);
+  const lastScanAtRef = useRef<number>(0);
+  const lastTextRef = useRef<string>("");
+  const isProcessingRef = useRef<boolean>(false);
   useEffect(() => {
     if (!open || !boxRef.current) return;
     const config = {
@@ -68,69 +68,79 @@ export function ReadQrDialog({
     );
     scannerRef.current = scanner;
 
-      scanner.render(
-          async (text) => {
-              const now = Date.now();
-              if (isProcessingRef.current) return;
-              if (now - lastScanAtRef.current < COOLDOWN_MS) return;
-              if (text === lastTextRef.current && now - lastScanAtRef.current < 5000) return;
-              isProcessingRef.current = true;
-              lastScanAtRef.current = now;
-              lastTextRef.current = text;
+    scanner.render(
+      async (text) => {
+        const now = Date.now();
+        if (isProcessingRef.current) return;
+        if (now - lastScanAtRef.current < COOLDOWN_MS) return;
+        if (text === lastTextRef.current && now - lastScanAtRef.current < 5000)
+          return;
+        isProcessingRef.current = true;
+        lastScanAtRef.current = now;
+        lastTextRef.current = text;
 
-              try {
-                  const { e, a, n } = extractParamsFromScan(text);
+        try {
+          const { e, a, n } = extractParamsFromScan(text);
 
-                  if (!e || !a || !["start", "end"].includes(a)) {
-                      toast.error("QR inválido");
-                      return;
-                  }
+          if (!e || !a || !["start", "end"].includes(a)) {
+            toast.error("QR inválido");
+            return;
+          }
 
-                  const sb = supabase();
-                  const { data: { session } } = await sb.auth.getSession();
+          const sb = supabase();
+          const {
+            data: { session },
+          } = await sb.auth.getSession();
 
-                  if (!session?.access_token || !session.user?.id) {
-                      toast.error("Inicia sesión para registrar asistencia");
-                      return;
-                  }
+          if (!session?.access_token || !session.user?.id) {
+            toast.error("Inicia sesión para registrar asistencia");
+            return;
+          }
 
-                  const body: any = { id_event: e, action: a, user_id: session.user.id };
-                  if (n) body.nonce = n;
+          const body: any = {
+            id_event: e,
+            action: a,
+            user_id: session.user.id,
+          };
+          if (n) body.nonce = n;
 
-                  const res = await fetch(
-                      `${apiBase.replace(/\/$/, "")}/event-attendance/attendance`,
-                      {
-                          method: "POST",
-                          headers: {
-                              "Content-Type": "application/json",
-                              Authorization: `Bearer ${session.access_token}`,
-                          },
-                          body: JSON.stringify(body),
-                      },
-                  );
+          const res = await fetch(
+            `${apiBase.replace(/\/$/, "")}/event-attendance/attendance`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${session.access_token}`,
+              },
+              body: JSON.stringify(body),
+            },
+          );
 
-                  const data = await res.json().catch(() => ({}));
-                  if (!res.ok || data?.success === false) {
-                      toast.error(data?.message ?? "No se pudo registrar la asistencia");
-                      return;
-                  }
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok || data?.success === false) {
+            toast.error(data?.message ?? "No se pudo registrar la asistencia");
+            return;
+          }
 
-                  if ("vibrate" in navigator) {
-                      try { navigator.vibrate?.(60); } catch {}
-                  }
-                  toast.success(data?.message ?? "Asistencia registrada");
-                  await scanner.clear();
-                  onClose();
-              } catch (err) {
-                  console.error(err);
-                  toast.error("Error leyendo el QR");
-              } finally {
-                  setTimeout(() => { isProcessingRef.current = false; }, COOLDOWN_MS);
-              }
-          },
-          () => {},
-      );
-
+          if ("vibrate" in navigator) {
+            try {
+              navigator.vibrate?.(60);
+            } catch {}
+          }
+          toast.success(data?.message ?? "Asistencia registrada");
+          await scanner.clear();
+          onClose();
+        } catch (err) {
+          console.error(err);
+          toast.error("Error leyendo el QR");
+        } finally {
+          setTimeout(() => {
+            isProcessingRef.current = false;
+          }, COOLDOWN_MS);
+        }
+      },
+      () => {},
+    );
 
     return () => {
       scanner.clear().catch(() => {});

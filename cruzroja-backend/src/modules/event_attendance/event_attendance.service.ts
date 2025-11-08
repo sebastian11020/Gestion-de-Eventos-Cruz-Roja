@@ -3,7 +3,7 @@ import { EventAttendance } from './entity/event_attendance.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Not, Repository } from 'typeorm';
 import { EventEnrollmentService } from '../event-enrollment/event-enrollment.service';
-import { assertFound } from '../../common/utils/assert';
+import { assertFound, conflict } from '../../common/utils/assert';
 import { CheckInOutDto } from './dto/check-in-out.dto';
 import { ActionEnum } from './enum/action.enum';
 import dayjs from 'dayjs';
@@ -17,23 +17,33 @@ export class EventAttendanceService {
     private eventEnrollmentService: EventEnrollmentService,
   ) {}
 
-  async checkInAndCheckOut(id_user: string, dto: CheckInOutDto) {
+  async checkInAndCheckOut(dto: CheckInOutDto) {
     let message: string = '';
     const enrollment = await this.eventEnrollmentService.findEnrollmentInEvent(
-      id_user,
+      dto.user_id,
       dto.id_event,
     );
     assertFound(enrollment, 'No te encuentras inscrito en este evento');
-    let attendance: EventAttendance | null;
-    if (dto.action === ActionEnum.start) {
-      attendance = this.eventAttendanceRepository.create({
+    let attendance = await this.eventAttendanceRepository.findOne({
+      where: {
         enrollment: {
           id: enrollment.id,
         },
-        check_in: new Date(),
-      });
-      await this.eventAttendanceRepository.save(attendance);
-      message = 'Registro de ingreso exitoso';
+      },
+    });
+    if (dto.action === ActionEnum.start) {
+      if (attendance != null) {
+        conflict('Ya habias registrado tu ingreso en este evento.');
+      } else {
+        attendance = this.eventAttendanceRepository.create({
+          enrollment: {
+            id: enrollment.id,
+          },
+          check_in: new Date(),
+        });
+        await this.eventAttendanceRepository.save(attendance);
+        message = 'Registro de ingreso exitoso';
+      }
     } else {
       attendance = await this.eventAttendanceRepository.findOne({
         where: {

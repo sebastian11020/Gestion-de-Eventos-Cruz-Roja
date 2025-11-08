@@ -22,6 +22,7 @@ export class EventController {
 
   @Post('/create')
   async create(@Body() dto: CreateEventForm) {
+    console.log(dto);
     return this.eventService.create(dto);
   }
 
