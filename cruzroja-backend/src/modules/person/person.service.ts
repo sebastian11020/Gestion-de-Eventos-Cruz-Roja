@@ -807,7 +807,7 @@ export class PersonService {
             .filter((e) => e && e.includes('@')),
         ),
       );
-      const ids = Array.from(new Set(persons.map((p) => p.id.trim())));
+      const ids = Array.from(new Set(persons.map((p) => p.id)));
       await this.notificationPersonService.createNotificationPerson(
         ids,
         id_notification,
