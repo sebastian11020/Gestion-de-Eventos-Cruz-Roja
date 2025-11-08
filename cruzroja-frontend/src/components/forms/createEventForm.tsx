@@ -127,7 +127,6 @@ export default function CreateEventForm({
       participants: form.isPrivate ? selectedVolunteers.map((v) => v.id) : [],
       skillsQuotasList: skillsQuotasListToSend,
     };
-    console.log(payload);
     await toast.promise(
       createEventService(payload).then((res) => {
         if (!res.success) {
