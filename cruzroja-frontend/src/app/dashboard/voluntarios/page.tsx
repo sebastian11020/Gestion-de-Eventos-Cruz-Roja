@@ -119,8 +119,8 @@ export default function Voluntarios() {
             ),
           },
         );
-        await reload();
         setOpenWizard(false);
+          await reload();
       } else {
         const reg = await register(data);
         const newData = {
@@ -145,8 +145,8 @@ export default function Voluntarios() {
             ),
           },
         );
-        await reload();
         setOpenWizard(false);
+          await reload();
       }
       setEditUser(null);
     } catch (error) {
