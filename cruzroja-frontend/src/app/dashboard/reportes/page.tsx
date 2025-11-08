@@ -10,6 +10,11 @@ import { buildInactivityPdf } from "@/utils/pdf/inactivity";
 import { buildUnlinkingPdf } from "@/utils/pdf/unlinking";
 import { formatFechaLarga } from "@/utils/date";
 import type { groupReport } from "@/types/reportType";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Reportes",
+};
 
 export type Volunteer = groupReport["groups"][number]["volunteers"][number];
 export type InactiveItem = {

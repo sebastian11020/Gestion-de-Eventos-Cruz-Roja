@@ -9,6 +9,11 @@ import { useSectionalsNode } from "@/hooks/useSectionalsNode";
 import { getPersonUpdate } from "@/services/serviceGetPerson";
 import { updatePersonProfile } from "@/services/serviceCreatePerson";
 import { ReadOnly } from "@/components/layout/ReadOnly";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Ajustes",
+};
 
 function toNumberHours(v: unknown) {
   const n = parseInt(String(v ?? "").trim(), 10);

@@ -15,10 +15,13 @@ import {
   updatePersonService,
 } from "@/services/serviceCreatePerson";
 import toast from "react-hot-toast";
-import { getSupabaseUserId } from "@/utils/getSupabaseId";
 import { usePersonData } from "@/hooks/usePersonData";
 import { Loading } from "@/components/ui/loading";
-import { associateProgramService } from "@/services/serviceCreateProgram";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Voluntarios",
+};
 
 function normalize(v: unknown) {
   return String(v ?? "").toLowerCase();

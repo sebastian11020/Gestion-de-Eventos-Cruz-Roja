@@ -20,7 +20,11 @@ import { PageBtn } from "@/components/buttons/pageButton";
 import { CreateProgramForm } from "@/components/forms/createProgramForm";
 import { AssociateProgramForm } from "@/components/forms/associateProgramForm";
 import { Loading } from "@/components/ui/loading";
-import { deleteSectional } from "@/services/serviceCreateSectional";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Programas",
+};
 
 export default function Programas() {
   const [open, setOpen] = useState(false);

@@ -22,23 +22,24 @@ export function Topbar({ onOpenSidebar }: Props) {
     setItems(notifications);
   }, [notifications]);
 
-  useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      const target = e.target as Node;
-      if (
-        panelRef.current &&
-        !panelRef.current.contains(target) &&
-        bellRef.current &&
-        bellRef.current.contains(target)
-      ) {
-        setOpen(false);
-      }
-    };
-    if (open) document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [open]);
+    useEffect(() => {
+        const handleClick = (e: MouseEvent) => {
+            const target = e.target as Node;
+            if (
+                panelRef.current &&
+                !panelRef.current.contains(target) &&
+                bellRef.current &&
+                !bellRef.current.contains(target)
+            ) {
+                setOpen(false);
+            }
+        };
+        if (open) document.addEventListener("mousedown", handleClick);
+        return () => document.removeEventListener("mousedown", handleClick);
+    }, [open]);
 
-  const count = notifications.length;
+
+  const count = items.length;
 
   async function handleReadOne(id: string) {
     try {

@@ -17,8 +17,12 @@ import { EventsToolbar } from "@/components/events/EventsToolbar";
 import { PaginationBar } from "@/components/events/PaginationBar";
 import { EventCardSkeleton } from "@/components/events/EventCardSkeleton";
 import { useAssistants } from "@/hooks/useAssistants";
+import type { Metadata } from "next";
 
-/** Helpers originales **/
+export const metadata: Metadata = {
+    title: "Eventos",
+};
+
 function asDateRange(e: Pick<EventType, "startDate" | "endDate">) {
   if (e.startDate && e.endDate) return `${e.startDate} – ${e.endDate}`;
   return e.startDate ?? e.endDate ?? "";
