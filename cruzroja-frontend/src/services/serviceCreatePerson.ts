@@ -40,12 +40,19 @@ export async function createPersonService(person: formCreatePerson) {
 }
 
 export async function updatePersonService(person: formCreatePerson) {
+  const sex=person.sex.toUpperCase()
+  const gender = person.gender.toUpperCase()
+  const type = person.type_affiliation.toUpperCase()
+  const payload = {
+      ...person,sex:sex,gender:gender,type_affiliation:type
+  }
+  console.log(payload);
   try {
     const token = await getAccessToken();
 
     const response = await axios.put(
       `${process.env.NEXT_PUBLIC_API_URL}/person/update/${person.id}`,
-      person,
+      payload,
       {
         headers: {
           "Content-Type": "application/json",

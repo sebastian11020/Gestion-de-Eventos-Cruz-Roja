@@ -187,7 +187,7 @@ export function StepLocationContact({
           Celular <span className="text-red-500">*</span>
         </label>
         <input
-          type="tel"
+          type="number"
           name="phone"
           value={form.phone}
           onChange={handleChange}
