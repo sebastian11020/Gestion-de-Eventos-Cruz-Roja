@@ -10,7 +10,9 @@ import {
   Pencil,
   Check,
   X,
-  Hospital,Loader2 } from "lucide-react";
+  Hospital,
+  Loader2,
+} from "lucide-react";
 import Modal from "@/components/layout/modal";
 import ViewUser from "@/components/cards/viewUser";
 import ChangeLeaderTable from "@/components/tables/changeLeaderTable";
@@ -40,7 +42,7 @@ export function ProgramCard({ program, users, onDeleted }: SectionalCardProps) {
   const [editing, setEditing] = useState(false);
   const [deleteProgramId, setDeleteProgramId] = useState<string>("");
   const [nameDraft, setNameDraft] = useState(localName);
-    const [loadingLeader, setLoadingLeader] = useState(false);
+  const [loadingLeader, setLoadingLeader] = useState(false);
 
   function startEdit() {
     setNameDraft(localName);
@@ -93,18 +95,18 @@ export function ProgramCard({ program, users, onDeleted }: SectionalCardProps) {
     }
   }
 
-    async function handleViewLeaderClick() {
-        if (!program?.leader?.document) return;
-        try {
-            setLoadingLeader(true);
-            await onView(program.leader.document);
-        } catch (e) {
-            console.error(e);
-            toast.error("No se pudo cargar la información del líder.");
-        } finally {
-            setLoadingLeader(false);
-        }
+  async function handleViewLeaderClick() {
+    if (!program?.leader?.document) return;
+    try {
+      setLoadingLeader(true);
+      await onView(program.leader.document);
+    } catch (e) {
+      console.error(e);
+      toast.error("No se pudo cargar la información del líder.");
+    } finally {
+      setLoadingLeader(false);
     }
+  }
 
   async function handleDelete() {
     try {
@@ -268,27 +270,27 @@ export function ProgramCard({ program, users, onDeleted }: SectionalCardProps) {
           <ArrowLeftRight className="w-4 h-4" />
           Cambiar
         </button>
-          {program?.leader?.document && (
-              <button
-                  onClick={handleViewLeaderClick}
-                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-white text-sm font-medium hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
-                  aria-label="Ver líder"
-                  disabled={loadingLeader}
-                  aria-busy={loadingLeader}
-              >
-                  {loadingLeader ? (
-                      <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          Cargando...
-                      </>
-                  ) : (
-                      <>
-                          <Eye className="w-4 h-4" />
-                          Ver líder
-                      </>
-                  )}
-              </button>
-          )}
+        {program?.leader?.document && (
+          <button
+            onClick={handleViewLeaderClick}
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-white text-sm font-medium hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+            aria-label="Ver líder"
+            disabled={loadingLeader}
+            aria-busy={loadingLeader}
+          >
+            {loadingLeader ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Cargando...
+              </>
+            ) : (
+              <>
+                <Eye className="w-4 h-4" />
+                Ver líder
+              </>
+            )}
+          </button>
+        )}
       </div>
       <Modal
         open={openChangeLeader}

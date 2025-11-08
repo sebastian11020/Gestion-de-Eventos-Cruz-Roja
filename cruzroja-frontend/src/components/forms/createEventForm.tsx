@@ -18,7 +18,7 @@ import { PrivacyParticipantsSection } from "@/components/events/sections/privacy
 import { useEventData } from "@/hooks/useEventData";
 import toast from "react-hot-toast";
 import { createEventService } from "@/services/serviceGetEvent";
-import {cities} from "@/components/volunteer/constants";
+import { cities } from "@/components/volunteer/constants";
 
 export type CityOption = { id: string; name: string };
 
@@ -38,7 +38,8 @@ export default function CreateEventForm({
   const [openPicker, setOpenPicker] = useState(false);
   const [openChangeLeader, setOpenChangeLeader] = useState(false);
   const { skills } = useSectionalsNode();
-  const { scopes, classificationEvent, frame, users, person,departments } = useEventData();
+  const { scopes, classificationEvent, frame, users, person, departments } =
+    useEventData();
   const [documentLeader, setDocumentLeader] = useState<string>("");
   const [nameLeader, setNameLeader] = useState<string>("");
   const [selectedVolunteers, setSelectedVolunteers] = useState<
@@ -81,11 +82,10 @@ export default function CreateEventForm({
   );
 
   const departmentSelected = useMemo(
-      ()=>
-          departments.find((d)=>d.id === form.department) || null,
-      [departments,form.department],
-  )
-    const citiesOptions: cities[] = departmentSelected?.children ?? []
+    () => departments.find((d) => d.id === form.department) || null,
+    [departments, form.department],
+  );
+  const citiesOptions: cities[] = departmentSelected?.children ?? [];
   const updateForm = <K extends keyof CreateEventForm>(
     key: K,
     value: CreateEventForm[K],
@@ -99,8 +99,8 @@ export default function CreateEventForm({
   };
 
   const handleDepartmentChange = (value: string) => {
-      setForm((f) => ({ ...f, department: value,city:"" }));
-  }
+    setForm((f) => ({ ...f, department: value, city: "" }));
+  };
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -124,8 +124,7 @@ export default function CreateEventForm({
     const payload = {
       ...form,
       attendant: documentLeader,
-      participants:
-        form.isPrivate ? selectedVolunteers.map((v) => v.id) : [],
+      participants: form.isPrivate ? selectedVolunteers.map((v) => v.id) : [],
       skillsQuotasList: skillsQuotasListToSend,
     };
     console.log(payload);
