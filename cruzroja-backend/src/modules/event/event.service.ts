@@ -472,21 +472,32 @@ export class EventService {
         'No puedes iniciar un evento que no este a tu cargo',
       );
       await this.assignStatus(manager, id_event, 9);
-      const enrollmentCoordinator = manager.create(EventAttendance, {
-        enrollment: {
-          event: {
-            id: id_event,
-          },
+      const enrollmentCoordinator = await manager.findOne(EventEnrollment, {
+        where: {
           person: {
             id: userId,
           },
+          event: {
+            id: id_event,
+          },
           state: true,
         },
-        check_in: new Date(),
       });
       console.log('Enrrolment coordinator');
       console.log(enrollmentCoordinator);
-      await manager.save(EventAttendance, enrollmentCoordinator);
+      assertFound(
+        enrollmentCoordinator,
+        'No se encontro el registro del encargado',
+      );
+      await manager.save(
+        EventAttendance,
+        manager.create(EventAttendance, {
+          enrollment: {
+            id: enrollmentCoordinator.id,
+          },
+          check_in: new Date(),
+        }),
+      );
       return { success: true, message: 'Evento iniciado exitosamente.' };
     });
   }
