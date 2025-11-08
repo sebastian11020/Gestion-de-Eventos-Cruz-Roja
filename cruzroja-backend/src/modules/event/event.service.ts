@@ -303,7 +303,7 @@ export class EventService {
           id: id_event,
         },
       });
-      assertFound(currentEvent, 'No se encontro el vento que deseas cancelar');
+      assertFound(currentEvent, 'No se encontro el evento que deseas cancelar');
       await this.assignStatus(manager, id_event, 11);
       return { success: true, message: 'Evento cancelado exitosamente.' };
     });
@@ -453,12 +453,22 @@ export class EventService {
 
   async startEvent(id_event: number, userId: string) {
     return this.eventRepository.manager.transaction(async (manager) => {
-      const currentEvent = this.eventRepository.findOne({
+      console.log('User id');
+      console.log(userId);
+      console.log('Event id');
+      console.log(id_event);
+      const currentEvent = await this.eventRepository.findOne({
         where: {
           id: id_event,
+          person: {
+            id: userId,
+          },
         },
       });
-      assertFound(currentEvent, 'No se encontro el vento que deseas cancelar');
+      assertFound(
+        currentEvent,
+        'No puedes iniciar un evento que no este a tu cargo',
+      );
       await this.assignStatus(manager, id_event, 9);
       await manager.save(
         EventAttendance,
