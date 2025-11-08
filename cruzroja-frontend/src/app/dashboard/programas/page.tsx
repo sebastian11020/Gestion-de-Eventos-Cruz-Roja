@@ -20,11 +20,8 @@ import { PageBtn } from "@/components/buttons/pageButton";
 import { CreateProgramForm } from "@/components/forms/createProgramForm";
 import { AssociateProgramForm } from "@/components/forms/associateProgramForm";
 import { Loading } from "@/components/ui/loading";
-import type { Metadata } from "next";
+import {usePageTitle} from "@/hooks/usePageTittle";
 
-export const metadata: Metadata = {
-    title: "Programas",
-};
 
 export default function Programas() {
   const [open, setOpen] = useState(false);
@@ -50,7 +47,7 @@ export default function Programas() {
     pageSize: PAGE_SIZE,
     filterFn: (g, q) => normalize(g.name).includes(q),
   });
-
+    usePageTitle("Programas");
   const pageNumbers = usePageNumbers(page, totalPages);
 
   function openAssociate() {

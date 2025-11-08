@@ -1,5 +1,4 @@
-"use client";
-
+"use client"
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase-browser";
 import { useRouter } from "next/navigation";
@@ -10,11 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-    title: "Cambiar contraseña",
-};
+import {usePageTitle} from "@/hooks/usePageTittle";
 
 export default function ChangePasswordPage() {
   const router = useRouter();
@@ -31,6 +26,8 @@ export default function ChangePasswordPage() {
 
   const [submitting, setSubmitting] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+
+    usePageTitle("Cambiar contraseña");
 
   useEffect(() => {
     (async () => {

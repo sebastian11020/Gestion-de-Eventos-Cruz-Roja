@@ -1,4 +1,3 @@
-// Dashboard.tsx
 "use client";
 
 import { Card } from "@/components/cards/InformationCard";
@@ -15,11 +14,6 @@ import Link from "next/link";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useEffect, useMemo, useState } from "react";
 import PodiumTop, { TopVolunteer } from "@/components/layout/podium";
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-    title: "Login",
-};
 
 export default function Dashboard() {
   const { events, cards, top } = useDashboardData();

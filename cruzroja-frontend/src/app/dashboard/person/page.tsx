@@ -9,11 +9,7 @@ import { useSectionalsNode } from "@/hooks/useSectionalsNode";
 import { getPersonUpdate } from "@/services/serviceGetPerson";
 import { updatePersonProfile } from "@/services/serviceCreatePerson";
 import { ReadOnly } from "@/components/layout/ReadOnly";
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-    title: "Ajustes",
-};
+import {usePageTitle} from "@/hooks/usePageTittle";
 
 function toNumberHours(v: unknown) {
   const n = parseInt(String(v ?? "").trim(), 10);
@@ -36,6 +32,8 @@ export default function ProfilePage() {
 
   const [epsId, setEpsId] = useState<string | "">("");
   const [typeAffiliation, setTypeAffiliation] = useState<string>("");
+
+    usePageTitle("Ajustes");
 
   useEffect(() => {
     (async () => {

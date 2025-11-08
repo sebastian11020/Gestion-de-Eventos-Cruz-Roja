@@ -10,11 +10,7 @@ import { buildInactivityPdf } from "@/utils/pdf/inactivity";
 import { buildUnlinkingPdf } from "@/utils/pdf/unlinking";
 import { formatFechaLarga } from "@/utils/date";
 import type { groupReport } from "@/types/reportType";
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-    title: "Reportes",
-};
+import {usePageTitle} from "@/hooks/usePageTittle";
 
 export type Volunteer = groupReport["groups"][number]["volunteers"][number];
 export type InactiveItem = {
@@ -53,23 +49,16 @@ export default function ReportesPage() {
       const raw = localStorage.getItem(LS_KEY_VOL);
       if (raw) JSON.parse(raw).forEach((v: Volunteer) => selVol.select(v));
     } catch {}
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // ---- notas (tabla 1)
+    usePageTitle("Reportes");
   const [notes, setNotes] = useState<Record<string, string>>({});
-
-  // ---- paginación (tabla 1)
   const pagVol = usePagination(rowsVol.length, 10);
   const pageSliceVol = useMemo(
     () => pagVol.slice(rowsVol),
     [rowsVol, pagVol.page, pagVol.pageSize],
   );
-
-  // ---- modal horas
   const [openHoursFor, setOpenHoursFor] = useState<Volunteer | null>(null);
 
-  // ---- acciones (tabla 1)
   async function handlePdfVol() {
     const selected = selVol.items();
     if (selected.length === 0) return;
