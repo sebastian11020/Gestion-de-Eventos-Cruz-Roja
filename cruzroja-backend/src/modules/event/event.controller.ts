@@ -41,8 +41,6 @@ export class EventController {
     @Param('id', ParseIntPipe) id_event: number,
     @UserId() userId: string,
   ) {
-    console.log('Iniciando evento:');
-    console.log(userId);
     return this.eventService.startEvent(id_event, userId);
   }
 
