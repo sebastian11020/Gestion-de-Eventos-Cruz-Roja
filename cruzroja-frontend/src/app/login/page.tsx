@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -12,11 +11,7 @@ import { supabase } from "@/lib/supabase-browser";
 import { useRouter } from "next/navigation";
 import { getPersonData } from "@/services/serviceGetPerson";
 import { user } from "@/types/usertType";
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-    title: "Login",
-};
+import {usePageTitle} from "@/hooks/usePageTittle";
 
 
 export default function LoginCR() {
@@ -25,6 +20,7 @@ export default function LoginCR() {
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+    usePageTitle("Login");
 
   async function login(e: React.FormEvent) {
     e.preventDefault();
@@ -59,6 +55,8 @@ export default function LoginCR() {
       setLoading(false);
     }
   }
+
+
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-4 bg-[radial-gradient(ellipse_at_top_left,rgba(30,64,175,0.35),transparent_45%),radial-gradient(ellipse_at_bottom_right,rgba(220,38,38,0.15),transparent_40%)] bg-white">

@@ -22,7 +22,10 @@ export const metadata: Metadata = {
     },
     description: "Sistema de gestión de eventos y horas - Cruz Roja Colombiana",
     icons: {
-        icon: "/Emblema_Cruz_Roja.png",
+        icon: [
+            { url: "/icono.png", sizes: "32x32", type: "image/png" },
+            { url: "/icono.png", sizes: "192x192", type: "image/png" },
+        ],
     },
 };
 
@@ -32,7 +35,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="es">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

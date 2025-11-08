@@ -16,11 +16,8 @@ import { usePaginatedSearch } from "@/hooks/usePaginatedSearch";
 import { PageBtn } from "@/components/buttons/pageButton";
 import { CreateSectionalForm } from "@/components/forms/createSectionalForm";
 import { Loading } from "@/components/ui/loading";
-import type { Metadata } from "next";
+import {usePageTitle} from "@/hooks/usePageTittle";
 
-export const metadata: Metadata = {
-    title: "Sedes",
-};
 
 
 export default function Sedes() {
@@ -48,7 +45,7 @@ export default function Sedes() {
   });
 
   const pageNumbers = usePageNumbers(page, totalPages);
-
+    usePageTitle("Sedes");
   async function handleCreate(payload: createSectional) {
     setOpen(false);
     setQuery("");

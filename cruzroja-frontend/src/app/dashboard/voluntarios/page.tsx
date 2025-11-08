@@ -17,11 +17,8 @@ import {
 import toast from "react-hot-toast";
 import { usePersonData } from "@/hooks/usePersonData";
 import { Loading } from "@/components/ui/loading";
-import type { Metadata } from "next";
+import {usePageTitle} from "@/hooks/usePageTittle";
 
-export const metadata: Metadata = {
-    title: "Voluntarios",
-};
 
 function normalize(v: unknown) {
   return String(v ?? "").toLowerCase();
@@ -54,7 +51,7 @@ export default function Voluntarios() {
   const handleSearch = (value: string) => {
     setFiltro(value);
   };
-
+    usePageTitle("Voluntarios");
   const cities = useMemo(() => {
     const set = new Set(users.map((u) => u.sectional.city));
     return Array.from(set).sort();

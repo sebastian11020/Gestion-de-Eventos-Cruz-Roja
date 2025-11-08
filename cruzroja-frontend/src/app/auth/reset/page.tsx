@@ -1,5 +1,4 @@
-"use client";
-
+"use client"
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase-browser";
 import { Button } from "@/components/ui/button";
@@ -13,12 +12,12 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
+import {usePageTitle} from "@/hooks/usePageTittle";
 
 function validPassword(pw: string) {
   return pw.length >= 8;
 }
 
-// Eval simple de fortaleza (puedes ajustar reglas)
 function passwordScore(pw: string) {
   let s = 0;
   if (pw.length >= 8) s++;
@@ -60,6 +59,8 @@ export default function ResetPasswordPage() {
   const score = useMemo(() => passwordScore(pw), [pw]);
   const match = pw.length > 0 && pw === pw2;
   const canSubmit = ready && validPassword(pw) && match && !loading;
+
+    usePageTitle("Recuperar contraseña");
 
   useEffect(() => {
     const sb = supabase();

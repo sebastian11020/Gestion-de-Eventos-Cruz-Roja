@@ -1,16 +1,16 @@
-"use client";
-
+"use client"
 import { useState } from "react";
 import { supabase } from "@/lib/supabase-browser";
 import { Button } from "@/components/ui/button";
 import { Mail, Loader2, ShieldCheck } from "lucide-react";
 import toast from "react-hot-toast";
 import Link from "next/link";
+import {usePageTitle} from "@/hooks/usePageTittle";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-
+    usePageTitle("Recuperar contraseña");
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email) return toast.error("Ingresa tu correo.");

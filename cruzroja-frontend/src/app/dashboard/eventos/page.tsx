@@ -17,11 +17,8 @@ import { EventsToolbar } from "@/components/events/EventsToolbar";
 import { PaginationBar } from "@/components/events/PaginationBar";
 import { EventCardSkeleton } from "@/components/events/EventCardSkeleton";
 import { useAssistants } from "@/hooks/useAssistants";
-import type { Metadata } from "next";
+import {usePageTitle} from "@/hooks/usePageTittle";
 
-export const metadata: Metadata = {
-    title: "Eventos",
-};
 
 function asDateRange(e: Pick<EventType, "startDate" | "endDate">) {
   if (e.startDate && e.endDate) return `${e.startDate} – ${e.endDate}`;
@@ -68,7 +65,6 @@ function isHistoryEvent(e: any) {
   return false;
 }
 
-/** Filtro nuevo */
 type RoleFilter = "ALL" | "PARTICIPANT" | "LEADER";
 
 export default function EventosPage() {
@@ -78,20 +74,17 @@ export default function EventosPage() {
   const [openCreate, setOpenCreate] = useState(false);
   const [qrOpen, setQrOpen] = useState(false);
   const [role, setRole] = useState<string | null>(null);
-
-  /** NUEVO: filtro de rol */
   const [roleFilter, setRoleFilter] = useState<RoleFilter>("ALL");
 
   const { events, reload, skills, loading } = useEventData();
   const assistants = useAssistants();
-
-  /** Cargar rol desde localStorage (sin return temprano) */
+    usePageTitle("Eventos");
   useEffect(() => {
     const storedRole = localStorage.getItem("role");
     setRole(storedRole);
   }, []);
 
-  /** Resetear página al cambiar filtros */
+
   useEffect(() => {
     setPage(1);
   }, [showHistory, roleFilter]);
