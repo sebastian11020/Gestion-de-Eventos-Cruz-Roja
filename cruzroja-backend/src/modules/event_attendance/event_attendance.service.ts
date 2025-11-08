@@ -23,6 +23,8 @@ export class EventAttendanceService {
       id_user,
       dto.id_event,
     );
+    console.log(id_user);
+    console.log(dto);
     assertFound(enrollment, 'No te encuentras inscrito en este evento');
     let attendance: EventAttendance | null;
     if (dto.action === ActionEnum.start) {
