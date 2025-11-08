@@ -800,6 +800,7 @@ export class PersonService {
       },
     });
     if (persons.length > 0) {
+      console.log(persons[0]);
       const emails = Array.from(
         new Set(
           persons
@@ -808,6 +809,7 @@ export class PersonService {
         ),
       );
       const ids = Array.from(new Set(persons.map((p) => p.id)));
+      console.log(ids[0]);
       await this.notificationPersonService.createNotificationPerson(
         ids,
         id_notification,
