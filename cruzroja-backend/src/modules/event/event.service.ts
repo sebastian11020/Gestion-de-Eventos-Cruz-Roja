@@ -61,7 +61,7 @@ export class EventService {
         is_adult: eventForm.isAdult,
         is_emergency: eventForm.isEmergency,
         max_volunteers: eventForm.capacity,
-        street_address: NormalizeString(eventForm.streetAddress),
+        street_address: eventForm.streetAddress,
         location: {
           id: eventForm.city,
         },
