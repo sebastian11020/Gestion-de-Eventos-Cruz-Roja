@@ -128,14 +128,12 @@ export class EventService {
         await this.notificationService.createNotificationNewEvent(
           eventForm.name,
         );
-      /*
       await this.sendNotification(
         manager,
         eventForm.sectionalId,
         newEvent.id,
         notification,
       );
-       */
       return { success: true, message: 'Evento creado exitosamente.' };
     });
   }
