@@ -480,6 +480,7 @@ export class EventService {
             person: {
               id: userId,
             },
+            state: true,
           },
           check_in: new Date(),
         }),
