@@ -797,6 +797,7 @@ export class PersonService {
       },
       select: {
         email: true,
+        id: true,
       },
     });
     if (persons.length > 0) {
@@ -809,7 +810,6 @@ export class PersonService {
         ),
       );
       const ids = Array.from(new Set(persons.map((p) => p.id)));
-      console.log(ids[0]);
       await this.notificationPersonService.createNotificationPerson(
         ids,
         id_notification,

@@ -18,7 +18,6 @@ export class NotificationPersonService {
     id_notification: number,
   ): Promise<void> {
     for (const id_person of id_persons) {
-      console.log(id_person);
       await this.notificationRepository.save({
         id_notification: id_notification,
         id_person: id_person,
