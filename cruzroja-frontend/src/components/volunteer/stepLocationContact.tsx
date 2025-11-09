@@ -99,7 +99,7 @@ export function StepLocationContact({
       </div>
 
       <div className="relative">
-        <label className={labelBase}>Sede</label><span className="text-red-500">*</span>
+        <label className={labelBase}>Sede <span className="text-red-500">*</span></label>
         <select
           name="id_headquarters"
           value={form.id_headquarters}
