@@ -479,16 +479,19 @@ export class PersonService {
     const currentEps = await this.epsPersonService.findByIds(id_person, id_eps);
     if (currentEps) {
       if (affiliation != currentEps.affiliation) {
-        await this.closeEpsPerson(manager, id_eps, id_person);
-        const dto = new CreateEpsPersonDTO();
-        dto.id_person = id_person;
-        dto.id_eps = id_eps;
-        dto.affiliation = affiliation;
         await manager.update(EpsPerson, currentEps.id_eps, {
           affiliation: affiliation,
+          state: true,
         });
+      } else {
+        if (!currentEps.state) {
+          await manager.update(EpsPerson, currentEps.id_eps, {
+            state: true,
+          });
+        }
       }
     } else {
+      await this.closeEpsPerson(manager, id_eps, id_person);
       const dto = new CreateEpsPersonDTO();
       dto.id_person = id_person;
       dto.id_eps = id_eps;
