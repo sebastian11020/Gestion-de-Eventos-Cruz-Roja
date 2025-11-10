@@ -389,7 +389,7 @@ export class PersonService {
       );
       await this.associateStatus(manager, dto.id, dto.id_state);
       await this.associateSkills(manager, dto.skills, dto.id);
-      await this.sendEmail(dto.email, dto.password);
+      //await this.sendEmail(dto.email, dto.password);
       return { success: true, message: 'Persona creada exitosamente.' };
     });
   }

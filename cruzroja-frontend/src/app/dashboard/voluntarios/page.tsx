@@ -128,7 +128,6 @@ export default function Voluntarios() {
           id: reg?.id ?? "",
           password: reg?.password ?? "",
         };
-        console.log(newData)
         await toast.promise(
           createPersonService(newData).then((res) => {
             if (!res.success) {
