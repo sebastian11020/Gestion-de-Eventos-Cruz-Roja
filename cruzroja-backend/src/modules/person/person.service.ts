@@ -479,10 +479,14 @@ export class PersonService {
     const currentEps = await this.epsPersonService.findByIds(id_person, id_eps);
     if (currentEps) {
       if (affiliation != currentEps.affiliation) {
-        await manager.update(EpsPerson, currentEps.id_eps, {
-          affiliation: affiliation,
-          state: true,
-        });
+        await manager.update(
+          EpsPerson,
+          { id_eps, id_person },
+          {
+            affiliation: affiliation,
+            state: true,
+          },
+        );
       } else {
         if (!currentEps.state) {
           await manager.update(EpsPerson, currentEps.id_eps, {
