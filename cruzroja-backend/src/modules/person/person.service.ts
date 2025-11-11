@@ -85,12 +85,6 @@ export class PersonService {
   async findAllDtoTable() {
     const rows = await this.personRepository.find({
       where: {
-        person_roles: {
-          role: {
-            id: 5,
-          },
-          end_date: IsNull(),
-        },
         person_status: {
           state: {
             id: 3,
