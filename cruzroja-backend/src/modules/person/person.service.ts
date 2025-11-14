@@ -85,12 +85,6 @@ export class PersonService {
   async findAllDtoTable() {
     const rows = await this.personRepository.find({
       where: {
-        person_roles: {
-          role: {
-            id: 5,
-          },
-          end_date: IsNull(),
-        },
         person_status: {
           state: {
             id: 3,
@@ -389,7 +383,7 @@ export class PersonService {
       );
       await this.associateStatus(manager, dto.id, dto.id_state);
       await this.associateSkills(manager, dto.skills, dto.id);
-      await this.sendEmail(dto.email, dto.password);
+      //await this.sendEmail(dto.email, dto.password);
       return { success: true, message: 'Persona creada exitosamente.' };
     });
   }
@@ -479,10 +473,14 @@ export class PersonService {
     const currentEps = await this.epsPersonService.findByIds(id_person, id_eps);
     if (currentEps) {
       if (affiliation != currentEps.affiliation) {
-        await manager.update(EpsPerson, currentEps.id_eps, {
-          affiliation: affiliation,
-          state: true,
-        });
+        await manager.update(
+          EpsPerson,
+          { id_eps, id_person },
+          {
+            affiliation: affiliation,
+            state: true,
+          },
+        );
       } else {
         if (!currentEps.state) {
           await manager.update(EpsPerson, currentEps.id_eps, {
