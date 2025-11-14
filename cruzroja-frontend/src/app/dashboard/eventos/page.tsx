@@ -97,6 +97,7 @@ export default function EventosPage() {
   function isCreate() {
     const leaderRoles = [
       "LIDER SECCIONAL",
+        "LIDER VOLUNTARIADO",
       "LIDER SEDE",
       "ADMINISTRADOR",
       "COORDINADOR AGRUPACION",
