@@ -22,8 +22,6 @@ export function MultiSelectChips({
 }) {
   const [open, setOpen] = React.useState(false);
   const ref = React.useRef<HTMLDivElement>(null);
-
-  // Siempre trabaja con un arreglo “seguro”
   const safeValue = Array.isArray(value) ? value : [];
 
   const baseId = React.useMemo(
@@ -31,13 +29,12 @@ export function MultiSelectChips({
     [options],
   );
 
-  // Garantiza que "base" siempre esté seleccionado
   React.useEffect(() => {
     if (!safeValue.includes(baseId)) {
       onChange([...safeValue, baseId]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [baseId]); // evitar re-ejecutar por cada cambio de value
+  }, [baseId]);
 
   const selected = React.useMemo(
     () => options.filter((o) => safeValue.includes(o.id)),
