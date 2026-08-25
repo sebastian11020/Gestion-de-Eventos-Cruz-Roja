@@ -184,6 +184,7 @@ export class PersonService {
       });
     }
     const aux = await persons.getMany();
+    console.log(aux);
     return this.mapEntityToDto(aux);
   }
 
@@ -383,7 +384,7 @@ export class PersonService {
       );
       await this.associateStatus(manager, dto.id, dto.id_state);
       await this.associateSkills(manager, dto.skills, dto.id);
-      //await this.sendEmail(dto.email, dto.password);
+      await this.sendEmail(dto.email, dto.password);
       return { success: true, message: 'Persona creada exitosamente.' };
     });
   }
@@ -423,6 +424,7 @@ export class PersonService {
         },
       });
       await this.associateStatus(manager, id, dto.id_state);
+      console.log(dto);
       await this.checkCurrentRolePerson(
         manager,
         id,
@@ -815,7 +817,7 @@ export class PersonService {
         ids,
         id_notification,
       );
-      //await this.nodeEmailerService.sendEmailNewEventMany(emails, event);
+      await this.nodeEmailerService.sendEmailNewEventMany(emails, event);
     }
   }
 

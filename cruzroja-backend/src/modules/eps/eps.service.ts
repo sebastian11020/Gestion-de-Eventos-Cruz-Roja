@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Eps } from './entity/eps.entity';
 import { Repository } from 'typeorm';
-import { conflict } from '../../common/utils/assert';
+import { assertFound, conflict } from '../../common/utils/assert';
 import { GetEpsDto } from './dto/get-eps.dto';
 import {
   FormatNamesString,
@@ -15,19 +15,19 @@ export class EpsService {
   constructor(@InjectRepository(Eps) private epsRepository: Repository<Eps>) {}
 
   async create(dto: CreateEpsDto) {
-    let eps = await this.epsRepository.findOne({
+    const exist = await this.epsRepository.exists({
       where: {
         name: NormalizeString(dto.name),
       },
     });
-    if (eps) {
-      conflict(`Ya existe la eps: ${eps.name}`);
+    if (exist) {
+      conflict(`Ya existe una EPS con el nombre: ${dto.name}`);
     } else {
-      eps = this.epsRepository.create({
+      const eps = this.epsRepository.create({
         name: NormalizeString(dto.name),
       });
+      await this.epsRepository.save(eps);
     }
-    await this.epsRepository.save(eps);
     return { success: true, message: 'Eps creada exitosamente' };
   }
 
@@ -42,9 +42,10 @@ export class EpsService {
   }
 
   async update(id: number, dto: CreateEpsDto) {
-    await this.epsRepository.update(id, {
+    const result = await this.epsRepository.update(id, {
       name: NormalizeString(dto.name),
     });
-    return { success: true };
+    assertFound(result.affected, 'No se encontro la eps con el id: ' + id);
+    return { success: true, message: 'Eps actualizada exitosamente' };
   }
 }

@@ -252,25 +252,26 @@ export class ProgramHeadquartersService {
             person: true,
           },
         });
-        assertFound(p, 'No se pudo desactivar el programa, intente nuevamente');
-        await manager.update(PersonRole, p.id, {
-          end_date: new Date(),
-        });
-        const newRole = manager.create(PersonRole, {
-          person: {
-            id: p.person.id,
-          },
-          headquarters: {
-            id: p.headquarters.id,
-          },
-          role: {
-            id: 5,
-          },
-          group: {
-            id: p.group.id,
-          },
-        });
-        await manager.save(newRole);
+        if (p) {
+          await manager.update(PersonRole, p.id, {
+            end_date: new Date(),
+          });
+          const newRole = manager.create(PersonRole, {
+            person: {
+              id: p.person.id,
+            },
+            headquarters: {
+              id: p.headquarters.id,
+            },
+            role: {
+              id: 5,
+            },
+            group: {
+              id: p.group.id,
+            },
+          });
+          await manager.save(newRole);
+        }
         return {
           success: true,
           message: 'Se desactivo el programa correctamente',
@@ -300,23 +301,21 @@ export class ProgramHeadquartersService {
             person: true,
           },
         });
-        assertFound(
-          pr,
-          'No se encontro un rol activo para la persona seleccionada',
-        );
-        await this.closeCoordinatorRoleCurrent(
-          manager,
-          pr,
-          dto.idSectional,
-          dto.idProgramsHeadquarters,
-        );
-        await this.assignCoordinator(
-          manager,
-          dto.leader,
-          dto.idSectional,
-          pr.group.id,
-          dto.idProgramsHeadquarters,
-        );
+        if (pr) {
+          await this.closeCoordinatorRoleCurrent(
+            manager,
+            pr,
+            dto.idSectional,
+            dto.idProgramsHeadquarters,
+          );
+          await this.assignCoordinator(
+            manager,
+            dto.leader,
+            dto.idSectional,
+            pr.group.id,
+            dto.idProgramsHeadquarters,
+          );
+        }
         return {
           success: true,
           message: 'Se cambio el cordinador de la agrupacion de forma exixtosa',
