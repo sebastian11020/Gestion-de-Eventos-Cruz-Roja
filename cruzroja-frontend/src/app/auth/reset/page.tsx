@@ -126,7 +126,7 @@ export default function ResetPasswordPage() {
       const { error } = await sb.auth.updateUser({ password: pw });
       if (error) throw error;
 
-      await sb.auth.signOut(); // opcional: login limpio
+      await sb.auth.signOut();
       toast.success(
         "Contraseña actualizada. Inicia sesión con tu nueva clave.",
       );

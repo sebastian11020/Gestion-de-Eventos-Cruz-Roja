@@ -53,8 +53,6 @@ export default function Dashboard() {
       </div>
     );
   }
-
-  // ---- Vista exclusiva para VOLUNTARIO: solo podio + top ----
   if (isVolunteer) {
     return (
       <div className="p-4 sm:p-6 lg:p-1 overflow-y-auto scrollbar-thin scrollbar-thumb-red-600 scrollbar-track-gray-100">

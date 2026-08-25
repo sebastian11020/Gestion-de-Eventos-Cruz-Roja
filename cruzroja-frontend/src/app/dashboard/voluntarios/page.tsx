@@ -150,7 +150,7 @@ export default function Voluntarios() {
       }
       setEditUser(null);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
   useEffect(() => {

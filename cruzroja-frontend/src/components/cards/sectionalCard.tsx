@@ -51,7 +51,6 @@ export function SectionalCard({
   async function onView(id: string) {
     try {
       const response = await getPersonId(id);
-      console.log(response.leader);
       if (response.success) {
         setOpenView(true);
         setViewUser(response.leader);
@@ -101,7 +100,6 @@ export function SectionalCard({
   async function GetGroupTable(id: string) {
     try {
       const response = await getGroupTable(id);
-      console.log(response);
       setGroups(response);
     } catch (error) {
       console.error(error);

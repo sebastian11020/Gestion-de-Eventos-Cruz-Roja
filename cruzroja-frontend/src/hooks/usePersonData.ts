@@ -48,11 +48,11 @@ export function usePersonData() {
         getReportDesvinculate(),
         getReportInactivate(),
       ]);
+      console.log("usuarios",usersData);
       setUsers(usersData ?? []);
       const normalized = normalizeGroups(groupsData);
       setGroups(normalized);
       setUnlinked(inactivateData);
-      console.log(inactivateData);
     } finally {
       setLoading(false);
     }

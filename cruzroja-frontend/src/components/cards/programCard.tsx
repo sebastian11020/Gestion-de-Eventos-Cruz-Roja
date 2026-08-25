@@ -83,7 +83,6 @@ export function ProgramCard({ program, users, onDeleted }: SectionalCardProps) {
   async function onView(id: string) {
     try {
       const response = await getPersonId(id);
-      console.log(response.leader);
       if (response.success) {
         setOpenView(true);
         setViewUser(response.leader);

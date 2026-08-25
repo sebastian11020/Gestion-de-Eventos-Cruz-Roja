@@ -1,4 +1,3 @@
-// app/api/session/route.ts
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -14,18 +13,8 @@ export async function POST(req: Request) {
 
   const res = NextResponse.json({ ok: true });
 
-  // HttpOnly (server lo ve, cliente NO lo ve en document.cookie)
   res.cookies.set("cr_role", value, {
     httpOnly: true,
-    secure: isHttps, // <- en http será false
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 120,
-  });
-
-  // DEBUG: visible en document.cookie (para que confirmes rápido)
-  res.cookies.set("cr_role_dbg", value, {
-    httpOnly: false,
     secure: isHttps,
     sameSite: "lax",
     path: "/",

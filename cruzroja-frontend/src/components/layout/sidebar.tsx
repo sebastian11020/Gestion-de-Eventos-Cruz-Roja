@@ -18,6 +18,7 @@ import { supabase } from "@/lib/supabase-browser";
 import { useSideBarData } from "@/hooks/useSideBarData";
 import { useEffect, useMemo, useState } from "react";
 import { Role } from "@/const/consts";
+import ReportErrorButton from "../buttons/buttonSupport";
 
 function normalizeRole(s?: string | null): Role | undefined {
   if (!s) return undefined;
@@ -282,6 +283,8 @@ export function AppSidebar({
                 </div>
               </div>
             </div>
+
+            <ReportErrorButton />
 
             {/* Logout */}
             <button

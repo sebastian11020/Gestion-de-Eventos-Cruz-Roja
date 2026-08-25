@@ -23,7 +23,6 @@ export function useDashboardData() {
       setEvents(eventsData);
       setCards(cardsData);
       setTop(topData);
-      console.log(topData);
     } finally {
       setLoading(false);
     }

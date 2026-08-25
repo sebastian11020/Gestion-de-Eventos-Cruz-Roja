@@ -23,3 +23,31 @@ html {
   scrollbar-width: thin;
   scrollbar-color: #f3f4f6 #f3f4f6;
 }
+
+/* ================================
+   HTML5 QR CODE
+================================ */
+
+#qr-reader {
+  width: 100% !important;
+  border: none !important;
+}
+
+#qr-reader video {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 280px !important;
+  object-fit: cover !important;
+  border-radius: 12px !important;
+}
+
+#qr-reader__scan_region {
+  width: 100% !important;
+  border: none !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+#qr-reader__scan_region img {
+  max-width: 100% !important;
+}

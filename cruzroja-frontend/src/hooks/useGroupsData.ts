@@ -26,7 +26,6 @@ export function useGroupsData() {
       setCatalogGroups(allGroups);
       setSectionals(sectionalsData);
       setUsers(usersData);
-      console.log(groupsData);
     } finally {
       setLoading(false);
     }

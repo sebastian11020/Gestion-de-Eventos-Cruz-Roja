@@ -84,7 +84,6 @@ export default function Programas() {
   }
   async function handleAssociateCatalog(payload: createProgram) {
     const newPayload = { ...payload, leader: documentSelected };
-    console.log(newPayload);
     setOpen(false);
     setQuery("");
     setPage(1);

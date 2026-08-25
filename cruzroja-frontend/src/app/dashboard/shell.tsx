@@ -1,4 +1,3 @@
-// app/dashboard/shell.tsx  (CLIENT)
 "use client";
 
 import { useState } from "react";

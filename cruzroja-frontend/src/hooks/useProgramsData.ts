@@ -22,7 +22,6 @@ export function useProgramsData() {
       setItems(programsData);
       setSectionals(sectionalsData);
       setUsers(usersData);
-      console.log(programsData);
     } finally {
       setLoading(false);
     }

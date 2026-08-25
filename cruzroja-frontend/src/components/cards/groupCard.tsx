@@ -89,7 +89,6 @@ export function GroupCard({ group, users, onDeleted }: SectionalCardProps) {
   async function onView(id: string) {
     try {
       const response = await getPersonId(id);
-      console.log(response.leader);
       if (response.success) {
         setOpenView(true);
         setViewUser(response.leader);
@@ -142,7 +141,6 @@ export function GroupCard({ group, users, onDeleted }: SectionalCardProps) {
   async function handleGetProgramData(id: string) {
     try {
       const response = await getProgramTable(id);
-      console.log(response);
       setProgramData(response);
     } catch (error) {
       console.error(error);

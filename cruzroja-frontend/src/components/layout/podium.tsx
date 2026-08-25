@@ -1,4 +1,3 @@
-// "@/components/layout/podium.tsx"
 "use client";
 
 import { Crown, Medal, Trophy } from "lucide-react";
@@ -20,7 +19,6 @@ export default function PodiumTop({
   title?: string;
 }) {
   const list = Array.isArray(top) ? top.slice(0, 10) : [];
-  const [gold, silver, bronze] = list;
 
   const Card = ({
     place,

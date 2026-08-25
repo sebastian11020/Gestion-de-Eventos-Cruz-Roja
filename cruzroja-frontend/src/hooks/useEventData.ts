@@ -56,7 +56,6 @@ export function useEventData() {
       setUsers(userData);
       setSkills(skillsData);
       setDepartments(departmentsData);
-      console.log(departmentsData);
     } finally {
       setLoading(false);
     }

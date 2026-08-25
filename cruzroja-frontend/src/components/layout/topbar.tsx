@@ -81,12 +81,12 @@ export function Topbar({ onOpenSidebar }: Props) {
               className="object-contain"
             />
           </span>
-          <span className="text-sm font-semibold text-gray-900">Dashboard</span>
+          <span className="text-sm font-semibold text-gray-900">Cruz Roja Colombiana Seccional Boyacá</span>
         </button>
 
         {/* Desktop: marca */}
         <div className="hidden md:flex items-center gap-3">
-          <div className="grid size-9 place-items-center bg-white shadow ring-1 ring-red-200 rounded-md overflow-hidden">
+          <div className="grid size-9 place-items-center  overflow-hidden">
             <Image
               src="/Emblema_Cruz_Roja.jpg"
               alt="Logo Cruz Roja"
@@ -96,25 +96,12 @@ export function Topbar({ onOpenSidebar }: Props) {
             />
           </div>
           <h1 className="text-lg font-bold text-gray-900 tracking-tight">
-            Cruz Roja Colombiana
+            Cruz Roja Colombiana Seccional Boyacá
           </h1>
         </div>
 
         {/* Derecha */}
         <div className="flex items-center gap-3 sm:gap-4 ml-auto relative">
-          <div className="hidden sm:flex items-center gap-2">
-            <Image
-              src="/Flag_of_Boyacá_Department.png"
-              width={28}
-              height={28}
-              alt="Bandera de Boyacá"
-              className="rounded-sm shadow-sm"
-            />
-            <h2 className="text-base md:text-lg font-bold text-gray-900 tracking-tight">
-              Seccional Boyacá
-            </h2>
-          </div>
-
           {/* Campana */}
           <button
             ref={bellRef}
