@@ -108,14 +108,7 @@ export class EventService {
             qty: eventForm.capacity,
           },
         ]);
-        await this.privateEvent(
-          manager,
-          newEvent.id,
-          participants,
-          newEvent.start_date,
-          newEvent.estimated_end_date,
-        );
-        state = 10;
+        state = 8;
       } else {
         await this.assignSkillQuota(
           manager,
@@ -292,6 +285,7 @@ export class EventService {
           (ee) => ee.state && String(ee.person?.id) === String(id_user),
         );
       dto.is_adult = row.is_adult;
+      dto.is_private = row.is_private;
       return dto;
     });
   }

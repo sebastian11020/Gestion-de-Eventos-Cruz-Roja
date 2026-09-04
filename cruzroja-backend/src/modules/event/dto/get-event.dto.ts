@@ -24,6 +24,7 @@ export class GetEventCardDDto {
   is_leader: boolean;
   is_participant: boolean;
   is_adult: boolean;
+  is_private: boolean;
 }
 
 export class GetSkillQuota {

@@ -13,11 +13,14 @@ export class GroupStatusService {
   async findOneOpenStateByIdPk(id: number): Promise<GroupStatus | null> {
     return this.groupStatusRepository.findOne({
       where: {
-        id: id,
+        groupHeadquarters: {
+          id: id,
+        },
         end_date: IsNull(),
       },
       relations: {
         state: true,
+        groupHeadquarters: true,
       },
     });
   }

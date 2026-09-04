@@ -162,7 +162,7 @@ export class GroupHeadquartersService {
       await manager.update(GroupStatus, id, {
         end_date: new Date(),
       });
-      if (currentStatus.state.name === 'ACTIVO') {
+      if (currentStatus.state.id === 1) {
         aux_id_state = 2;
       }
     }
