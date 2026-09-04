@@ -425,7 +425,6 @@ export class PersonService {
         },
       });
       await this.associateStatus(manager, id, dto.id_state);
-      console.log(dto);
       await this.checkCurrentRolePerson(
         manager,
         id,
