@@ -28,7 +28,7 @@ function normalizeMessage(input: unknown, fallback: string): string {
 
 function mapPostgresError(code?: string): { status: number; message: string } {
   switch (code) {
-    case '23505': // unique_violation
+    case '23505':
       return {
         status: HttpStatus.CONFLICT,
         message: 'Registro duplicado (violación de índice único).',

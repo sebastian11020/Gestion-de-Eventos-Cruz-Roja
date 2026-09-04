@@ -6,7 +6,7 @@ export class Eps {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   name: string;
 
   @OneToMany(() => EpsPerson, (epsP) => epsP.eps)

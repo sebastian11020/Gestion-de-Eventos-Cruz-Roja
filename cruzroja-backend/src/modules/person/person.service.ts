@@ -184,6 +184,7 @@ export class PersonService {
       });
     }
     const aux = await persons.getMany();
+    console.log(aux);
     return this.mapEntityToDto(aux);
   }
 
@@ -424,6 +425,7 @@ export class PersonService {
         },
       });
       await this.associateStatus(manager, id, dto.id_state);
+      console.log(dto);
       await this.checkCurrentRolePerson(
         manager,
         id,
