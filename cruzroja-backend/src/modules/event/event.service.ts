@@ -108,6 +108,20 @@ export class EventService {
             qty: eventForm.capacity,
           },
         ]);
+        for (const participant of participants) {
+          let enrollment = manager.create(EventEnrollment, {
+            event: {
+              id: newEvent.id,
+            },
+            person: {
+              id: participant,
+            },
+            skill: {
+              id: 3,
+            },
+          });
+          enrollment = await manager.save(enrollment);
+        }
         state = 8;
       } else {
         await this.assignSkillQuota(

@@ -157,9 +157,10 @@ export class GroupHeadquartersService {
   private async changeGroupStatus(manager: EntityManager, id: number) {
     const currentStatus =
       await this.groupHeadquartersStatusService.findOneOpenStateByIdPk(id);
+    console.log(currentStatus, id);
     let aux_id_state: number = 1;
     if (currentStatus) {
-      await manager.update(GroupStatus, id, {
+      await manager.update(GroupStatus, currentStatus.id, {
         end_date: new Date(),
       });
       if (currentStatus.state.id === 1) {
