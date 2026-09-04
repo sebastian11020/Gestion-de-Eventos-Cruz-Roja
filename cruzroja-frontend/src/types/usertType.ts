@@ -162,6 +162,7 @@ export type event = {
   capacity: string;
   is_leader: boolean;
   is_participant: boolean;
+  is_private:boolean;
   state: string;
   skill_quota: skillQuota[];
   leader: {
