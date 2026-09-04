@@ -57,12 +57,13 @@ function isHistoryEvent(e: any) {
   const endAt = getEndAt(e);
   const FINISHED = ["FINALIZADO", "FINALIZED"];
   const CANCELED = ["CANCELADO", "CANCELED", "CANCELLED"];
+  const PROGRAMED = ["PROGRAMED", "PROGRAMADO"];
   const ONGOING = ["EN CURSO", "ONGOING", "IN_PROGRESS", "EN_CURSO"];
   if (FINISHED.includes(status) || CANCELED.includes(status)) return true;
   const endedByTime = isDatePast(endAt);
   const isOngoing = ONGOING.includes(status);
-  if (endedByTime && !isOngoing) return true;
-  return false;
+  return endedByTime && !isOngoing && !PROGRAMED;
+
 }
 
 type RoleFilter = "ALL" | "PARTICIPANT" | "LEADER";
@@ -205,10 +206,14 @@ export default function EventosPage() {
               : pageSlice.map((e, idx) => {
                   const composedDate = (e as any).date ?? asDateRange(e);
                   const id =
-                    (e as any).id ?? String((page - 1) * PAGE_SIZE + idx);
-
+                    (e as EventType).id ?? String((page - 1) * PAGE_SIZE + idx);
+                  if (e.is_private){
+                      if(!e.is_leader || !e.is_participant){
+                          return;
+                      }
+                  }
                   return (
-                    <EventCard
+                      <EventCard
                       id={e.id ?? ""}
                       key={e.id}
                       title={e.title}

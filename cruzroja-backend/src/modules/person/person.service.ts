@@ -190,6 +190,7 @@ export class PersonService {
   mapEntityToDto(persons: Person[]): Promise<GetPersons[]> {
     return Promise.all(
       persons.map(async (p) => {
+        console.log(p.name,p.last_name);
         const dto = new GetPersons();
         dto.id = p.id;
         dto.typeDocument = p.type_document;
@@ -802,7 +803,6 @@ export class PersonService {
       },
     });
     if (persons.length > 0) {
-      console.log(persons[0]);
       const emails = Array.from(
         new Set(
           persons
