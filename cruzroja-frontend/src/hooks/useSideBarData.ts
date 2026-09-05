@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { user } from "@/types/usertType";
 import { getPersonData } from "@/services/serviceGetPerson";
+import {Notifications} from "@/types/dashboardTypes";
 
 export function useSideBarData() {
   const [user, setUser] = useState<user>();
-  const [notifications, setNotifications] = useState<[]>([]);
+  const [notifications, setNotifications] = useState<Notifications[]>([]);
 
   async function loadAll() {
     try {
