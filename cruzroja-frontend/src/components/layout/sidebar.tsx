@@ -134,18 +134,37 @@ export function AppSidebar({
   }, [role]);
 
   async function handleLogout() {
-    const sb = supabase();
-    const { error } = await sb.auth.signOut();
-    localStorage.removeItem("role");
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("supabase_uid");
-    localStorage.removeItem("sb-kzrnlvzooxifdiddajlr-auth-token");
-    await fetch("/api/session", { method: "DELETE" });
-    if (error) {
-      console.error("Error al cerrar sesión:", error.message);
+    try {
+      const sb = supabase();
+
+      const {
+        data: { session },
+      } = await sb.auth.getSession();
+
+      if (session) {
+        const { error } = await sb.auth.signOut();
+
+        if (error) {
+          console.error("Error al cerrar sesión:", error.message);
+          return false;
+        }
+      }
+
+      localStorage.removeItem("role");
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("supabase_uid");
+
+      await fetch("/api/session", {
+        method: "DELETE",
+      });
+
+      window.location.href = "/login";
+
+      return true;
+    } catch (error) {
+      console.error("Error inesperado al cerrar sesión:", error);
       return false;
     }
-    window.location.href = "/login";
   }
 
   return (
