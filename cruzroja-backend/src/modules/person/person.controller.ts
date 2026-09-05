@@ -24,7 +24,7 @@ export class PersonController {
   async getLogin(@Param('id') id: string) {
     return this.personService.getLoginPerson(id);
   }
-
+  @UseGuards(SupabaseAuthGuard)
   @Get('/all')
   async getAll(@UserId() userId: string) {
     return this.personService.findAllDto(userId);
