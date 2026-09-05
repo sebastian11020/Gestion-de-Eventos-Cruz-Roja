@@ -84,7 +84,9 @@ export function EventCard({
 
   const [editOpen, setEditOpen] = useState(false);
   const canEdit =
-    !inHistory && (!flags.isOngoing || (flags.isOngoing && isEdit));
+      isLeader &&
+      !inHistory &&
+      (!flags.isOngoing || (flags.isOngoing && isEdit));
   const { users } = useEventData();
 
   const [confirmOpen, setConfirmOpen] = useState(false);

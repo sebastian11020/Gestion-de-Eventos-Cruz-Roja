@@ -14,13 +14,15 @@ export default function AssistantsDialog({
   assistants,
   loading = false,
   onRemove,
+  isLeader,showHistory,
   title = "Asistentes",
 }: {
   open: boolean;
   onClose: () => void;
   assistants: assistantEvent[];
   loading?: boolean;
-  /** Callback que recibe el document del asistente a quitar */
+  isLeader: boolean;
+  showHistory:boolean;
   onRemove: (document: string) => Promise<void> | void;
   title?: string;
 }) {
@@ -101,7 +103,7 @@ export default function AssistantsDialog({
               <th className="text-left px-4 py-3 font-semibold">Nombre</th>
               <th className="text-left px-4 py-3 font-semibold">Licencia</th>
               <th className="text-left px-4 py-3 font-semibold">Teléfono</th>
-              <th className="px-4 py-3 text-right font-semibold">Acciones</th>
+              {(isLeader && !showHistory) &&  (<th className="px-4 py-3 text-right font-semibold">Acciones</th>)}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -144,25 +146,27 @@ export default function AssistantsDialog({
                   </td>
                   <td className="px-4 py-3">{a.licence}</td>
                   <td className="px-4 py-3">{a.phone}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex justify-end">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="gap-2 rounded-xl border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"
-                        onClick={() => setConfirming(a)}
-                        disabled={removingId !== null}
-                        title="Quitar del evento"
-                        aria-label={`Quitar a ${a.name}`}
-                      >
-                        {removingId === a.document ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Trash2 className="w-4 h-4" />
-                        )}
-                      </Button>
-                    </div>
-                  </td>
+                  { (isLeader && !showHistory) && (
+                      <td className="px-4 py-3">
+                        <div className="flex justify-end">
+                          <Button
+                              type="button"
+                              variant="outline"
+                              className="gap-2 rounded-xl border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"
+                              onClick={() => setConfirming(a)}
+                              disabled={removingId !== null}
+                              title="Quitar del evento"
+                              aria-label={`Quitar a ${a.name}`}
+                          >
+                            {removingId === a.document ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                                <Trash2 className="w-4 h-4" />
+                            )}
+                          </Button>
+                        </div>
+                      </td>
+                  )}
                 </tr>
               ))}
           </tbody>
@@ -202,21 +206,23 @@ export default function AssistantsDialog({
                   </div>
                   <div className="text-xs text-gray-600">Tel: {a.phone}</div>
                 </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="ml-auto gap-2 rounded-xl border-red-200 text-red-600 hover:bg-red-50"
-                  onClick={() => setConfirming(a)}
-                  disabled={removingId !== null}
-                  title="Quitar del evento"
-                  aria-label={`Quitar a ${a.name}`}
-                >
-                  {removingId === a.document ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Trash2 className="w-4 h-4" />
-                  )}
-                </Button>
+                {(isLeader && !showHistory) && (
+                    <Button
+                        type="button"
+                        variant="outline"
+                        className="ml-auto gap-2 rounded-xl border-red-200 text-red-600 hover:bg-red-50"
+                        onClick={() => setConfirming(a)}
+                        disabled={removingId !== null}
+                        title="Quitar del evento"
+                        aria-label={`Quitar a ${a.name}`}
+                    >
+                      {removingId === a.document ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                          <Trash2 className="w-4 h-4" />
+                      )}
+                    </Button>
+                )}
               </div>
             </div>
           ))}
