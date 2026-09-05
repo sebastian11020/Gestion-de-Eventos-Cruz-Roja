@@ -34,6 +34,7 @@ export class PersonController {
     return this.personService.findByDocumentDto(document);
   }
 
+  @UseGuards(SupabaseAuthGuard)
   @Get('/profile/')
   async getProfileInfo(@UserId() userId: string) {
     return this.personService.findById(userId);
