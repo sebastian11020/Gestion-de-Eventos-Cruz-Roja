@@ -191,7 +191,7 @@ export class PersonService {
   mapEntityToDto(persons: Person[]): Promise<GetPersons[]> {
     return Promise.all(
       persons.map(async (p) => {
-        console.log(p.name,p.last_name);
+        console.log(p.name, p.last_name);
         const dto = new GetPersons();
         dto.id = p.id;
         dto.typeDocument = p.type_document;
