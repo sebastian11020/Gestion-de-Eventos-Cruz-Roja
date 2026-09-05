@@ -287,6 +287,8 @@ export default function EventosPage() {
         open={assistants.open}
         onClose={() => assistants.setOpen(false)}
         assistants={assistants.assistants}
+        isLeader={isLeader()}
+        showHistory={showHistory}
         loading={assistants.loading}
         onRemove={(doc) => assistants.remove(doc)}
         title="Asistentes del evento"
