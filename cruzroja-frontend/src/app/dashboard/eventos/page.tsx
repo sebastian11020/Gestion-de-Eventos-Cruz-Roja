@@ -91,7 +91,7 @@ export default function EventosPage() {
   }, [showHistory, roleFilter]);
 
   function isLeader() {
-    const leaderRoles = ["LIDER SECCIONAL", "LIDER SEDE", "ADMINISTRADOR"];
+    const leaderRoles = ["LIDER VOLUNTARIADO", "LIDER SEDE", "ADMINISTRADOR"];
     return leaderRoles.includes(role ?? "");
   }
 
