@@ -137,6 +137,9 @@ export function AppSidebar({
     const sb = supabase();
     const { error } = await sb.auth.signOut();
     localStorage.removeItem("role");
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("supabase_uid");
+    localStorage.removeItem("sb-kzrnlvzooxifdiddajlr-auth-token");
     await fetch("/api/session", { method: "DELETE" });
     if (error) {
       console.error("Error al cerrar sesión:", error.message);

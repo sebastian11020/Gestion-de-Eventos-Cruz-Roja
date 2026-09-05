@@ -25,38 +25,35 @@ export class PersonController {
     return this.personService.getLoginPerson(id);
   }
 
-  @UseGuards(SupabaseAuthGuard)
   @Get('/all')
   async getAll(@UserId() userId: string) {
-    console.log(this.personService.findAllDto(userId));
     return this.personService.findAllDto(userId);
   }
-  @UseGuards(SupabaseAuthGuard)
   @Get('/leaderinfo/:document')
   async getLeaderInfo(@Param('document') document: string) {
     return this.personService.findByDocumentDto(document);
   }
-  @UseGuards(SupabaseAuthGuard)
+
   @Get('/profile/')
   async getProfileInfo(@UserId() userId: string) {
     return this.personService.findById(userId);
   }
-  @UseGuards(SupabaseAuthGuard)
+
   @Get('/table/all')
   async getTableAll(): Promise<GetPersonTableDto[]> {
     return this.personService.findAllDtoTable();
   }
-  @UseGuards(SupabaseAuthGuard)
+
   @Get('/table/special-event')
   async getTableSpecialEvent() {
     return this.personService.getTableSpecialEvent();
   }
-  @UseGuards(SupabaseAuthGuard)
+
   @Post('/create')
   async create(@Body() personDto: CreatePersonDto) {
     return this.personService.create(personDto);
   }
-  @UseGuards(SupabaseAuthGuard)
+
   @Put('/update-profile')
   async updateProfile(
     @UserId() id_user: string,
@@ -64,22 +61,22 @@ export class PersonController {
   ) {
     return this.personService.updateProfile(id_user, personDto);
   }
-  @UseGuards(SupabaseAuthGuard)
+
   @Put('/update/:id')
   async update(@Param('id') id: string, @Body() personDto: UpdatePersonDto) {
     return this.personService.update(id, personDto);
   }
-  @UseGuards(SupabaseAuthGuard)
+
   @Get('/skills')
   async getSkills(@Query('id_user') id_user: string) {
     return this.personService.getSkills(id_user);
   }
-  @UseGuards(SupabaseAuthGuard)
+
   @Get('/inactivity-report')
   async getInactivityReport(@UserId() userId: string) {
     return this.personService.reportInactivityPerson(userId);
   }
-  @UseGuards(SupabaseAuthGuard)
+
   @Get('/unlinked-report')
   async getUnlinkedReport(@UserId() userId: string) {
     return this.personService.reportUnlinkedPerson(userId);

@@ -1,12 +1,10 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { NotificationPersonService } from './notification-person.service';
 import { UserId } from '../../common/decorators/user.decorator';
-import { SupabaseAuthGuard } from '../../common/config/guards/supabase-auth.guard';
 import { GetNotificationPersonDTO } from './dto/get-notification-person.dto';
 import { ReadNotificationDto } from './dto/read-notification.dto';
 
 @Controller('notification-person')
-@UseGuards(SupabaseAuthGuard)
 export class NotificationPersonController {
   constructor(
     private readonly notificationPersonService: NotificationPersonService,

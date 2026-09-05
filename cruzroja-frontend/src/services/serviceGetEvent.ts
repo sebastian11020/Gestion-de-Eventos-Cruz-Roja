@@ -72,7 +72,7 @@ export async function getClassificationService() {
 export async function getEventService() {
   try {
     const token = await getAccessToken();
-    const id = await getUserId(); // evita crashear en SSR y usa sesión si no hay localStorage
+    const id = await getUserId();
     const { data } = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/event/all`,
       {
