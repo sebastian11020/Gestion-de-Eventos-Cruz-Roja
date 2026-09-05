@@ -33,7 +33,7 @@ export default function LoginCR() {
                 password: loginData.password,
             });
 
-            if (error) throw error;
+        if (error) throw error;
 
             const id = data.user?.id;
             if (!id) throw new Error("No se pudo obtener el usuario.");

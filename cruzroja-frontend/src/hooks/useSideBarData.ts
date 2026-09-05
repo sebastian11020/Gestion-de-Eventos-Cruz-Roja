@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { user } from "@/types/usertType";
 import { getPersonData } from "@/services/serviceGetPerson";
-import { Notifications } from "@/types/dashboardTypes";
-import { getNotifications } from "@/services/serviceSelect";
+import {Notifications} from "@/types/dashboardTypes";
 
 export function useSideBarData() {
   const [user, setUser] = useState<user>();
@@ -12,7 +11,7 @@ export function useSideBarData() {
     try {
       const supaBaseId: string = localStorage.getItem("supabase_uid") ?? "";
       const userData = await getPersonData(supaBaseId);
-      const notificationsData = await getNotifications();
+      const notificationsData:[] = [];
       setUser(userData);
       setNotifications(notificationsData);
       localStorage.setItem("role", userData.role);
