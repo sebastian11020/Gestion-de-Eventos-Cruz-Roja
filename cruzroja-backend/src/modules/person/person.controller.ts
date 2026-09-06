@@ -56,6 +56,7 @@ export class PersonController {
   }
 
   @Put('/update-profile')
+  @UseGuards(SupabaseAuthGuard)
   async updateProfile(
     @UserId() id_user: string,
     @Body() personDto: UpdateProfilePersonDto,
