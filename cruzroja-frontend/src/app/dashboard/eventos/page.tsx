@@ -203,43 +203,40 @@ export default function EventosPage() {
               ? Array.from({ length: PAGE_SIZE }).map((_, i) => (
                   <EventCardSkeleton key={`skeleton-${i}`} />
                 ))
-              : pageSlice.map((e, idx) => {
+                : pageSlice.map((e, idx) => {
                   const composedDate = (e as any).date ?? asDateRange(e);
                   const id =
-                    (e as EventType).id ?? String((page - 1) * PAGE_SIZE + idx);
-                  if (e.is_private){
-                    if (!isLeader()){
-                      if(!e.is_leader || !e.is_participant){
-                        return;
-                      }
-                    }
+                      (e as EventType).id ?? String((page - 1) * PAGE_SIZE + idx);
+                  if (e.is_private && !isLeader() && !e.is_leader && !e.is_participant) {
+                    return null;
                   }
+
                   return (
                       <EventCard
-                      id={e.id ?? ""}
-                      key={e.id}
-                      title={e.title}
-                      streetAddress={e.streetAddress}
-                      leader={e.leader}
-                      inHistory={showHistory}
-                      description={e.description}
-                      date={composedDate}
-                      city={e.city}
-                      department={e.department}
-                      capacity={e.capacity as any}
-                      isInscrit={e.is_participant}
-                      isLeader={e.is_leader}
-                      isEdit={isLeader()}
-                      state={e.state}
-                      skillQuotas={e.skill_quota}
-                      startDate={e.startDate}
-                      endDate={e.endDate}
-                      skillsUser={skills}
-                      showSuscribe={!showHistory}
-                      onDelete={reload}
-                      onSubscribe={(skillId) => handleSubscribe(id, skillId)}
-                      onViewEnrolled={() => assistants.openForEvent(e.id ?? "")}
-                    />
+                          id={e.id ?? ""}
+                          key={e.id}
+                          title={e.title}
+                          streetAddress={e.streetAddress}
+                          leader={e.leader}
+                          inHistory={showHistory}
+                          description={e.description}
+                          date={composedDate}
+                          city={e.city}
+                          department={e.department}
+                          capacity={e.capacity as any}
+                          isInscrit={e.is_participant}
+                          isLeader={e.is_leader}
+                          isEdit={isLeader()}
+                          state={e.state}
+                          skillQuotas={e.skill_quota}
+                          startDate={e.startDate}
+                          endDate={e.endDate}
+                          skillsUser={skills}
+                          showSuscribe={!showHistory}
+                          onDelete={reload}
+                          onSubscribe={(skillId) => handleSubscribe(id, skillId)}
+                          onViewEnrolled={() => assistants.openForEvent(e.id ?? "")}
+                      />
                   );
                 })}
 
