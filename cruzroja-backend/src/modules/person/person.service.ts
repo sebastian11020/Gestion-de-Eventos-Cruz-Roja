@@ -184,14 +184,28 @@ export class PersonService {
       });
     }
     const aux = await persons.getMany();
-    console.log(aux);
+    const peopleWithoutRoles = aux.filter(
+      (p) => !p.person_roles || p.person_roles.length === 0,
+    );
+    console.log({
+      total: aux.length,
+
+      peopleWithoutRoles: peopleWithoutRoles.map((p) => ({
+        id: p.id,
+
+        name: p.name,
+
+        last_name: p.last_name,
+
+        person_roles: p.person_roles,
+      })),
+    });
     return this.mapEntityToDto(aux);
   }
 
   mapEntityToDto(persons: Person[]): Promise<GetPersons[]> {
     return Promise.all(
       persons.map(async (p) => {
-        console.log(p.name, p.last_name);
         const dto = new GetPersons();
         dto.id = p.id;
         dto.typeDocument = p.type_document;
