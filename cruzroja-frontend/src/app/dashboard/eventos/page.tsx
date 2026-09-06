@@ -208,9 +208,11 @@ export default function EventosPage() {
                   const id =
                     (e as EventType).id ?? String((page - 1) * PAGE_SIZE + idx);
                   if (e.is_private){
+                    if (!isLeader()){
                       if(!e.is_leader || !e.is_participant){
-                          return;
+                        return;
                       }
+                    }
                   }
                   return (
                       <EventCard
