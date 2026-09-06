@@ -10,7 +10,7 @@ import {
   UserRoundCog,
   CalendarClock,
   MapPin,
-  Users,
+  Users, AlertTriangle,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { updateEventService } from "@/services/serviceGetEvent";
@@ -20,6 +20,7 @@ import { Department } from "@/types/sedesType";
 import { cities } from "@/components/volunteer/constants";
 import { useEventQr } from "@/hooks/useEventQr";
 import { useEventData } from "@/hooks/useEventData";
+import {useDepartments} from "@/hooks/useDepartments";
 
 type SkillOption = { id: string; name: string };
 type SkillQuota = { id: string; name?: string; quantity: number };
@@ -106,18 +107,13 @@ export function EditEventDialog({
   const [saving, setSaving] = useState(false);
   const [leaderModalOpen, setLeaderModalOpen] = useState(false);
   const [leaderName, setLeaderName] = useState(initialLeaderName);
-  const { departments } = useEventData();
+  const { departments } = useDepartments();
   const departmentSelected = useMemo(
       () => departments.find((d) => d.id === form.department) || null,
       [departments, form.department],
   );
   const citiesOptions: cities[] = departmentSelected?.children ?? [];
 
-  // Solo resincronizamos el formulario cuando el modal PASA de cerrado a
-  // abierto. Antes, el efecto dependía de `normalizedInitial`/`initialLeaderName`
-  // y se volvía a disparar con cualquier re-render del padre mientras el
-  // modal seguía abierto, pisando `leaderName` (y el resto del form) con los
-  // valores originales -> por eso el líder "desaparecía" del input.
   const wasOpenRef = useRef(false);
   useEffect(() => {
     if (open && !wasOpenRef.current) {
@@ -125,14 +121,8 @@ export function EditEventDialog({
       setLeaderName(initialLeaderName);
     }
     wasOpenRef.current = open;
-    // Intencionalmente NO incluimos normalizedInitial/initialLeaderName:
-    // solo nos importa el momento en que `open` pasa a true.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  // Fallback: si por algún motivo no llegó `initialLeaderName` (o llega
-  // vacío) pero sí tenemos un `attendant` con id, buscamos el nombre en la
-  // lista de usuarios para no mostrar "Sin líder seleccionado" quedando mal.
   const resolvedLeaderName = useMemo(() => {
     if (leaderName) return leaderName;
     if (!form.attendant) return "";
@@ -174,11 +164,25 @@ export function EditEventDialog({
   }
   function setQuotaQty(index: number, qty: number) {
     setForm((f) => {
+      const cap = Number(f.capacity) || 0;
+      const assignedWithoutThis = f.skill_quota.reduce(
+          (sum, q, i) => (i === index ? sum : sum + (Number.isFinite(q.quantity) ? q.quantity : 0)),
+          0,
+      );
+      const maxAllowed = Math.max(0, cap - assignedWithoutThis);
+      const clamped = Math.min(Math.max(0, qty), maxAllowed);
+
       const next = [...f.skill_quota];
-      next[index] = { ...next[index], quantity: qty < 0 ? 0 : qty };
+      next[index] = { ...next[index], quantity: clamped };
       return { ...f, skill_quota: next };
     });
   }
+
+  const totalQuota = useMemo(
+      () => form.skill_quota.reduce((a, q) => a + (Number.isFinite(q.quantity) ? q.quantity : 0), 0),
+      [form.skill_quota],
+  );
+  const overCapacity = totalQuota > (Number(form.capacity) || 0);
 
   const duplicatedSkill = useMemo(() => {
     const ids = form.skill_quota.map((s) => s.id).filter(Boolean);
@@ -207,6 +211,11 @@ export function EditEventDialog({
       toast.error("Hay habilidades repetidas en los cupos.");
       return;
     }
+    if (overCapacity) {
+      toast.error("La suma de cupos por habilidad no puede superar el cupo total.");
+      return;
+    }
+
     if (!hasLeader) {
       toast.error("Debes seleccionar un encargado/líder antes de guardar.");
       return;
@@ -480,21 +489,24 @@ export function EditEventDialog({
 
           {/* Cupos por habilidad */}
           <fieldset className="rounded-3xl border border-white/20 bg-gradient-to-br from-white/80 to-white/60 backdrop-blur-xl shadow-xl shadow-black/5 ring-1 ring-black/5 overflow-hidden">
-            <div className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-slate-50/70 to-transparent border-b border-white/30">
-              <div className="inline-flex items-center gap-2">
-              <span className="inline-flex size-8 items-center justify-center rounded-2xl bg-slate-700 text-white shadow">
-                %
-              </span>
+            <div className="border-b border-white/30 bg-gradient-to-r from-slate-50/70 to-transparent">
+              <div className="flex items-center gap-2 px-4 py-3">
+      <span className="inline-flex size-8 items-center justify-center rounded-2xl bg-slate-700 text-white shadow">
+        %
+      </span>
                 <h3 className="text-sm font-semibold text-gray-800">
                   Cupos por habilidad
                 </h3>
+                {form.skill_quota.length > 0 && (
+                    <span className="ml-auto text-[11px] text-gray-600">
+          Total filas:{" "}
+                      <span className="font-semibold">{form.skill_quota.length}</span>
+        </span>
+                )}
               </div>
-              {form.skill_quota.length > 0 && (
-                  <span className="ml-auto text-[11px] text-gray-600">
-                Total filas:{" "}
-                    <span className="font-semibold">{form.skill_quota.length}</span>
-              </span>
-              )}
+              <p className="px-4 pb-3 text-xs text-gray-500">
+                La suma de cupos por habilidad no puede superar el cupo total del evento ({Number(form.capacity) || 0}).
+              </p>
             </div>
 
             <div className="p-4 sm:p-6">
@@ -529,9 +541,7 @@ export function EditEventDialog({
                                 min={0}
                                 disabled={disabled}
                                 value={row.quantity}
-                                onChange={(e) =>
-                                    setQuotaQty(idx, Number(e.target.value))
-                                }
+                                onChange={(e) => setQuotaQty(idx, Number(e.target.value))}
                                 className={`${inputBase} h-11 rounded-xl border-gray-300 bg-white/80 focus:ring-4 focus:ring-slate-200/70`}
                                 placeholder="Cupos"
                             />
@@ -552,10 +562,19 @@ export function EditEventDialog({
               )}
 
               {duplicatedSkill && (
-                  <p className="mt-3 text-xs text-amber-800 bg-amber-50/80 border border-amber-200 rounded-2xl p-2.5">
-                    Hay habilidades repetidas. Selecciona cada habilidad una sola
-                    vez.
-                  </p>
+                  <div className="mt-3 flex items-start gap-2 rounded-2xl border border-amber-200 bg-amber-50/80 p-3 text-xs text-amber-800">
+                    <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+                    <p>Hay habilidades repetidas. Selecciona cada habilidad una sola vez.</p>
+                  </div>
+              )}
+
+              {overCapacity && (
+                  <div className="mt-3 flex items-start gap-2 rounded-2xl border border-red-200 bg-red-50/80 p-3 text-xs text-red-800">
+                    <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
+                    <p>
+                      La suma de cupos por habilidad (<span className="font-semibold">{totalQuota}</span>) supera el cupo total (<span className="font-semibold">{form.capacity || 0}</span>).
+                    </p>
+                  </div>
               )}
             </div>
           </fieldset>
