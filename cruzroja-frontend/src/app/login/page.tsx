@@ -27,8 +27,7 @@ export default function LoginCR() {
         setErr(null);
 
         try {
-            const sb = supabase();
-            const { data, error } = await sb.auth.signInWithPassword({
+            const { data, error } = await supabase.auth.signInWithPassword({
                 email: loginData.email,
                 password: loginData.password,
             });

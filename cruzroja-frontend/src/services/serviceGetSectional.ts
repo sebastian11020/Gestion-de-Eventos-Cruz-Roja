@@ -3,22 +3,19 @@
 import axios from "axios";
 import { supabase } from "@/lib/supabase-browser";
 
-const sb = supabase();
 
-// 🔹 Helper: obtiene el token actual de Supabase
 async function getAccessToken() {
   const {
     data: { session },
-  } = await sb.auth.getSession();
+  } = await supabase.auth.getSession();
   return session?.access_token ?? null;
 }
 
-// 🔹 Helper: arma los headers de autenticación
 function authHeaders(token: string | null) {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
-// 🔹 Servicio: obtener todas las seccionales
+
 export async function getSectionalService() {
   try {
     const token = await getAccessToken();

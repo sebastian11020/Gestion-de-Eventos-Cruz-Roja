@@ -1,37 +1,33 @@
 "use client";
+
 import { useEffect } from "react";
 import { supabase } from "@/lib/supabase-browser";
 
 export default function SupabaseSessionWatcher() {
-  if (
-    typeof window !== "undefined" &&
-    (window as any).__MUTE_AUTH_EVENTS === undefined
-  ) {
-    (window as any).__MUTE_AUTH_EVENTS = false;
-  }
-
   useEffect(() => {
-    const { data: listener } = supabase().auth.onAuthStateChange(
-      (event, session) => {
-        if ((window as any).__MUTE_AUTH_EVENTS) return;
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if ((window as any).__MUTE_AUTH_EVENTS) return;
 
-        const id = session?.user?.id ?? null;
-        const token = session?.access_token ?? null;
+      const id = session?.user?.id ?? null;
 
-        if (event === "SIGNED_IN") {
-          if (id) localStorage.setItem("supabase_uid", id);
+      if (event === "SIGNED_IN") {
+        if (id) {
+          localStorage.setItem("supabase_uid", id);
         }
+      }
 
-        if (event === "TOKEN_REFRESHED" && token) {
-        }
+      if (event === "SIGNED_OUT") {
+        localStorage.removeItem("supabase_uid");
+      }
+    });
 
-        if (event === "SIGNED_OUT") {
-          localStorage.removeItem("supabase_uid");
-        }
-      },
-    );
-    return () => listener.subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   return null;
 }
+

@@ -40,10 +40,9 @@ export default function ProfilePage() {
     (async () => {
       try {
         setLoading(true);
-        const sb = supabase();
         const {
           data: { session },
-        } = await sb.auth.getSession();
+        } = await supabase.auth.getSession();
 
         const token = session?.access_token;
         if (!token) {
@@ -80,10 +79,9 @@ export default function ProfilePage() {
     e.preventDefault();
     try {
       setSaving(true);
-      const sb = supabase();
       const {
         data: { session },
-      } = await sb.auth.getSession();
+      } = await supabase.auth.getSession();
       const token = session?.access_token;
       if (!token) throw new Error("Sesión no válida");
       if (!cityId) {

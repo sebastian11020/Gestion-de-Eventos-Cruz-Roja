@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useMemo, useState } from "react";
 import VolunteerWizard from "@/components/forms/formCreateUser";
 import { Eye, PencilLine } from "lucide-react";
-import { formCreatePerson, FormState, sectional } from "@/types/usertType";
+import { formCreatePerson, FormState } from "@/types/usertType";
 import ViewUser from "@/components/cards/viewUser";
 import { supabase } from "@/lib/supabase-browser";
 import { generatePassword } from "@/utils/generatePassword";
@@ -71,11 +71,10 @@ export default function Voluntarios() {
 
   async function register(form: formCreatePerson) {
     const password = generatePassword(12);
-    const sb = supabase();
-    const { data: before } = await sb.auth.getSession();
+    const { data: before } = await supabase.auth.getSession();
     const prev = before.session;
     (window as any).__MUTE_AUTH_EVENTS = true;
-    const { data, error } = await sb.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email: form.email,
       password,
     });
@@ -88,12 +87,12 @@ export default function Voluntarios() {
 
     const newUserId = data.user?.id ?? null;
     if (prev) {
-      await sb.auth.setSession({
+      await supabase.auth.setSession({
         access_token: prev.access_token,
         refresh_token: prev.refresh_token,
       });
     } else {
-      await sb.auth.signOut();
+      await supabase.auth.signOut();
     }
     (window as any).__MUTE_AUTH_EVENTS = false;
     return { id: newUserId, password };

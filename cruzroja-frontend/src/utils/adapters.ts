@@ -1,4 +1,5 @@
 import type { formCreatePerson, FormState, skill } from "@/types/usertType";
+import {EPS_TYPES} from "@/const/consts";
 type Legacy = FormState;
 
 function toIdArray(skills?: skill[]): string[] {
@@ -17,7 +18,8 @@ export function toFormCreatePerson(u: Legacy): formCreatePerson {
   const id_group = u.group?.id ? String(u.group.id) : "";
   const id_program = u.group?.program?.id ? String(u.group.program.id) : "";
   const id_eps = u.eps?.id ? String(u.eps.id) : "";
-  const type_affiliation = u.eps?.type ?? "";
+  const rawAffiliation = (u.eps?.type ?? "").toString().trim().toUpperCase();
+  const type_affiliation = EPS_TYPES.includes(rawAffiliation) ? rawAffiliation : "";
 
   const skillIds = toIdArray(u.skills);
 
