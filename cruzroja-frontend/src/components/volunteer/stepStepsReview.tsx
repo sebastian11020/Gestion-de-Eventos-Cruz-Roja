@@ -12,37 +12,62 @@ export function StepReview({
   cityMap: Map<string, string>;
   epsMap: Map<string, string> | undefined;
 }) {
-  const { sectionals, skills } = useSectionalsNode();
-  const sectionalMap = new Map<string, string>();
-  sectionals.forEach((s) => sectionalMap.set(String(s.id), s.city));
-  const { state } = useSectionalsNode();
+  const { sectionals, skills, state } = useSectionalsNode();
 
-  const stateMap = new Map<string, string>();
-  state.forEach((s) => stateMap.set(String(s.id), s.name));
-
-  const groupMap = new Map<string, string>();
-  sectionals.forEach((s) =>
-    s.groups.forEach((g) => groupMap.set(g.id, g.name)),
+  const safeSectionals = useMemo(
+      () => (Array.isArray(sectionals) ? sectionals : []),
+      [sectionals],
+  );
+  const safeState = useMemo(
+      () => (Array.isArray(state) ? state : []),
+      [state],
+  );
+  const safeSkills = useMemo(
+      () => (Array.isArray(skills) ? skills : []),
+      [skills],
   );
 
-  const programMap = new Map<string, string>();
-  sectionals.forEach((s) =>
-    s.groups?.forEach((g) =>
-      g.program?.forEach((p) => programMap.set(p.id, p.name)),
-    ),
-  );
+  const sectionalMap = useMemo(() => {
+    const m = new Map<string, string>();
+    safeSectionals.forEach((s) => m.set(String(s.id), s.city));
+    return m;
+  }, [safeSectionals]);
+
+  const stateMap = useMemo(() => {
+    const m = new Map<string, string>();
+    safeState.forEach((s) => m.set(String(s.id), s.name));
+    return m;
+  }, [safeState]);
+
+  const groupMap = useMemo(() => {
+    const m = new Map<string, string>();
+    safeSectionals.forEach((s) =>
+        s.groups?.forEach((g: any) => m.set(g.id, g.name)),
+    );
+    return m;
+  }, [safeSectionals]);
+
+  const programMap = useMemo(() => {
+    const m = new Map<string, string>();
+    safeSectionals.forEach((s) =>
+        s.groups?.forEach((g: any) =>
+            g.program?.forEach((p: any) => m.set(p.id, p.name)),
+        ),
+    );
+    return m;
+  }, [safeSectionals]);
 
   const skillsMap = useMemo(() => {
     const m = new Map<string, string>();
-    (skills ?? []).forEach((s) => m.set(String(s.id), s.name ?? ""));
+    safeSkills.forEach((s) => m.set(String(s.id), s.name ?? ""));
     return m;
-  }, [skills]);
+  }, [safeSkills]);
 
   const selectedSkillNames = useMemo(() => {
     const ids: string[] = Array.isArray(form.skills) ? form.skills : [];
     return ids
-      .map((id) => skillsMap.get(String(id)))
-      .filter((n): n is string => !!n && n.length > 0);
+        .map((id) => skillsMap.get(String(id)))
+        .filter((n): n is string => !!n && n.length > 0);
   }, [form.skills, skillsMap]);
 
   return (
