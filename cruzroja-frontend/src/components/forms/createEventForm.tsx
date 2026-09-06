@@ -19,6 +19,7 @@ import { useEventData } from "@/hooks/useEventData";
 import toast from "react-hot-toast";
 import { createEventService } from "@/services/serviceGetEvent";
 import { cities } from "@/components/volunteer/constants";
+import {useSkillsCatalog} from "@/hooks/useSkillsCatalog";
 
 export type CityOption = {
   id: string;
@@ -44,7 +45,7 @@ export default function CreateEventForm({
   const [openPicker, setOpenPicker] = useState(false);
   const [openChangeLeader, setOpenChangeLeader] = useState(false);
 
-  const { skills } = useSectionalsNode();
+  const { skills } = useSkillsCatalog();
 
   const {
     scopes,
