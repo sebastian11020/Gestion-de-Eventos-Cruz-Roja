@@ -177,29 +177,16 @@ export class PersonService {
       .leftJoinAndSelect('p.person_skills', 'skills', 'skills.state = true')
       .leftJoinAndSelect('skills.skill', 'skill')
       .leftJoinAndSelect('groups.group', 'group')
-      .leftJoinAndSelect('programs.program', 'program');
+      .leftJoinAndSelect('programs.program', 'program')
+      .where(' current_role.id_role != :excludedRoleId', {
+        excludedRoleId: 6,
+      });
     if (2 === person.person_roles[0].role.id) {
       persons.where('headquarters.id = :id', {
         id: person.person_roles[0].headquarters.id,
       });
     }
     const aux = await persons.getMany();
-    const peopleWithoutRoles = aux.filter(
-      (p) => !p.person_roles || p.person_roles.length === 0,
-    );
-    console.log({
-      total: aux.length,
-
-      peopleWithoutRoles: peopleWithoutRoles.map((p) => ({
-        id: p.id,
-
-        name: p.name,
-
-        last_name: p.last_name,
-
-        person_roles: p.person_roles,
-      })),
-    });
     return this.mapEntityToDto(aux);
   }
 
@@ -439,6 +426,7 @@ export class PersonService {
         },
       });
       await this.associateStatus(manager, id, dto.id_state);
+      /*
       await this.checkCurrentRolePerson(
         manager,
         id,
@@ -447,6 +435,7 @@ export class PersonService {
         dto.id_group,
         dto.id_program,
       );
+       */
       await this.associateEps(manager, id, dto.id_eps, dto.type_affiliation);
       await this.associateSkills(manager, dto.skills, id);
       return { success: true, message: 'Persona actualizada exitosamente.' };
@@ -489,6 +478,7 @@ export class PersonService {
     const currentEps = await this.epsPersonService.findByIds(id_person, id_eps);
     if (currentEps) {
       if (affiliation != currentEps.affiliation) {
+        await this.closeEpsPerson(manager, id_person);
         await manager.update(
           EpsPerson,
           { id_eps, id_person },
@@ -499,13 +489,14 @@ export class PersonService {
         );
       } else {
         if (!currentEps.state) {
+          await this.closeEpsPerson(manager, id_person);
           await manager.update(EpsPerson, currentEps.id_eps, {
             state: true,
           });
         }
       }
     } else {
-      await this.closeEpsPerson(manager, id_eps, id_person);
+      await this.closeEpsPerson(manager, id_person);
       const dto = new CreateEpsPersonDTO();
       dto.id_person = id_person;
       dto.id_eps = id_eps;
@@ -514,14 +505,10 @@ export class PersonService {
     }
   }
 
-  private async closeEpsPerson(
-    manager: EntityManager,
-    id_eps: number,
-    id_person: string,
-  ) {
+  private async closeEpsPerson(manager: EntityManager, id_person: string) {
     await manager.update(
       EpsPerson,
-      { id_person, id_eps },
+      { id_person, state: true },
       {
         state: false,
       },

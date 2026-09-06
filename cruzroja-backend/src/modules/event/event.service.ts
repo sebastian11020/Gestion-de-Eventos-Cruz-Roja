@@ -133,6 +133,7 @@ export class EventService {
         description: NormalizeString(dto.description),
         start_date: dto.startDate,
         estimated_end_date: dto.endDate,
+        max_volunteers: dto.capacity,
         location: {
           id: dto.location,
         },
