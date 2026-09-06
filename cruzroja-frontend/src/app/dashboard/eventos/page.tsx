@@ -91,7 +91,7 @@ export default function EventosPage() {
   }, [showHistory, roleFilter]);
 
   function isLeader() {
-    const leaderRoles = ["LIDER SECCIONAL", "LIDER SEDE", "ADMINISTRADOR"];
+    const leaderRoles = ["LIDER VOLUNTARIADO", "LIDER SEDE", "ADMINISTRADOR"];
     return leaderRoles.includes(role ?? "");
   }
 
@@ -208,9 +208,11 @@ export default function EventosPage() {
                   const id =
                     (e as EventType).id ?? String((page - 1) * PAGE_SIZE + idx);
                   if (e.is_private){
+                    if (!isLeader()){
                       if(!e.is_leader || !e.is_participant){
-                          return;
+                        return;
                       }
+                    }
                   }
                   return (
                       <EventCard
@@ -287,6 +289,8 @@ export default function EventosPage() {
         open={assistants.open}
         onClose={() => assistants.setOpen(false)}
         assistants={assistants.assistants}
+        isLeader={isLeader()}
+        showHistory={showHistory}
         loading={assistants.loading}
         onRemove={(doc) => assistants.remove(doc)}
         title="Asistentes del evento"

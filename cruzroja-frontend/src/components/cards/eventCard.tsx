@@ -83,8 +83,13 @@ export function EventCard({
   const hasQuotas = Array.isArray(skillQuotas) && skillQuotas.length > 0;
 
   const [editOpen, setEditOpen] = useState(false);
+
   const canEdit =
-    !inHistory && (!flags.isOngoing || (flags.isOngoing && isEdit));
+      isLeader &&
+      !inHistory &&
+      (!flags.isOngoing || (flags.isOngoing && isEdit))
+       || isEdit;
+
   const { users } = useEventData();
 
   const [confirmOpen, setConfirmOpen] = useState(false);

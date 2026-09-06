@@ -21,12 +21,12 @@ export function EventActions({
   showSuscribe: boolean;
   onSubscribe: () => void;
   onCancel: () => Promise<void> | void;
-  onViewEnrolled: () => void; // soportado como sync o async
+  onViewEnrolled: () => void;
   openStartQr: () => void;
   openEndQr: () => void;
 }) {
   const { isOngoing } = flags;
-  const [loadingEnrolled, setLoadingEnrolled] = useState(false); // ⬅️ nuevo
+  const [loadingEnrolled, setLoadingEnrolled] = useState(false);
 
   function handleSubscribeClick() {
     if (isOngoing) {
@@ -36,7 +36,6 @@ export function EventActions({
     onSubscribe();
   }
 
-  // ⬅️ nuevo: wrapper que muestra el loading mientras se obtiene la lista
   async function handleViewEnrolledClick() {
     try {
       setLoadingEnrolled(true);

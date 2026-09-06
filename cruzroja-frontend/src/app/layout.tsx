@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import SupabaseSessionWatcher from "@/lib/supabase-session";
+import { Analytics } from '@vercel/analytics/next';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -43,6 +44,7 @@ export default function RootLayout({
         <Toaster position="top-right" reverseOrder={false} />
         <SupabaseSessionWatcher />
         <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );

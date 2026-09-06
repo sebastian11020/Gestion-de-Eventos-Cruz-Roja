@@ -8,15 +8,12 @@ import {
   ParseIntPipe,
   Post,
   Put,
-  UseGuards,
 } from '@nestjs/common';
 import { HeadquartersService } from './headquarters.service';
 import { CreateHeadquartersDto } from './dto/create-headquarters.dto';
 import { ChangeLeaderHeadquartersDto } from './dto/change-leader-headquarters.dto';
-import { SupabaseAuthGuard } from '../../common/config/guards/supabase-auth.guard';
 
 @Controller('headquarters')
-@UseGuards(SupabaseAuthGuard)
 export class HeadquartersController {
   constructor(private headquartersService: HeadquartersService) {}
 
