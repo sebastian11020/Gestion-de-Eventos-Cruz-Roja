@@ -39,7 +39,6 @@ export default function CreateEventForm({
 }) {
   const [loading, setLoading] = useState(false);
 
-  // Bloquea múltiples envíos aunque el usuario haga doble clic rápidamente
   const submittingRef = useRef(false);
 
   const [openPicker, setOpenPicker] = useState(false);
@@ -150,17 +149,14 @@ export default function CreateEventForm({
   ) {
     e.preventDefault();
 
-    // Evita doble/triple envío
     if (submittingRef.current) {
       return;
     }
 
-    // Validación básica
     if (!form.name) {
       return;
     }
 
-    // Bloquear inmediatamente el formulario
     submittingRef.current = true;
     setLoading(true);
 
