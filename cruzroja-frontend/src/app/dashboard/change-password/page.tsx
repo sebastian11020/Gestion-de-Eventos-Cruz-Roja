@@ -32,8 +32,7 @@ export default function ChangePasswordPage() {
   useEffect(() => {
     (async () => {
       try {
-        const sb = supabase();
-        const { data } = await sb.auth.getUser();
+        const { data } = await supabase.auth.getUser();
         const userEmail = data.user?.email ?? "";
         if (!userEmail) {
           toast.error("Tu sesión expiró. Vuelve a iniciar sesión.");
@@ -49,8 +48,6 @@ export default function ChangePasswordPage() {
       }
     })();
   }, [router]);
-
-  // Validación simple de robustez
   function validatePassword(pw: string) {
     const issues: string[] = [];
     if (pw.length < 8) issues.push("Debe tener al menos 8 caracteres.");
@@ -65,24 +62,19 @@ export default function ChangePasswordPage() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setErr(null);
-
-    // Validaciones rápidas
     if (!currentPw) return setErr("Ingresa tu contraseña actual.");
     if (!newPw) return setErr("Ingresa la nueva contraseña.");
     if (newPw !== confirmPw) return setErr("La confirmación no coincide.");
 
     const strength = validatePassword(newPw);
     if (strength.length > 0) {
-      setErr(strength[0]); // muestra el 1er problema encontrado
+      setErr(strength[0]);
       return;
     }
 
     setSubmitting(true);
     try {
-      const sb = supabase();
-
-      // 1) Re-autenticar para verificar current password
-      const { error: reauthError } = await sb.auth.signInWithPassword({
+      const { error: reauthError } = await supabase.auth.signInWithPassword({
         email,
         password: currentPw,
       });
@@ -90,13 +82,13 @@ export default function ChangePasswordPage() {
         setErr("La contraseña actual es incorrecta.");
         return;
       }
-      const { error: updError } = await sb.auth.updateUser({ password: newPw });
+      const { error: updError } = await supabase.auth.updateUser({ password: newPw });
       if (updError) {
         setErr(updError.message || "No se pudo actualizar la contraseña.");
         return;
       }
       toast.success("Contraseña actualizada. Vuelve a iniciar sesión.");
-      await sb.auth.signOut();
+      await supabase.auth.signOut();
       localStorage.removeItem("role"); // si la usas para el menú
       await fetch("/api/session", { method: "DELETE" }).catch(() => {});
       router.replace("/login");

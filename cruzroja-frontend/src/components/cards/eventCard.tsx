@@ -20,7 +20,6 @@ import { useSectionalsNode } from "@/hooks/useSectionalsNode";
 import { EditEventDialog } from "@/components/events/EditEventsDialog";
 import { Button } from "@/components/ui/button";
 import { useEventData } from "@/hooks/useEventData";
-import { cities } from "@/components/volunteer/constants";
 
 type Props = {
   id: string;

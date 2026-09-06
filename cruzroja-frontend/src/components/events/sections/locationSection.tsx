@@ -6,6 +6,7 @@ import type { CreateEventForm } from "@/types/usertType";
 import type { GroupNode, SectionalNode } from "@/types/programType";
 import { Department } from "@/types/sedesType";
 import { CityOption } from "@/components/forms/createEventForm";
+import {SearchableSelect} from "@/components/layout/searchableSelect";
 
 export function LocationSection({
   form,
@@ -36,36 +37,22 @@ export function LocationSection({
     >
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Departamento" icon={<Landmark className="w-4 h-4" />}>
-          <select
-            required
-            onChange={(e) => onChangeDepartment(e.target.value)}
-            value={form.department}
-            className="w-full rounded-2xl  px-2 py-2 text-sm focus:outline-none"
-          >
-            <option value="">Seleccione…</option>
-            {departments.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.name}
-              </option>
-            ))}
-          </select>
+          <SearchableSelect
+              value={form.department}
+              options={departments}
+              onChange={onChangeDepartment}
+              placeholder="Escriba para buscar…"
+          />
         </Field>
 
         <Field label="Municipio" icon={<Building2 className="w-4 h-4" />}>
-          <select
-            required
-            value={form.city}
-            disabled={!form.department}
-            onChange={(e) => onChange("city", e.target.value)}
-            className="w-full rounded-2xl bg-white px-2 py-2 text-sm focus:outline-none"
-          >
-            <option value="">Seleccione…</option>
-            {cityOptions.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.name}
-              </option>
-            ))}
-          </select>
+          <SearchableSelect
+              value={form.city}
+              options={cityOptions}
+              onChange={(v) => onChange("city", v)}
+              disabled={!form.department}
+              placeholder={form.department ? "Escriba para buscar…" : "Elija departamento primero"}
+          />
         </Field>
 
         <Field label="Dirección">

@@ -63,12 +63,10 @@ export default function ResetPasswordPage() {
     usePageTitle("Recuperar contraseña");
 
   useEffect(() => {
-    const sb = supabase();
-
     async function ensureRecoverySession() {
       const {
         data: { session },
-      } = await sb.auth.getSession();
+      } = await supabase.auth.getSession();
       if (session) {
         setReady(true);
         return;
@@ -80,7 +78,7 @@ export default function ResetPasswordPage() {
       const type = hashParams.get("type");
 
       if (type === "recovery" && access_token && refresh_token) {
-        const { error } = await sb.auth.setSession({
+        const { error } = await supabase.auth.setSession({
           access_token,
           refresh_token,
         });
@@ -97,7 +95,7 @@ export default function ResetPasswordPage() {
 
       const code = new URLSearchParams(window.location.search).get("code");
       if (code) {
-        const { error } = await sb.auth.exchangeCodeForSession(code);
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
         if (!error) {
           const url = new URL(window.location.href);
           url.searchParams.delete("code");
@@ -122,11 +120,10 @@ export default function ResetPasswordPage() {
 
     setLoading(true);
     try {
-      const sb = supabase();
-      const { error } = await sb.auth.updateUser({ password: pw });
+      const { error } = await supabase.auth.updateUser({ password: pw });
       if (error) throw error;
 
-      await sb.auth.signOut();
+      await supabase.auth.signOut();
       toast.success(
         "Contraseña actualizada. Inicia sesión con tu nueva clave.",
       );

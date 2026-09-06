@@ -221,12 +221,9 @@ export function ReadQrDialog({
                 toast.error("QR inválido");
                 return;
               }
-
-              const sb = supabase();
-
               const {
                 data: { session },
-              } = await sb.auth.getSession();
+              } = await supabase.auth.getSession();
 
               if (
                   !session?.access_token ||

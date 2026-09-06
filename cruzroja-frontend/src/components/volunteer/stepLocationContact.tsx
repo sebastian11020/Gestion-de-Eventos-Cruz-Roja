@@ -6,6 +6,7 @@ import {
   type ProgramItem,
 } from "@/types/programType";
 import { useMemo } from "react";
+import { SearchableSelect } from "@/components/volunteer/searchableSelect";
 
 export function StepLocationContact({
   form,
@@ -50,39 +51,13 @@ export function StepLocationContact({
         <label className={labelBase}>
           Ciudad / Municipio <span className="text-red-500">*</span>
         </label>
-        <div className="relative">
-          <select
+        <SearchableSelect
             name="id_location"
             value={form.id_location}
+            options={cities ?? []}
             onChange={handleChange}
-            className={`${fieldBase} appearance-none`}
-            required
-          >
-            <option value="" disabled>
-              Seleccione…
-            </option>
-            {cities?.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.name}
-              </option>
-            ))}
-          </select>
-          <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400">
-            <svg
-              className="h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 9l6 6 6-6"
-              />
-            </svg>
-          </div>
-        </div>
+            placeholder="Escriba para buscar…"
+        />
       </div>
 
       <div>

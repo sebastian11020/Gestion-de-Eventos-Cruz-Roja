@@ -4,12 +4,11 @@ import axios from "axios";
 import { createProgram } from "@/types/usertType";
 import { supabase } from "@/lib/supabase-browser";
 
-const sb = supabase();
 
 async function getAccessToken() {
   const {
     data: { session },
-  } = await sb.auth.getSession();
+  } = await supabase.auth.getSession();
   return session?.access_token ?? null;
 }
 

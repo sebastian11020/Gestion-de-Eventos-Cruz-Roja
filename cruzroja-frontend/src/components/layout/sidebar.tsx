@@ -135,14 +135,12 @@ export function AppSidebar({
 
   async function handleLogout() {
     try {
-      const sb = supabase();
-
       const {
         data: { session },
-      } = await sb.auth.getSession();
+      } = await supabase.auth.getSession();
 
       if (session) {
-        const { error } = await sb.auth.signOut();
+        const { error } = await supabase.auth.signOut();
 
         if (error) {
           console.error("Error al cerrar sesión:", error.message);
