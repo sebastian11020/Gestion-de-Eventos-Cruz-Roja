@@ -38,18 +38,19 @@ export class EventService {
 
   async create(eventForm: CreateEventForm) {
     return this.eventRepository.manager.transaction(async (manager) => {
-      let state = 8;
-      const idGroupHeadquarters =
-        await this.groupHeadquartersService.findOneById(
+      const state = 8;
+
+      const [idGroupHeadquarters, coordinatorEvent] = await Promise.all([
+        this.groupHeadquartersService.findOneById(
           eventForm.sectionalId,
           eventForm.groupId,
-        );
-      const coordinatorEvent = await manager.findOne(Person, {
-        where: {
-          document: eventForm.attendant,
-        },
-      });
+        ),
+        manager.findOne(Person, {
+          where: { document: eventForm.attendant },
+        }),
+      ]);
       assertFound(coordinatorEvent, 'No se encontro el encargado especificado');
+
       let newEvent = manager.create(EventEntity, {
         name: NormalizeString(eventForm.name),
         description: NormalizeString(eventForm.description),
@@ -62,34 +63,22 @@ export class EventService {
         is_emergency: eventForm.isEmergency,
         max_volunteers: eventForm.capacity,
         street_address: NormalizeString(eventForm.streetAddress),
-        location: {
-          id: eventForm.city,
-        },
-        scope: {
-          id: eventForm.ambit,
-        },
-        classificationEvent: {
-          id: eventForm.classification,
-        },
-        eventFrame: {
-          id: eventForm.marcActivity,
-        },
-        person: {
-          id: coordinatorEvent.id,
-        },
-        headquarters: {
-          id: eventForm.sectionalId,
-        },
-        groupHeadquarters: {
-          id: idGroupHeadquarters?.id ?? undefined,
-        },
+        location: { id: eventForm.city },
+        scope: { id: eventForm.ambit },
+        classificationEvent: { id: eventForm.classification },
+        eventFrame: { id: eventForm.marcActivity },
+        person: { id: coordinatorEvent.id },
+        headquarters: { id: eventForm.sectionalId },
+        groupHeadquarters: { id: idGroupHeadquarters?.id ?? undefined },
       });
       newEvent = await manager.save(EventEntity, newEvent);
+
       await this.enrollmentCoordinatorEvent(
         manager,
         newEvent.id,
         coordinatorEvent.id,
       );
+
       if (newEvent.is_private) {
         const participants = eventForm.participants;
         assert(
@@ -103,26 +92,17 @@ export class EventService {
         }
 
         await this.assignSkillQuota(manager, newEvent.id, [
-          {
-            id: 3,
-            qty: eventForm.capacity,
-          },
+          { id: 3, qty: eventForm.capacity },
         ]);
-        for (const participant of participants) {
-          let enrollment = manager.create(EventEnrollment, {
-            event: {
-              id: newEvent.id,
-            },
-            person: {
-              id: participant,
-            },
-            skill: {
-              id: 3,
-            },
-          });
-          enrollment = await manager.save(enrollment);
-        }
-        state = 8;
+
+        const enrollments = participants.map((participant) =>
+          manager.create(EventEnrollment, {
+            event: { id: newEvent.id },
+            person: { id: participant },
+            skill: { id: 3 },
+          }),
+        );
+        await manager.save(EventEnrollment, enrollments);
       } else {
         await this.assignSkillQuota(
           manager,
@@ -130,17 +110,12 @@ export class EventService {
           eventForm.skillsQuotasList,
         );
       }
-      await this.assignStatus(manager, newEvent.id, state);
-      const notification =
-        await this.notificationService.createNotificationNewEvent(
-          eventForm.name,
-        );
-      await this.sendNotification(
-        manager,
-        eventForm.sectionalId,
-        newEvent.id,
-        notification,
-      );
+
+      await this.assignStatus(manager, newEvent.id, state, true);
+
+      // const notification = await this.notificationService.createNotificationNewEvent(eventForm.name);
+      // await this.sendNotification(manager, eventForm.sectionalId, newEvent.id, notification);
+
       return { success: true, message: 'Evento creado exitosamente.' };
     });
   }
@@ -212,21 +187,20 @@ export class EventService {
     manager: EntityManager,
     id_event: number,
     id_state: number,
+    isNewEvent = false,
   ) {
-    let currentStatus =
-      await this.eventStatusService.findOneOpenStateByIdPk(id_event);
-    if (currentStatus) {
-      await manager.update(EventStatus, currentStatus.id, {
-        end_date: new Date(),
-      });
+    if (!isNewEvent) {
+      const currentStatus =
+        await this.eventStatusService.findOneOpenStateByIdPk(id_event);
+      if (currentStatus) {
+        await manager.update(EventStatus, currentStatus.id, {
+          end_date: new Date(),
+        });
+      }
     }
-    currentStatus = manager.create(EventStatus, {
-      event: {
-        id: id_event,
-      },
-      state: {
-        id: id_state,
-      },
+    const currentStatus = manager.create(EventStatus, {
+      event: { id: id_event },
+      state: { id: id_state },
       start_date: new Date(),
     });
     await manager.save(EventStatus, currentStatus);
@@ -322,20 +296,14 @@ export class EventService {
     id_event: number,
     skill_quotas: SkillQuota[],
   ) {
-    for (const skillQuotaElement of skill_quotas) {
-      await manager.save(
-        EventQuota,
-        manager.create(EventQuota, {
-          skill: {
-            id: skillQuotaElement.id,
-          },
-          event: {
-            id: id_event,
-          },
-          quota: skillQuotaElement.qty,
-        }),
-      );
-    }
+    const quotas = skill_quotas.map((skillQuotaElement) =>
+      manager.create(EventQuota, {
+        skill: { id: skillQuotaElement.id },
+        event: { id: id_event },
+        quota: skillQuotaElement.qty,
+      }),
+    );
+    await manager.save(EventQuota, quotas);
   }
 
   private async changeSkillQuota(
