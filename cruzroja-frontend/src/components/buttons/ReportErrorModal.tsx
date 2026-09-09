@@ -10,6 +10,8 @@ import {
     CheckCircle2,
     AlertCircle,
     Loader2,
+    Mail,
+    Phone,
 } from "lucide-react";
 
 type ReportErrorModalProps = {
@@ -18,9 +20,9 @@ type ReportErrorModalProps = {
 };
 
 export default function ReportErrorModal({
-                                             open,
-                                             onClose,
-                                         }: ReportErrorModalProps) {
+    open,
+    onClose,
+}: ReportErrorModalProps) {
     const [state, handleSubmit, reset] = useForm("mrpzrqlg");
 
     const [pageUrl, setPageUrl] = useState("");
@@ -43,7 +45,7 @@ export default function ReportErrorModal({
 
         function handleKeyDown(event: KeyboardEvent) {
             if (event.key === "Escape") {
-                onClose();
+                handleClose();
             }
         }
 
@@ -52,7 +54,7 @@ export default function ReportErrorModal({
         return () => {
             document.removeEventListener("keydown", handleKeyDown);
         };
-    }, [open, onClose]);
+    }, [open]);
 
     useEffect(() => {
         if (!open) return;
@@ -94,16 +96,16 @@ export default function ReportErrorModal({
                 {/* Header */}
                 <div className="flex items-center justify-between bg-gradient-to-r from-blue-950 via-blue-900 to-blue-950 px-5 py-4 text-white">
                     <div className="flex items-center gap-3">
-            <span className="grid size-10 place-items-center rounded-xl bg-red-500/15 ring-1 ring-red-400/20">
-              <Bug className="size-5 text-red-300" />
-            </span>
+                        <span className="grid size-10 place-items-center rounded-xl bg-red-500/15 ring-1 ring-red-400/20">
+                            <Bug className="size-5 text-red-300" />
+                        </span>
 
                         <div>
                             <h2
                                 id="report-error-title"
                                 className="text-base font-bold"
                             >
-                                Reportar un error
+                                Reportar un problema
                             </h2>
 
                             <p className="text-xs text-blue-100/70">
@@ -124,7 +126,7 @@ export default function ReportErrorModal({
                 </div>
 
                 {/* Contenido */}
-                <div className="p-5">
+                <div className="max-h-[80vh] overflow-y-auto p-5">
                     {state.succeeded ? (
                         <div className="flex flex-col items-center py-8 text-center">
                             <div className="mb-4 grid size-16 place-items-center rounded-full bg-green-100">
@@ -149,13 +151,103 @@ export default function ReportErrorModal({
                             </button>
                         </div>
                     ) : (
-                        <form onSubmit={handleSubmit} className="space-y-5">
+                        <form
+                            onSubmit={handleSubmit}
+                            className="space-y-5"
+                        >
+                            {/* Información de contacto */}
+                            <div>
+                                <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                    Información de contacto
+                                </p>
+
+                                <div className="space-y-4">
+                                    {/* Correo electrónico */}
+                                    <div>
+                                        <label
+                                            htmlFor="report-email"
+                                            className="mb-1.5 block text-sm font-semibold text-gray-800"
+                                        >
+                                            Correo electrónico
+                                            <span className="ml-1 text-red-500">
+                                                *
+                                            </span>
+                                        </label>
+
+                                        <div className="relative">
+                                            <Mail className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
+
+                                            <input
+                                                id="report-email"
+                                                type="email"
+                                                name="email"
+                                                required
+                                                placeholder="ejemplo@correo.com"
+                                                autoComplete="email"
+                                                className="w-full rounded-xl border border-gray-300 bg-gray-50 py-2.5 pl-10 pr-3.5 text-sm text-gray-900 outline-none transition-all placeholder:text-gray-400 focus:border-blue-600 focus:bg-white focus:ring-2 focus:ring-blue-600/20"
+                                            />
+                                        </div>
+
+                                        <ValidationError
+                                            prefix="Correo electrónico"
+                                            field="email"
+                                            errors={state.errors}
+                                            className="mt-1 text-xs text-red-600"
+                                        />
+
+                                        <p className="mt-1 text-xs text-gray-400">
+                                            Utilizaremos este correo para
+                                            identificarte y contactarte si
+                                            necesitamos más información.
+                                        </p>
+                                    </div>
+
+                                    {/* Número de contacto */}
+                                    <div>
+                                        <label
+                                            htmlFor="report-phone"
+                                            className="mb-1.5 block text-sm font-semibold text-gray-800"
+                                        >
+                                            Número de contacto
+                                            <span className="ml-1 text-xs font-normal text-gray-400">
+                                                (opcional)
+                                            </span>
+                                        </label>
+
+                                        <div className="relative">
+                                            <Phone className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
+
+                                            <input
+                                                id="report-phone"
+                                                type="tel"
+                                                name="phone"
+                                                placeholder="Ej. 300 123 4567"
+                                                autoComplete="tel"
+                                                inputMode="tel"
+                                                maxLength={20}
+                                                className="w-full rounded-xl border border-gray-300 bg-gray-50 py-2.5 pl-10 pr-3.5 text-sm text-gray-900 outline-none transition-all placeholder:text-gray-400 focus:border-blue-600 focus:bg-white focus:ring-2 focus:ring-blue-600/20"
+                                            />
+                                        </div>
+
+                                        <p className="mt-1 text-xs text-gray-400">
+                                            Solo lo utilizaremos si necesitamos
+                                            contactarte para aclarar el
+                                            problema.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Descripción del problema */}
                             <div>
                                 <label
                                     htmlFor="error-message"
                                     className="mb-2 block text-sm font-semibold text-gray-800"
                                 >
                                     ¿Qué ocurrió?
+                                    <span className="ml-1 text-red-500">
+                                        *
+                                    </span>
                                 </label>
 
                                 <textarea
@@ -163,8 +255,9 @@ export default function ReportErrorModal({
                                     name="message"
                                     required
                                     minLength={5}
+                                    maxLength={2000}
                                     rows={5}
-                                    placeholder="Describe el problema que encontraste..."
+                                    placeholder="Describe el problema que encontraste. Indica qué estabas haciendo y qué ocurrió..."
                                     className="w-full resize-none rounded-xl border border-gray-300 bg-gray-50 px-3.5 py-3 text-sm text-gray-900 outline-none transition-all placeholder:text-gray-400 focus:border-blue-600 focus:bg-white focus:ring-2 focus:ring-blue-600/20"
                                 />
 
@@ -184,21 +277,24 @@ export default function ReportErrorModal({
 
                                 <div className="space-y-1.5 text-xs text-gray-600">
                                     <p>
-                    <span className="font-semibold text-gray-700">
-                      Página:
-                    </span>{" "}
-                                        <span className="break-all">{pageUrl}</span>
+                                        <span className="font-semibold text-gray-700">
+                                            Página:
+                                        </span>{" "}
+                                        <span className="break-all">
+                                            {pageUrl || "—"}
+                                        </span>
                                     </p>
 
                                     <p>
-                    <span className="font-semibold text-gray-700">
-                      Título:
-                    </span>{" "}
+                                        <span className="font-semibold text-gray-700">
+                                            Título:
+                                        </span>{" "}
                                         {pageTitle || "—"}
                                     </p>
                                 </div>
                             </div>
 
+                            {/* Datos ocultos */}
                             <input
                                 type="hidden"
                                 name="page_url"
@@ -231,6 +327,7 @@ export default function ReportErrorModal({
                                 }
                             />
 
+                            {/* Error general */}
                             {state.errors && (
                                 <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-sm text-red-700">
                                     <AlertCircle className="mt-0.5 size-4 shrink-0" />
@@ -241,12 +338,14 @@ export default function ReportErrorModal({
                                         </p>
 
                                         <p className="mt-0.5 text-xs text-red-600">
-                                            Inténtalo nuevamente en unos segundos.
+                                            Verifica la información e inténtalo
+                                            nuevamente en unos segundos.
                                         </p>
                                     </div>
                                 </div>
                             )}
 
+                            {/* Botones */}
                             <div className="flex justify-end gap-3 border-t border-gray-100 pt-4">
                                 <button
                                     type="button"
@@ -284,3 +383,4 @@ export default function ReportErrorModal({
 
     return createPortal(modal, document.body);
 }
+
