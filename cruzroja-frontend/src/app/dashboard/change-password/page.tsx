@@ -212,7 +212,7 @@ export default function ChangePasswordPage() {
                 type="submit"
                 disabled={submitting}
                 aria-busy={submitting}
-                className="w-full rounded-xl bg-gradient-to-r from-blue-700 via-blue-600 to-blue-700 hover:from-blue-800 hover:via-blue-700 hover:to-blue-800 shadow-md hover:shadow-lg focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500 text-white"
+                className="w-full rounded-xl bg-blue-700 bg-gradient-to-r from-blue-700 via-blue-600 to-blue-700 hover:from-blue-800 hover:via-blue-700 hover:to-blue-800 shadow-md hover:shadow-lg focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500 text-white"
               >
                 {submitting ? (
                   <span className="inline-flex items-center gap-2">

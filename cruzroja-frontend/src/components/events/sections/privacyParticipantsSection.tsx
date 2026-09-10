@@ -45,7 +45,7 @@ export function PrivacyParticipantsSection({
             <div className="flex gap-2">
               <button
                 type="button"
-                className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-3 py-2 text-sm text-white hover:from-blue-700 hover:to-indigo-700 disabled:opacity-60"
+                className="rounded-2xl bg-blue-600 bg-gradient-to-r from-blue-600 to-indigo-600 px-3 py-2 text-sm text-white hover:from-blue-700 hover:to-indigo-700 disabled:opacity-60"
                 disabled={!form.isPrivate}
                 onClick={onOpenPicker}
               >
@@ -57,7 +57,7 @@ export function PrivacyParticipantsSection({
 
               <button
                 type="button"
-                className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-3 py-2 text-sm text-white hover:from-blue-700 hover:to-indigo-700"
+                className="rounded-2xl bg-blue-600 bg-gradient-to-r from-blue-600 to-indigo-600 px-3 py-2 text-sm text-white hover:from-blue-700 hover:to-indigo-700"
                 onClick={onOpenChangeLeader}
               >
                 <span className="inline-flex items-center gap-2">

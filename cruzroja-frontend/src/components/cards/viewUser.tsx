@@ -83,7 +83,7 @@ export default function ViewUser({ infUser, onClose }: viewUserProps) {
       <div className="relative z-[101] w-[96vw] max-w-7xl max-h-[95vh] rounded-3xl bg-white/90 shadow-[0_10px_40px_-5px_rgba(0,0,0,0.25)] ring-1 ring-black/5  max-h-[90vh] overflow-y-auto">
         {/* header degradado */}
         <div className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 opacity-90" />
+          <div className="absolute inset-0 bg-blue-600 bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 opacity-90" />
           {/* sutil patrón */}
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.15),transparent_35%),radial-gradient(circle_at_80%_0,rgba(255,255,255,0.12),transparent_30%)]" />
           <div className="relative flex items-center justify-between px-6 py-4">

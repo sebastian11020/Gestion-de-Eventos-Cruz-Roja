@@ -8,7 +8,7 @@ export function Progress({ progress }: { progress: number }) {
       </div>
       <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
         <div
-          className="h-2 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 transition-[width] duration-300"
+          className="h-2 rounded-full bg-blue-600 bg-gradient-to-r from-blue-600 to-cyan-500 transition-[width] duration-300"
           style={{ width: `${progress}%` }}
         />
       </div>

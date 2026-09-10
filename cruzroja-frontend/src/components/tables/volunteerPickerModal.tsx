@@ -56,7 +56,7 @@ export default function VolunteerPickerModal({
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4">
       <div className="w-full max-w-5xl rounded-3xl bg-white shadow-2xl ring-1 ring-black/5">
         {/* Header degradado */}
-        <div className="sticky top-0 z-10 flex items-center justify-between rounded-t-3xl bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3 text-white">
+        <div className="sticky top-0 z-10 flex items-center justify-between rounded-t-3xl bg-blue-600 bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3 text-white">
           <h3 className="text-sm font-semibold">Seleccionar voluntarios</h3>
           <button
             onClick={onClose}
@@ -218,7 +218,7 @@ export default function VolunteerPickerModal({
                 Cancelar
               </Button>
               <Button
-                className="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700"
+                className="rounded-xl bg-blue-600 bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700"
                 type="button"
                 onClick={() => onSave(selected)}
               >

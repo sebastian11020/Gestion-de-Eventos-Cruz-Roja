@@ -80,7 +80,7 @@ export default function PodiumTop({
               place="2"
               person={list[1]}
               py="py-6"
-              accent="bg-gradient-to-br from-slate-400 to-slate-600"
+              accent="bg-slate-500 bg-gradient-to-br from-slate-400 to-slate-600"
               medalColor="text-slate-100"
             />
             {/* Oro */}
@@ -89,7 +89,7 @@ export default function PodiumTop({
                 place="1"
                 person={list[0]}
                 py="py-8"
-                accent="bg-gradient-to-br from-amber-400 via-amber-500 to-orange-500"
+                accent="bg-amber-500 bg-gradient-to-br from-amber-400 via-amber-500 to-orange-500"
                 medalColor="text-yellow-100"
               />
             </div>
@@ -98,7 +98,7 @@ export default function PodiumTop({
               place="3"
               person={list[2]}
               py="py-5"
-              accent="bg-gradient-to-br from-amber-700 to-orange-800"
+              accent="bg-orange-800 bg-gradient-to-br from-amber-700 to-orange-800"
               medalColor="text-orange-100"
             />
           </div>

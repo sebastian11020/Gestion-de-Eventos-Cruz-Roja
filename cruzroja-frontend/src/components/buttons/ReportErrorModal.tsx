@@ -94,7 +94,7 @@ export default function ReportErrorModal({
                 className="w-full max-w-lg overflow-hidden rounded-2xl border border-white/10 bg-white shadow-2xl"
             >
                 {/* Header */}
-                <div className="flex items-center justify-between bg-gradient-to-r from-blue-950 via-blue-900 to-blue-950 px-5 py-4 text-white">
+                <div className="flex items-center justify-between bg-blue-950 bg-gradient-to-r from-blue-950 via-blue-900 to-blue-950 px-5 py-4 text-white">
                     <div className="flex items-center gap-3">
                         <span className="grid size-10 place-items-center rounded-xl bg-red-500/15 ring-1 ring-red-400/20">
                             <Bug className="size-5 text-red-300" />
