@@ -199,7 +199,7 @@ export default function LoginCR() {
                                 aria-busy={loading}
                                 className="
                   w-full rounded-xl
-                  bg-gradient-to-r from-blue-700 via-blue-600 to-blue-700
+                  bg-blue-700 bg-gradient-to-r from-blue-700 via-blue-600 to-blue-700
                   hover:from-blue-800 hover:via-blue-700 hover:to-blue-800
                   shadow-md hover:shadow-lg
                   focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500
