@@ -179,7 +179,7 @@ export function AppSidebar({
       <aside
         className={[
           "fixed left-0 top-0 z-50 h-screen w-64 text-white border-r border-white/10 backdrop-blur",
-          "bg-gradient-to-b from-blue-950 via-blue-900 to-blue-950",
+          "bg-blue-950 bg-gradient-to-b from-blue-950 via-blue-900 to-blue-950",
           "before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(600px_240px_at_20%_-10%,rgba(59,130,246,.18),transparent_60%),radial-gradient(500px_200px_at_100%_100%,rgba(239,68,68,.10),transparent_60%)]",
           "transition-transform duration-300 md:translate-x-0",
           open ? "translate-x-0" : "-translate-x-full md:translate-x-0",

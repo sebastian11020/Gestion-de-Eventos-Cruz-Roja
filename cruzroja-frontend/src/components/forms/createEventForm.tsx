@@ -325,7 +325,7 @@ export default function CreateEventForm({
 
           <Button
               type="submit"
-              className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+              className="rounded-2xl bg-blue-600 bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
               disabled={loading}
           >
             {loading ? "Creando..." : "Crear evento"}
