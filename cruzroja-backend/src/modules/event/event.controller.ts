@@ -7,11 +7,13 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { EventService } from './event.service';
 import { CreateEventForm } from './dto/create-event.dto';
 import { EditEventDto } from './dto/edit-event.dto';
 import { UserId } from '../../common/decorators/user.decorator';
+import { SupabaseAuthGuard } from '../../common/config/guards/supabase-auth.guard';
 
 @Controller('event')
 export class EventController {
@@ -33,6 +35,7 @@ export class EventController {
     return this.eventService.getAllDto(id_user);
   }
 
+  @UseGuards(SupabaseAuthGuard)
   @Put('/start/:id')
   async start(
     @Param('id', ParseIntPipe) id_event: number,
